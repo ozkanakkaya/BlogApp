@@ -1,5 +1,6 @@
 ﻿using BlogApp.Core.Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace BlogApp.Data
 {
@@ -24,6 +25,7 @@ namespace BlogApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());//entity configurationlarını uygular
             base.OnModelCreating(modelBuilder);
         }
     }

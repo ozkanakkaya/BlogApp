@@ -12,8 +12,6 @@
 
   <ItemGroup>
     <Folder Include="Seed\" />
-    <Folder Include="Repositories\" />
-    <Folder Include="UnitOfWork\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 
