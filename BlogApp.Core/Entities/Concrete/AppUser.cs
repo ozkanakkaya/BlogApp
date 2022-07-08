@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BlogApp.Core.Entities.Abstract;
 
-namespace BlogApp.Core.Entities
+namespace BlogApp.Core.Entities.Concrete
 {
-    public class AppUser : BaseEntity
+    public class AppUser : BaseEntity, IEntity
     {
         public string Firstname { get; set; }
 

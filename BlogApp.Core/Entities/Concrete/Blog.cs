@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BlogApp.Core.Entities.Abstract;
 
-namespace BlogApp.Core.Entities
+namespace BlogApp.Core.Entities.Concrete
 {
-    public class Blog : BaseEntity
+    public class Blog : BaseEntity, IEntity
     {
         public string Title { get; set; }
 
@@ -15,8 +11,6 @@ namespace BlogApp.Core.Entities
         public string Thumbnail { get; set; }
 
         public string ImageUrl { get; set; }
-
-        public bool Status { get; set; }
 
         public int ViewsCount { get; set; } = 0;
 

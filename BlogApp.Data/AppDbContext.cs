@@ -1,10 +1,5 @@
-﻿using BlogApp.Core.Entities;
+﻿using BlogApp.Core.Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlogApp.Data
 {
@@ -12,7 +7,7 @@ namespace BlogApp.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-                
+
         }
 
         public DbSet<About> Abouts { get; set; }
