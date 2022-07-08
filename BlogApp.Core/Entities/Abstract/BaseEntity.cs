@@ -8,9 +8,9 @@
 
         public virtual DateTime UpdatedDate { get; set; }
 
-        public virtual string CreatedByUsername { get; set; }
+        public virtual string CreatedByUsername { get; set; } = "Admin";
 
-        public virtual string UpdatedByUsername { get; set; }
+        public virtual string UpdatedByUsername { get; set; } = "Admin";
 
         public virtual bool IsDeleted { get; set; } = false;
 

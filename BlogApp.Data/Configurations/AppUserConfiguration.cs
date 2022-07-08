@@ -10,9 +10,9 @@ namespace BlogApp.Data.Configurations
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).UseIdentityColumn();
-            builder.Property(x => x.Firstname).HasMaxLength(300).IsRequired();
-            builder.Property(x => x.Lastname).HasMaxLength(300).IsRequired();
-            builder.Property(x => x.Username).HasMaxLength(300).IsRequired();
+            builder.Property(x => x.Firstname).HasMaxLength(100).IsRequired();
+            builder.Property(x => x.Lastname).HasMaxLength(100).IsRequired();
+            builder.Property(x => x.Username).HasMaxLength(100).IsRequired();
             builder.HasIndex(x => x.Username).IsUnique();//benzersiz
             builder.Property(x => x.Email).HasMaxLength(100).IsRequired();
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);

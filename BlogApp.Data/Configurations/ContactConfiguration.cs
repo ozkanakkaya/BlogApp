@@ -4,13 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BlogApp.Data.Configurations
 {
-    public class MessageConfiguration : IEntityTypeConfiguration<Message>
+    public class ContactConfiguration : IEntityTypeConfiguration<Contact>
     {
-        public void Configure(EntityTypeBuilder<Message> builder)
+        public void Configure(EntityTypeBuilder<Contact> builder)
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
-            builder.Property(x => x.Username).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.Username).HasMaxLength(100).IsRequired();
+            builder.Property(x => x.Firstname).HasMaxLength(100).IsRequired();
+            builder.Property(x => x.Lastname).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Subject).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Content).HasMaxLength(1000).IsRequired();
             builder.Property(x => x.Email).HasMaxLength(50).IsRequired();
