@@ -1,3 +1,6 @@
+using AutoMapper;
+using BlogApp.Business.Helpers;
+using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Services;
@@ -17,6 +20,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//**Mappleme
+var profiles = ProfileHelper.GetProfiles();
+var configuration = new MapperConfiguration(opt =>
+{
+    opt.AddProfiles(profiles);
+});
+var mapper = configuration.CreateMapper();
+builder.Services.AddSingleton(mapper);
+//**Mappleme
+
 builder.Services.AddDbContext<AppDbContext>(x =>
 {
     x.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"), option =>
@@ -28,6 +41,8 @@ builder.Services.AddDbContext<AppDbContext>(x =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped( typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IAppUserService, AppUserService>();
+builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
 
 var app = builder.Build();
 

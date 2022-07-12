@@ -12,9 +12,11 @@
 
   <ItemGroup>
     <Folder Include="Exeptions\" />
-    <Folder Include="Mapping\" />
     <Folder Include="Validations\" />
-    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
   </ItemGroup>
 
 </Project>
