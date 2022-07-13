@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Filter\" />
     <Folder Include="Middlewares\" />
     <Folder Include="Modules\" />
   </ItemGroup>

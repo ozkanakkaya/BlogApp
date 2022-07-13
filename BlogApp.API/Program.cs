@@ -10,16 +10,21 @@ using BlogApp.Data;
 using BlogApp.Data.Repositories;
 using BlogApp.Data.UnitOfWork;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+//builder.Services.AddControllers(options => options.Filters.Add(new ValidateFilterAttribute()));
+//builder.Services.AddControllers(options => options.Filters.Add(new ValidateFilterAttribute()))/*.AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>())*/;
 
-//builder.Services.AddControllers().AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<AppUserRegisterValidator>());
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;//apinin kendi filtresini baskýladýk(true ile)
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -44,7 +49,9 @@ builder.Services.AddDbContext<AppDbContext>(x =>
         option.MigrationsAssembly(Assembly.GetAssembly(typeof(AppDbContext)).GetName().Name);
     });
 });
-builder.Services.AddTransient<IValidator<AppUserRegisterDto>, AppUserRegisterValidator>();
+//builder.Services.AddScoped(typeof());
+//builder.Services.AddValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>();//diðer kullaným
+builder.Services.AddScoped<IValidator<AppUserRegisterDto>, AppUserRegisterDtoValidator>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
