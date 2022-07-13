@@ -1,4 +1,5 @@
 using AutoMapper;
+using BlogApp.API.Middlewares;
 using BlogApp.Business.Helpers;
 using BlogApp.Business.Services;
 using BlogApp.Business.Validations;
@@ -71,6 +72,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//app.UseCustomException();//global hata yakalama için
 
 app.UseAuthorization();
 
