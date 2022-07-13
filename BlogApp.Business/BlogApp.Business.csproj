@@ -12,11 +12,11 @@
 
   <ItemGroup>
     <Folder Include="Exeptions\" />
-    <Folder Include="Validations\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
   </ItemGroup>
 
 </Project>

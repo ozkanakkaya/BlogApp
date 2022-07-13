@@ -1,13 +1,15 @@
 using AutoMapper;
 using BlogApp.Business.Helpers;
-using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
+using BlogApp.Business.Validations;
+using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
 using BlogApp.Data;
 using BlogApp.Data.Repositories;
 using BlogApp.Data.UnitOfWork;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -16,9 +18,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+//builder.Services.AddControllers().AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<AppUserRegisterValidator>());
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 //**Mappleme
 var profiles = ProfileHelper.GetProfiles();
@@ -37,12 +44,15 @@ builder.Services.AddDbContext<AppDbContext>(x =>
         option.MigrationsAssembly(Assembly.GetAssembly(typeof(AppDbContext)).GetName().Name);
     });
 });
+builder.Services.AddTransient<IValidator<AppUserRegisterDto>, AppUserRegisterValidator>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped( typeof(IService<>), typeof(Service<>));
+builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IAppUserService, AppUserService>();
 builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+
+
 
 var app = builder.Build();
 

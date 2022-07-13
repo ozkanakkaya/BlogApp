@@ -13,7 +13,7 @@ namespace BlogApp.Data.Configurations
             builder.Property(x => x.Title).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Content).HasColumnType("NVARCHAR(MAX)").IsRequired();
             builder.Property(x => x.Thumbnail).HasMaxLength(500).IsRequired();
-            builder.Property(x => x.ImageUrl).HasMaxLength(500).IsRequired();
+            builder.Property(x => x.ImageUrl).HasMaxLength(500);
             builder.Property(x => x.IsActive).IsRequired();
             builder.Property(x => x.IsDeleted).IsRequired();
             builder.Property(a => a.CreatedByUsername).HasMaxLength(50).IsRequired();

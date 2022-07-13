@@ -1,5 +1,4 @@
 ﻿using BlogApp.Core.Utilities.Responses;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogApp.API.Controllers
