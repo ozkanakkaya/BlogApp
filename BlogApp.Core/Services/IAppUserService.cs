@@ -1,6 +1,6 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
-using BlogApp.Core.Utilities.Responses;
+using BlogApp.Core.Response;
 
 namespace BlogApp.Core.Services
 {

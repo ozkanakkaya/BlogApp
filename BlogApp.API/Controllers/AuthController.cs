@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums;
+using BlogApp.Core.Response;
 using BlogApp.Core.Services;
-using BlogApp.Core.Utilities.Responses;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +31,20 @@ namespace BlogApp.API.Controllers
             if (result.IsValid)
             {
                 var user = await _appUserService.RegisterWithRoleAsync(registerDto, (int)RoleType.Member);
-                return CreateActionResult(CustomResponse<AppUserRegisterDto>.Success(201, registerDto));
+
+                var a = user.Errors.Any();
+
+                if (user.Errors.Any())//kullanıcı adı kayıtlıysa girer
+                {
+                    user.Errors.ForEach(x =>
+                    {
+                        ModelState.AddModelError(String.Empty, x);
+                    });
+
+                    var errorsResult = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
+                    return CreateActionResult(CustomResponse<AppUserRegisterDto>.Fail(400, errorsResult));
+                }
+                return CreateActionResult(user);
             }
 
             foreach (var error in result.Errors)
@@ -42,5 +55,11 @@ namespace BlogApp.API.Controllers
 
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
+
+        //[HttpPost("[action]")]
+        //public Task<IActionResult> Login(AppUserLoginDto registerDto)
+        //{
+
+        //}
     }
 }

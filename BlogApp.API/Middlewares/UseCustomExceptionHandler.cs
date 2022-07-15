@@ -1,5 +1,5 @@
 ﻿using BlogApp.Business.Exeptions;
-using BlogApp.Core.Utilities.Responses;
+using BlogApp.Core.Response;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Text.Json;
 
@@ -21,7 +21,7 @@ namespace BlogApp.API.Middlewares
                 config.Run(async context =>
                 {
                     context.Response.ContentType = "application/json";
-                    
+
                     var exceptionFeature = context.Features.Get<IExceptionHandlerFeature>();
 
                     var statusCode = exceptionFeature.Error switch

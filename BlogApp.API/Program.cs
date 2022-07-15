@@ -1,5 +1,4 @@
 using AutoMapper;
-using BlogApp.API.Middlewares;
 using BlogApp.Business.Helpers;
 using BlogApp.Business.Services;
 using BlogApp.Business.Validations;
@@ -11,7 +10,6 @@ using BlogApp.Data;
 using BlogApp.Data.Repositories;
 using BlogApp.Data.UnitOfWork;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -22,10 +20,10 @@ builder.Services.AddControllers();
 //builder.Services.AddControllers(options => options.Filters.Add(new ValidateFilterAttribute()));
 //builder.Services.AddControllers(options => options.Filters.Add(new ValidateFilterAttribute()))/*.AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>())*/;
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.SuppressModelStateInvalidFilter = true;//apinin kendi filtresini baskýladýk(true ile)
-});
+//builder.Services.Configure<ApiBehaviorOptions>(options =>
+//{
+//    options.SuppressModelStateInvalidFilter = true;//apinin kendi filtresini baskýladýk(true ile)
+//});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -59,7 +57,6 @@ builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IAppUserService, AppUserService>();
 builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
-
 
 
 var app = builder.Build();

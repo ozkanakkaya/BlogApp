@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace BlogApp.Core.Utilities.Responses
+namespace BlogApp.Core.Response
 {
     public class CustomResponse<T>
     {
@@ -9,7 +9,7 @@ namespace BlogApp.Core.Utilities.Responses
         [JsonIgnore]//clientlar göremeyecek
         public int StatusCode { get; set; }
 
-        public List<String> Errors { get; set; }
+        public List<String> Errors { get; set; } = new List<string>();
 
 
         public static CustomResponse<T> Success(int statusCode, T data)
