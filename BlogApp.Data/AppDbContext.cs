@@ -1,4 +1,5 @@
-﻿using BlogApp.Core.Entities.Concrete;
+﻿using BlogApp.Core.Entities.Abstract;
+using BlogApp.Core.Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -22,6 +23,64 @@ namespace BlogApp.Data
         public DbSet<Contact> Contact { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<TagBlog> TagBlogs { get; set; }
+
+
+        public override int SaveChanges()
+        {
+            foreach (var item in ChangeTracker.Entries())
+            {
+                if (item.Entity is AppUser entityReference)
+                {
+                    switch (item.State)
+                    {
+                        case EntityState.Added:
+                            {
+                                entityReference.CreatedDate = DateTime.Now;
+                                entityReference.CreatedByUsername = entityReference.Username;
+                                break;
+                            }
+                        case EntityState.Modified:
+                            {
+                                Entry(entityReference).Property(x => x.CreatedDate).IsModified = false;
+                                Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
+
+                                entityReference.UpdatedDate = DateTime.Now;
+                                entityReference.CreatedByUsername = entityReference.Username;
+                                break;
+                            }
+                    }
+                }
+            }
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            foreach (var item in ChangeTracker.Entries())
+            {
+                if (item.Entity is AppUser  entityReference)
+                {
+                    switch (item.State)
+                    {
+                        case EntityState.Added:
+                            {
+                                entityReference.CreatedDate = DateTime.Now;
+                                entityReference.CreatedByUsername = entityReference.Username;
+                                break;
+                            }
+                        case EntityState.Modified:
+                            {
+                                Entry(entityReference).Property(x => x.CreatedDate).IsModified = false;
+                                Entry(entityReference).Property(x=>x.CreatedByUsername).IsModified = false;
+                                entityReference.UpdatedDate = DateTime.Now;
+                                entityReference.CreatedByUsername= entityReference.Username;
+                                break;
+                            }
+                    }
+                }
+            }
+            return base.SaveChangesAsync(cancellationToken);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
