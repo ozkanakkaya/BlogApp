@@ -1,5 +1,7 @@
 using AutoMapper;
+using BlogApp.API.Jwt;
 using BlogApp.Business.Helpers;
+using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
 using BlogApp.Business.Validations;
 using BlogApp.Core.DTOs.Concrete;
@@ -10,8 +12,11 @@ using BlogApp.Data;
 using BlogApp.Data.Repositories;
 using BlogApp.Data.UnitOfWork;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +38,7 @@ builder.Services.AddSwaggerGen();
 
 //**Mappleme
 var profiles = ProfileHelper.GetProfiles();
+profiles.Add(new AppRoleProfile());
 var configuration = new MapperConfiguration(opt =>
 {
     opt.AddProfiles(profiles);
@@ -51,13 +57,28 @@ builder.Services.AddDbContext<AppDbContext>(x =>
 //builder.Services.AddScoped(typeof());
 //builder.Services.AddValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>();//diðer kullaným
 builder.Services.AddScoped<IValidator<AppUserRegisterDto>, AppUserRegisterDtoValidator>();
+builder.Services.AddScoped<IValidator<AppUserLoginDto>, AppUserLoginDtoValidator>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IAppUserService, AppUserService>();
 builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+builder.Services.AddScoped<IAppRoleRepository, AppRoleRepository>();
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+{
+    opt.RequireHttpsMetadata = false;
+    opt.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidAudience = TokenSettings.Audience,
+        ValidIssuer = TokenSettings.Issuer,
+        ClockSkew = TimeSpan.Zero,
+        ValidateLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenSettings.Key)),
+        ValidateIssuerSigningKey = true
+    };
+});
 
 var app = builder.Build();
 
@@ -71,6 +92,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //app.UseCustomException();//global hata yakalama için
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

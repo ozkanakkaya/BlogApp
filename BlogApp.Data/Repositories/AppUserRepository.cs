@@ -8,5 +8,10 @@ namespace BlogApp.Data.Repositories
         public AppUserRepository(AppDbContext context) : base(context)
         {
         }
+
+        public AppUser GetAppUserWithLoginInfo(string username, string password)
+        {
+            return _context.AppUsers.Where(x => x.Username == username && x.Password == password)/*.Include(x=>x.AppUserRoles)*/.SingleOrDefault();
+        }
     }
 }

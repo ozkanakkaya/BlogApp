@@ -9,6 +9,8 @@ namespace BlogApp.Business.Mapping
         public AppUserProfile()
         {
             CreateMap<AppUser, AppUserRegisterDto>().ReverseMap();
+            CreateMap<AppUser, AppUserListDto>().ReverseMap();
+            CreateMap<AppUser, CheckUserResponseDto>().ReverseMap();
         }
     }
 }

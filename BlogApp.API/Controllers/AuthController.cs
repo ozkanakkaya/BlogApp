@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlogApp.API.Jwt;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums;
 using BlogApp.Core.Response;
@@ -32,17 +33,9 @@ namespace BlogApp.API.Controllers
             {
                 var user = await _appUserService.RegisterWithRoleAsync(registerDto, (int)RoleType.Member);
 
-                var a = user.Errors.Any();
-
-                if (user.Errors.Any())//kullanıcı adı kayıtlıysa girer
+                if (user.Errors.Any())//aynı kullanıcı adı kayıtlıysa girer
                 {
-                    user.Errors.ForEach(x =>
-                    {
-                        ModelState.AddModelError(String.Empty, x);
-                    });
-
-                    var errorsResult = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
-                    return CreateActionResult(CustomResponse<AppUserRegisterDto>.Fail(400, errorsResult));
+                    return CreateActionResult(CustomResponse<AppUserRegisterDto>.Fail(user.StatusCode, user.Errors));
                 }
                 return CreateActionResult(user);
             }
@@ -56,10 +49,17 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
 
-        //[HttpPost("[action]")]
-        //public Task<IActionResult> Login(AppUserLoginDto registerDto)
-        //{
-
-        //}
+        [HttpPost("[action]")]
+        public IActionResult Login(AppUserLoginDto loginDto)
+        {
+            var result = _appUserService.CheckUser(loginDto);
+            if (!result.Errors.Any())
+            {
+                var roleResult = _appUserService.GetRolesByUserId(result.Data.Id);
+                var token = TokenGenerator.GenerateToken(result.Data, roleResult.Data);
+                return Created("", token);
+            }
+            return CreateActionResult(CustomResponse<CheckUserResponseDto>.Fail(result.StatusCode, result.Errors));
+        }
     }
 }

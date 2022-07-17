@@ -7,5 +7,9 @@ namespace BlogApp.Core.Services
     public interface IAppUserService : IService<AppUser>
     {
         Task<CustomResponse<AppUserRegisterDto>> RegisterWithRoleAsync(AppUserRegisterDto dto, int roleId);
+
+        CustomResponse<CheckUserResponseDto> CheckUser(AppUserLoginDto dto);
+
+        CustomResponse<List<AppRoleListDto>> GetRolesByUserId(int userId);
     }
 }
