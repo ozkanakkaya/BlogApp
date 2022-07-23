@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
 using BlogApp.Core.DTOs.Concrete.BlogDtos;
-using BlogApp.Core.DTOs.Concrete.TagDtos;
-using BlogApp.Core.Entities.Concrete;
+using BlogApp.Core.Response;
 using BlogApp.Core.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BlogApp.API.Controllers
 {
@@ -14,23 +11,37 @@ namespace BlogApp.API.Controllers
     {
         private readonly IBlogService _blogService;
         private readonly IMapper _mapper;
+        private readonly IValidator<BlogCreateDto> _createDtoValidator;
 
-        public BlogsController(IBlogService blogService, IMapper mapper)
+        public BlogsController(IBlogService blogService, IMapper mapper, IValidator<BlogCreateDto> createDtoValidator)
         {
             _blogService = blogService;
             _mapper = mapper;
+            _createDtoValidator = createDtoValidator;
         }
 
-        [Authorize(Roles = "Admin,Author")]
+        //[Authorize(Roles = "Admin,Author")]
         [HttpPost("[action]")]
-        public IActionResult Add(BlogCreateDto createDto,List<TagListDto> tagLists)
+        public async Task<IActionResult> Add(BlogCreateDto createDto, string tags)
         {
-            //var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
+            var result = _createDtoValidator.Validate(createDto);
 
+            if (result.IsValid)
+            {
+                var addResult = await _blogService.AddBlogWithTags(createDto, tags);
+                if (!addResult.Errors.Any())
+                    return CreateActionResult(CustomResponse<BlogCreateDto>.Success(201, createDto));
+                return CreateActionResult(CustomResponse<BlogCreateDto>.Fail(addResult.StatusCode, addResult.Errors));
+            }
 
-            //var blogDto = _mapper.Map<Blog>(createDto);
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
 
-            //var blog = _blogService.AddBlogWithTags
+            var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
+
+            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
     }
 }

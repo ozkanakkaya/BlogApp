@@ -1,16 +1,10 @@
 ﻿using AutoMapper;
 using BlogApp.Core.DTOs.Concrete.BlogDtos;
-using BlogApp.Core.DTOs.Concrete.TagDtos;
 using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlogApp.Business.Services
 {
@@ -20,9 +14,10 @@ namespace BlogApp.Business.Services
         private readonly IAppRoleRepository _appRoleRepository;
         private readonly IBlogRepository _blogRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly ITagBlogRepository _tagBlogRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        public BlogService(IGenericRepository<Blog> repository, IUnitOfWork unitOfWork, IAppUserRepository appUserRepository, IMapper mapper, IAppRoleRepository appRoleRepository, IBlogRepository blogRepository, ITagRepository tagRepository) : base(repository, unitOfWork)
+        public BlogService(IGenericRepository<Blog> repository, IUnitOfWork unitOfWork, IAppUserRepository appUserRepository, IMapper mapper, IAppRoleRepository appRoleRepository, IBlogRepository blogRepository, ITagRepository tagRepository, ITagBlogRepository tagBlogRepository) : base(repository, unitOfWork)
         {
             _appUserRepository = appUserRepository;
             _mapper = mapper;
@@ -30,39 +25,56 @@ namespace BlogApp.Business.Services
             _blogRepository = blogRepository;
             _unitOfWork = unitOfWork;
             _tagRepository = tagRepository;
+            _tagBlogRepository = tagBlogRepository;
         }
 
-        public async Task<CustomResponse<BlogCreateDto>> AddBlogWithTags(BlogCreateDto createDto, List<TagListDto> tagList)
+        public async Task<CustomResponse<BlogCreateDto>> AddBlogWithTags(BlogCreateDto createDto, string tags)
         {
-            /*"tagList"ten gelen taglerin bilgileri Tag tablosuna eklenecek*/
+            if (!string.IsNullOrEmpty(tags))
+            {
+                var tagSplit = tags.Split(',');
 
-            //var blog = _mapper.Map<Blog>(createDto);
+                var blog = _mapper.Map<Blog>(createDto);
+                blog.TagBlogs = new List<TagBlog>();
+                foreach (var tag in tagSplit)
+                {
+                    var tagName = tag.Trim();
+                    var checkTag = _tagRepository.Where(x => x.Name == tagName && !x.IsDeleted).FirstOrDefault();
+                    if (checkTag == null)
+                    {
+                        var tagModel = new Tag()
+                        {
+                            Name = tagName,
+                            IsDeleted = false,
+                            IsActive = true,
+                            Description = tagName,
+                        };
 
-            //blog.TagBlogs = new List<TagBlog>();
-            //blog.TagBlogs.Add()
-            //blog.TagBlogs.Add(new TagBlog
-            //{
-            //    Blog = blog,
-            //    TagId=/*Ekllenen taglerin Id leri sırasıyla ilgili bloğun TagId'sine eklenecek  */
-            //});
+                        await _tagRepository.AddAsync(tagModel);
+                        await _unitOfWork.CommitAsync();
 
+                        blog.TagBlogs.Add(new TagBlog
+                        {
+                            Blog = blog,
+                            TagId = tagModel.Id
+                        });
+                    }
+                    else
+                    {
+                        blog.TagBlogs.Add(new TagBlog
+                        {
+                            Blog = blog,
+                            TagId = checkTag.Id
+                        });
+                    }
+                }
+                await _blogRepository.AddAsync(blog);
+                await _unitOfWork.CommitAsync();
 
-            //var tags = _mapper.Map<Tag>(tagList);
+                return CustomResponse<BlogCreateDto>.Success(201, createDto);
+            }
 
-            //foreach (var tag in tagList)
-            //{
-            //    await _tagRepository.AddAsync(_mapper.Map<Tag>(tag));
-
-            //    _blogRepository.(x=>x.TagBlogs
-            //}
-
-
-
-
-            //await _blogRepository.AddAsync(blog);
-            //await _unitOfWork.CommitAsync();
-
-            return CustomResponse<BlogCreateDto>.Success(201, createDto);
+            return CustomResponse<BlogCreateDto>.Fail(400, "Bloğa ait tanımlayıcı etiketler girilmeli!");
         }
     }
 }

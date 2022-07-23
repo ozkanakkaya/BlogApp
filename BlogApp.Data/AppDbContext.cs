@@ -1,5 +1,4 @@
-﻿using BlogApp.Core.Entities.Abstract;
-using BlogApp.Core.Entities.Concrete;
+﻿using BlogApp.Core.Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -58,7 +57,7 @@ namespace BlogApp.Data
         {
             foreach (var item in ChangeTracker.Entries())
             {
-                if (item.Entity is AppUser  entityReference)
+                if (item.Entity is AppUser entityReference)
                 {
                     switch (item.State)
                     {
@@ -71,9 +70,9 @@ namespace BlogApp.Data
                         case EntityState.Modified:
                             {
                                 Entry(entityReference).Property(x => x.CreatedDate).IsModified = false;
-                                Entry(entityReference).Property(x=>x.CreatedByUsername).IsModified = false;
+                                Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
                                 entityReference.UpdatedDate = DateTime.Now;
-                                entityReference.CreatedByUsername= entityReference.Username;
+                                entityReference.CreatedByUsername = entityReference.Username;
                                 break;
                             }
                     }
