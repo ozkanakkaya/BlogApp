@@ -7,8 +7,8 @@ namespace BlogApp.Business.Validations
     {
         public AppUserLoginDtoValidator()
         {
-            RuleFor(x => x.Password).NotEmpty().WithMessage("Lütfen kullanıcı adını giriniz.");
-            RuleFor(x => x.Username).NotEmpty().WithMessage("Lütfen parolanızı giriniz.");
+            RuleFor(x => x.Password).NotEmpty().WithMessage("Lütfen parolanızı giriniz.");
+            RuleFor(x => x.Username).NotEmpty().WithMessage("Lütfen kullanıcı adınızı giriniz.");
         }
     }
 }

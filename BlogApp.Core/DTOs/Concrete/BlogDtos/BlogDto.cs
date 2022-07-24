@@ -2,7 +2,7 @@
 
 namespace BlogApp.Core.DTOs.Concrete.BlogDtos
 {
-    public class BlogCreateDto : IDto
+    public class BlogDto : IDto
     {
         public string Title { get; set; }
         public string Content { get; set; }
@@ -10,6 +10,7 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
         public string ImageUrl { get; set; }
         public int AppUserId { get; set; }
         public bool IsActive { get; set; }
-        public bool IsDeleted { get; set; }
+        public string Tags { get; set; }
+        public List<int> CategoryIds { get; set; }
     }
 }

@@ -17,6 +17,7 @@ namespace BlogApp.Data.Configurations
             builder.Property(x => x.Email).HasMaxLength(100).IsRequired();
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);
             builder.Property(x => x.Password).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.ConfirmPassword).HasMaxLength(50).IsRequired();
             builder.Property(x => x.ImageUrl).HasMaxLength(500);
             builder.Property(x => x.About).HasMaxLength(1000);
             builder.Property(x => x.GitHubLink).HasMaxLength(250);

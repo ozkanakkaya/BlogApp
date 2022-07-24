@@ -27,54 +27,66 @@ namespace BlogApp.Business.Services
             _tagRepository = tagRepository;
             _tagBlogRepository = tagBlogRepository;
         }
-
-        public async Task<CustomResponse<BlogCreateDto>> AddBlogWithTags(BlogCreateDto createDto, string tags)
+        //BlogCreateDto createDto, string tags, List<int> categories
+        public async Task<CustomResponse<BlogDto>> AddBlogWithTagsAsync(BlogDto blogDto)
         {
-            if (!string.IsNullOrEmpty(tags))
+            //if (!string.IsNullOrEmpty(tags))
+            //{
+            var tagSplit = blogDto.Tags.Split(',');
+
+            var blog = _mapper.Map<Blog>(blogDto);
+            blog.TagBlogs = new List<TagBlog>();
+            blog.BlogCategories = new List<BlogCategory>();
+
+            foreach (var tag in tagSplit)
             {
-                var tagSplit = tags.Split(',');
-
-                var blog = _mapper.Map<Blog>(createDto);
-                blog.TagBlogs = new List<TagBlog>();
-                foreach (var tag in tagSplit)
+                var tagName = tag.Trim();
+                var checkTag = _tagRepository.Where(x => x.Name == tagName && !x.IsDeleted).FirstOrDefault();
+                if (checkTag == null)
                 {
-                    var tagName = tag.Trim();
-                    var checkTag = _tagRepository.Where(x => x.Name == tagName && !x.IsDeleted).FirstOrDefault();
-                    if (checkTag == null)
+                    var tagModel = new Tag()
                     {
-                        var tagModel = new Tag()
-                        {
-                            Name = tagName,
-                            IsDeleted = false,
-                            IsActive = true,
-                            Description = tagName,
-                        };
+                        Name = tagName,
+                        IsDeleted = false,
+                        IsActive = true,
+                        Description = tagName,
+                    };
 
-                        await _tagRepository.AddAsync(tagModel);
-                        await _unitOfWork.CommitAsync();
+                    await _tagRepository.AddAsync(tagModel);
+                    await _unitOfWork.CommitAsync();
 
-                        blog.TagBlogs.Add(new TagBlog
-                        {
-                            Blog = blog,
-                            TagId = tagModel.Id
-                        });
-                    }
-                    else
+                    blog.TagBlogs.Add(new TagBlog
                     {
-                        blog.TagBlogs.Add(new TagBlog
-                        {
-                            Blog = blog,
-                            TagId = checkTag.Id
-                        });
-                    }
+                        Blog = blog,
+                        TagId = tagModel.Id
+                    });
                 }
-                await _blogRepository.AddAsync(blog);
-                await _unitOfWork.CommitAsync();
-
-                return CustomResponse<BlogCreateDto>.Success(201, createDto);
+                else
+                {
+                    blog.TagBlogs.Add(new TagBlog
+                    {
+                        Blog = blog,
+                        TagId = checkTag.Id
+                    });
+                }
             }
 
-            return CustomResponse<BlogCreateDto>.Fail(400, "Bloğa ait tanımlayıcı etiketler girilmeli!");
+            foreach (var categoryId in blogDto.CategoryIds)
+            {
+                blog.BlogCategories.Add(new BlogCategory
+                {
+                    Blog = blog,
+                    CategoryId = categoryId
+                });
+            }
+
+            await _blogRepository.AddAsync(blog);
+            await _unitOfWork.CommitAsync();
+
+            return CustomResponse<BlogDto>.Success(201, blogDto);
+            //}
+
+            //return CustomResponse<BlogCreateDto>.Fail(400, "Bloğa ait tanımlayıcı etiketler girilmeli!");
         }
     }
 }

@@ -24,7 +24,6 @@ namespace BlogApp.Data.Configurations
             builder.Property(x => x.CommentCount).IsRequired();
             builder.Property(x => x.LikeCount).IsRequired();
 
-            builder.HasOne(x => x.Category).WithMany(x => x.Blogs).HasForeignKey(x => x.CategoryId);
             builder.HasOne(x => x.AppUser).WithMany(x => x.Blogs).HasForeignKey(x => x.AppUserId);
         }
     }

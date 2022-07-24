@@ -4,6 +4,7 @@ using BlogApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220723215027_AddedBlogCategory")]
+    partial class AddedBlogCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,6 +247,9 @@ namespace BlogApp.Data.Migrations
                     b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CommentCount")
                         .HasColumnType("int");
 
@@ -297,6 +302,8 @@ namespace BlogApp.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Blogs");
                 });
@@ -608,6 +615,10 @@ namespace BlogApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BlogApp.Core.Entities.Concrete.Category", null)
+                        .WithMany("Blogs")
+                        .HasForeignKey("CategoryId");
+
                     b.Navigation("AppUser");
                 });
 
@@ -684,6 +695,8 @@ namespace BlogApp.Data.Migrations
             modelBuilder.Entity("BlogApp.Core.Entities.Concrete.Category", b =>
                 {
                     b.Navigation("BlogCategories");
+
+                    b.Navigation("Blogs");
                 });
 
             modelBuilder.Entity("BlogApp.Core.Entities.Concrete.Gender", b =>
