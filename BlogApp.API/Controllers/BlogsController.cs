@@ -73,6 +73,11 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
 
-
+        [HttpGet("[action]")]
+        public IActionResult GetAll()
+        {
+            var blogs = _blogService.GetAllByNonDeletedAndActive();
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
+        }
     }
 }

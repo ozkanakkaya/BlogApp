@@ -157,6 +157,25 @@ namespace BlogApp.Business.Services
 
             return CustomResponse<NoContent>.Success(204);
         }
+
+        public CustomResponse<List<BlogListDto>> GetAllByNonDeletedAndActive()
+        {
+            var blogs = _blogRepository.GetAllByNonDeletedAndActive();
+            var blogListDto = new List<BlogListDto>();
+
+            foreach (var blog in blogs)
+            {
+                var blogList = _mapper.Map<BlogListDto>(blog);
+                blogList.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
+                blogList.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
+                blogListDto.Add(blogList);
+            }
+
+            return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+
+
+        }
+
         public bool SetwiseEquivalentTo<T>(List<T> list, List<T> other) where T : IEquatable<T>
         {
             if (list.Except(other).Any())

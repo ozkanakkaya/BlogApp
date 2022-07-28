@@ -8,5 +8,6 @@ namespace BlogApp.Core.Services
     {
         Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAsync(BlogCreateDto blogDto);
         Task<CustomResponse<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto);
+        CustomResponse<List<BlogListDto>> GetAllByNonDeletedAndActive();
     }
 }
