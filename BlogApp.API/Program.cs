@@ -4,7 +4,7 @@ using BlogApp.Business.Helpers;
 using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
 using BlogApp.Business.Validations;
-using BlogApp.Core.DTOs.Concrete;
+using BlogApp.Core.DTOs.Concrete.AppUserDtos;
 using BlogApp.Core.DTOs.Concrete.BlogDtos;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Services;
@@ -61,7 +61,8 @@ builder.Services.AddDbContext<AppDbContext>(x =>
 //builder.Services.AddValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>();//diðer kullaným
 builder.Services.AddScoped<IValidator<AppUserRegisterDto>, AppUserRegisterDtoValidator>();
 builder.Services.AddScoped<IValidator<AppUserLoginDto>, AppUserLoginDtoValidator>();
-builder.Services.AddScoped<IValidator<BlogDto>, BlogDtoValidator>();
+builder.Services.AddScoped<IValidator<BlogCreateDto>, BlogCreateDtoValidator>();
+builder.Services.AddScoped<IValidator<BlogUpdateDto>, BlogUpdateDtoValidator>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
@@ -74,7 +75,7 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<ITagBlogRepository, TagBlogRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
-
+builder.Services.AddScoped<IBlogCategoryRepository, BlogCategoryRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
 {

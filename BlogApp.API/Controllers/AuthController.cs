@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BlogApp.API.Jwt;
-using BlogApp.Core.DTOs.Concrete;
+using BlogApp.Core.DTOs.Concrete.AppUserDtos;
 using BlogApp.Core.Enums;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;

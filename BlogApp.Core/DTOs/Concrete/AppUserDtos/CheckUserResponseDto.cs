@@ -1,6 +1,6 @@
 ﻿using BlogApp.Core.DTOs.Abstract;
 
-namespace BlogApp.Core.DTOs.Concrete
+namespace BlogApp.Core.DTOs.Concrete.AppUserDtos
 {
     public class CheckUserResponseDto : IDto
     {

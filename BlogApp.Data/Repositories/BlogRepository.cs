@@ -1,5 +1,6 @@
 ﻿using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.Data.Repositories
 {
@@ -9,6 +10,9 @@ namespace BlogApp.Data.Repositories
         {
         }
 
-
+        public Blog GetBlogById(int blogId)
+        {
+            return _context.Blogs.Where(x => x.Id == blogId).Include(x => x.BlogCategories).Include(x => x.TagBlogs).ThenInclude(x => x.Tag).FirstOrDefault();
+        }
     }
 }

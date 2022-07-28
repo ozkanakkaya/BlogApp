@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace BlogApp.Business.Validations
 {
-    public class BlogDtoValidator : AbstractValidator<BlogDto>
+    public class BlogUpdateDtoValidator : AbstractValidator<BlogUpdateDto>
     {
-        public BlogDtoValidator()
+        public BlogUpdateDtoValidator()
         {
             RuleFor(x => x.Title).NotEmpty().WithMessage("Lütfen başlık giriniz.");
             RuleFor(x => x.Content).NotEmpty().WithMessage("Lütfen içerik giriniz.");

@@ -59,11 +59,11 @@ namespace BlogApp.Data
         {
             foreach (var item in ChangeTracker.Entries())
             {
-                var username = "Admin";
-                if (item.Entity is AppUser entityReference1)
-                {
-                    username = entityReference1.Username;
-                }
+                //var username = "Admin";
+                //if (item.Entity is AppUser entityReference1)
+                //{
+                //    username = entityReference1.Username;
+                //}
 
                 if (item.Entity is BaseEntity entityReference)
                 {
@@ -72,15 +72,15 @@ namespace BlogApp.Data
                         case EntityState.Added:
                             {
                                 entityReference.CreatedDate = DateTime.Now;
-                                entityReference.CreatedByUsername = username;
+                                //entityReference.CreatedByUsername = username;
                                 break;
                             }
                         case EntityState.Modified:
                             {
                                 Entry(entityReference).Property(x => x.CreatedDate).IsModified = false;
-                                Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
+                                //Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
                                 entityReference.UpdatedDate = DateTime.Now;
-                                entityReference.UpdatedByUsername = username;
+                                //entityReference.UpdatedByUsername = username;
                                 break;
                             }
                     }

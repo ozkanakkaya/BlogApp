@@ -1,4 +1,4 @@
-﻿using BlogApp.Core.DTOs.Concrete;
+﻿using BlogApp.Core.DTOs.Concrete.AppUserDtos;
 using FluentValidation;
 
 namespace BlogApp.Business.Validations

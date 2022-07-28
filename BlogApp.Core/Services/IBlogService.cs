@@ -5,7 +5,8 @@ using BlogApp.Core.Response;
 namespace BlogApp.Core.Services
 {
     public interface IBlogService : IService<Blog>
-    {//BlogCreateDto createDto, string tags, List<int> categories
-        Task<CustomResponse<BlogDto>> AddBlogWithTagsAsync(BlogDto blogDto);
+    {
+        Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAsync(BlogCreateDto blogDto);
+        Task<CustomResponse<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto);
     }
 }

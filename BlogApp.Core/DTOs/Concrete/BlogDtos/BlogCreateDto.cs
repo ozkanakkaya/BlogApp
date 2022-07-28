@@ -9,7 +9,7 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
         public string Thumbnail { get; set; }
         public string ImageUrl { get; set; }
         public int AppUserId { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsDeleted { get; set; }
+        public string Tags { get; set; }
+        public List<int> CategoryIds { get; set; }
     }
 }

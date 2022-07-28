@@ -1,9 +1,11 @@
 ﻿using BlogApp.Core.DTOs.Abstract;
+using BlogApp.Core.DTOs.Concrete.GenderDtos;
 
-namespace BlogApp.Core.DTOs.Concrete
+namespace BlogApp.Core.DTOs.Concrete.AppUserDtos
 {
-    public class AppUserRegisterDto : IDto
+    public class AppUserListDto : IDto
     {
+        public int Id { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
         public string Username { get; set; }
@@ -16,5 +18,7 @@ namespace BlogApp.Core.DTOs.Concrete
         public string GitHubLink { get; set; }
         public string WebsiteLink { get; set; }
         public int GenderId { get; set; }
+
+        public GenderListDto Gender { get; set; }
     }
 }
