@@ -29,7 +29,7 @@ namespace BlogApp.Business.Services
             _tagBlogRepository = tagBlogRepository;
             _blogCategoryRepository = blogCategoryRepository;
         }
-        public async Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAsync(BlogCreateDto blogDto)
+        public async Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogDto)
         {
             var tagSplit = blogDto.Tags.Split(',');
 
@@ -49,7 +49,7 @@ namespace BlogApp.Business.Services
                         IsDeleted = false,
                         IsActive = true,
                         Description = tagName,
-                        CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogDto.AppUserId)).Username
+                        //CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogDto.AppUserId)).Username
                     };
 
                     await _tagRepository.AddAsync(tagModel);
@@ -79,7 +79,7 @@ namespace BlogApp.Business.Services
                     CategoryId = categoryId
                 });
             }
-            blog.CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogDto.AppUserId)).Username;
+            //blog.CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogDto.AppUserId)).Username;
 
             await _blogRepository.AddAsync(blog);
             await _unitOfWork.CommitAsync();
@@ -127,7 +127,7 @@ namespace BlogApp.Business.Services
                             IsDeleted = false,
                             IsActive = true,
                             Description = tagName,
-                            CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogUpdateDto.AppUserId)).Username
+                            //CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogUpdateDto.AppUserId)).Username
                         };
 
                         await _tagRepository.AddAsync(tagModel);
@@ -150,7 +150,7 @@ namespace BlogApp.Business.Services
                 }
             }
 
-            blog.UpdatedByUsername = (await _appUserRepository.GetByIdAsync(blogUpdateDto.AppUserId)).Username;
+            //blog.UpdatedByUsername = (await _appUserRepository.GetByIdAsync(blogUpdateDto.AppUserId)).Username;
 
             _blogRepository.Update(blog);
             await _unitOfWork.CommitAsync();
@@ -170,10 +170,22 @@ namespace BlogApp.Business.Services
                 blogList.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
                 blogListDto.Add(blogList);
             }
-
             return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+        }
 
-
+        public async Task<CustomResponse<NoContent>> DeleteAsync(int blogId)
+        {
+            var blog = _blogRepository.Where(x => x.Id == blogId).FirstOrDefault();
+            if (blog != null)
+            {
+                blog.IsDeleted = true;
+                blog.IsActive = false;
+                //blog.UpdatedByUsername = (await _appUserRepository.GetByIdAsync(blog.AppUserId)).Username;
+                _blogRepository.Update(blog);
+                await _unitOfWork.CommitAsync();
+                return CustomResponse<NoContent>.Success(200);
+            }
+            return CustomResponse<NoContent>.Fail(404,$"{blogId} idli blog bulunamadı!");
         }
 
         public bool SetwiseEquivalentTo<T>(List<T> list, List<T> other) where T : IEquatable<T>

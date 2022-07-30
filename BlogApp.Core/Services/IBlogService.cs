@@ -6,8 +6,9 @@ namespace BlogApp.Core.Services
 {
     public interface IBlogService : IService<Blog>
     {
-        Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAsync(BlogCreateDto blogDto);
+        Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogDto);
         Task<CustomResponse<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto);
         CustomResponse<List<BlogListDto>> GetAllByNonDeletedAndActive();
+        Task<CustomResponse<NoContent>> DeleteAsync(int blogId);
     }
 }

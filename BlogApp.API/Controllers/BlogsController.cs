@@ -21,8 +21,7 @@ namespace BlogApp.API.Controllers
             _blogCreateDtoValidator = blogCreateDtoValidator;
             _blogUpdateDtoValidotor = blogUpdateDtoValidotor;
         }
-        //BlogCreateDto createDto, string tags, [FromBody]List<int> categories
-        //createDto, blogDto.Tags, blogDto.CategoryIds
+
         //[Authorize(Roles = "Admin,Author")]
         [HttpPost("[action]")]
         public async Task<IActionResult> Add(BlogCreateDto blogDto)
@@ -33,7 +32,7 @@ namespace BlogApp.API.Controllers
             {
                 //var createDto = _mapper.Map<BlogCreateDto>(blogDto);
 
-                var addResult = await _blogService.AddBlogWithTagsAsync(blogDto);
+                var addResult = await _blogService.AddBlogWithTagsAndCategoriesAsync(blogDto);
                 //if (!addResult.Errors.Any())
                 return CreateActionResult(CustomResponse<BlogCreateDto>.Success(201, addResult.Data));
                 //return CreateActionResult(CustomResponse<BlogCreateDto>.Fail(addResult.StatusCode, addResult.Errors));
@@ -47,6 +46,13 @@ namespace BlogApp.API.Controllers
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult GetAll()
+        {
+            var blogs = _blogService.GetAllByNonDeletedAndActive();
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
         }
 
         [HttpPut("[action]")]
@@ -73,11 +79,15 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
 
-        [HttpGet("[action]")]
-        public IActionResult GetAll()
+        [HttpPost("[action]")]
+        public IActionResult Delete(int blogId)
         {
-            var blogs = _blogService.GetAllByNonDeletedAndActive();
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
+            var result = _blogService.DeleteAsync(blogId);
+
+            if (!result.Result.Errors.Any())
+                return CreateActionResult(CustomResponse<NoContent>.Success(result.Result.StatusCode));
+
+            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Result.Errors));
         }
     }
 }
