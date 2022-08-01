@@ -5,6 +5,7 @@ using BlogApp.Core.Repositories;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.Business.Services
 {
@@ -174,7 +175,7 @@ namespace BlogApp.Business.Services
                 }
                 return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Aktif ve silinmemiş bir blog bulunamadı!");
+            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
         }
 
         public async Task<CustomResponse<NoContent>> DeleteAsync(int blogId)
@@ -194,11 +195,19 @@ namespace BlogApp.Business.Services
 
         public CustomResponse<List<BlogDto>> GetAllByDeleted()
         {
-            var blogs = _blogRepository.Where(x => x.IsDeleted).ToList();
+            var blogs = _blogRepository.Where(x => x.IsDeleted).Include(x => x.AppUser).Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
+
             if (blogs.Any())
             {
-                var deletedBlogs = _mapper.Map<List<BlogDto>>(blogs);
-                return CustomResponse<List<BlogDto>>.Success(200, deletedBlogs);
+                var blogListDto = new List<BlogDto>();
+                foreach (var blog in blogs)
+                {
+                    var deletedBlog = _mapper.Map<BlogDto>(blog);
+                    deletedBlog.Category = blog.BlogCategories.Select(x => x.Category.Title).FirstOrDefault();
+                    deletedBlog.Username = blog.AppUser.Username;
+                    blogListDto.Add(deletedBlog);
+                }
+                return CustomResponse<List<BlogDto>>.Success(200, blogListDto);
             }
             return CustomResponse<List<BlogDto>>.Fail(404, "Silinmiş bir blog bulunamadı!");
         }
@@ -212,7 +221,23 @@ namespace BlogApp.Business.Services
             return true;
         }
 
-         
+        public CustomResponse<List<BlogDto>> GetByUserId(int userId)
+        {
+            var blogs =_blogRepository.Where(x=>x.AppUserId==userId).Include(x => x.AppUser).Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
+            if (blogs.Any())
+            {
+                var blogListDto = new List<BlogDto>();
+                foreach (var blog in blogs)
+                {
+                    var deletedBlog = _mapper.Map<BlogDto>(blog);
+                    deletedBlog.Category = blog.BlogCategories.Select(x => x.Category.Title).FirstOrDefault();
+                    deletedBlog.Username = blog.AppUser.Username;
+                    blogListDto.Add(deletedBlog);
+                }
+                return CustomResponse<List<BlogDto>>.Success(200, blogListDto);
+            }
+            return CustomResponse<List<BlogDto>>.Fail(404, "Silinmiş bir blog bulunamadı!");
+        }
 
         /*
          *GetBlogById

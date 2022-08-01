@@ -16,5 +16,7 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
         public int CommentCount { get; set; } = 0;
         public int LikeCount { get; set; } = 0;
         public int AppUserId { get; set; }
+        public string Username { get; set; }
+        public string Category { get; set; }
     }
 }
