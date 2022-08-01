@@ -48,13 +48,6 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
 
-        [HttpGet("[action]")]
-        public IActionResult GetAll()
-        {
-            var blogs = _blogService.GetAllByNonDeletedAndActive();
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
-        }
-
         [HttpPut("[action]")]
         public async Task<IActionResult> Update(BlogUpdateDto blogUpdateDto)
         {
@@ -88,6 +81,28 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Success(result.Result.StatusCode));
 
             return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Result.Errors));
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult GetAllByNonDeletedAndActiveBlogs()
+        {
+            var blogs = _blogService.GetAllByNonDeletedAndActive();
+            if (blogs.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
+            }
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult GetAllByDeletedBlogs()
+        {
+            var deletedBlogs = _blogService.GetAllByDeleted();
+            if (deletedBlogs.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, deletedBlogs.Errors));
+            }
+            return CreateActionResult(CustomResponse<List<BlogDto>>.Success(200, deletedBlogs.Data));
         }
     }
 }

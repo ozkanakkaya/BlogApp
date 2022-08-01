@@ -11,6 +11,7 @@ namespace BlogApp.Business.Mapping
             CreateMap<Blog, BlogCreateDto>().ReverseMap();
             CreateMap<Blog, BlogUpdateDto>().ReverseMap();
             CreateMap<Blog, BlogListDto>().ReverseMap();
+            CreateMap<Blog, BlogDto>().ReverseMap();
         }
     }
 }

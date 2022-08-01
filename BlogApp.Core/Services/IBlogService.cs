@@ -10,5 +10,6 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto);
         CustomResponse<List<BlogListDto>> GetAllByNonDeletedAndActive();
         Task<CustomResponse<NoContent>> DeleteAsync(int blogId);
+        CustomResponse<List<BlogDto>> GetAllByDeleted();
     }
 }

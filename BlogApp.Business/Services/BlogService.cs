@@ -161,16 +161,20 @@ namespace BlogApp.Business.Services
         public CustomResponse<List<BlogListDto>> GetAllByNonDeletedAndActive()
         {
             var blogs = _blogRepository.GetAllByNonDeletedAndActive();
-            var blogListDto = new List<BlogListDto>();
-
-            foreach (var blog in blogs)
+            if (blogs.Any())
             {
-                var blogList = _mapper.Map<BlogListDto>(blog);
-                blogList.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
-                blogList.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
-                blogListDto.Add(blogList);
+                var blogListDto = new List<BlogListDto>();
+
+                foreach (var blog in blogs)
+                {
+                    var blogList = _mapper.Map<BlogListDto>(blog);
+                    blogList.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
+                    blogList.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
+                    blogListDto.Add(blogList);
+                }
+                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+            return CustomResponse<List<BlogListDto>>.Fail(404, "Aktif ve silinmemiş bir blog bulunamadı!");
         }
 
         public async Task<CustomResponse<NoContent>> DeleteAsync(int blogId)
@@ -185,7 +189,18 @@ namespace BlogApp.Business.Services
                 await _unitOfWork.CommitAsync();
                 return CustomResponse<NoContent>.Success(200);
             }
-            return CustomResponse<NoContent>.Fail(404,$"{blogId} idli blog bulunamadı!");
+            return CustomResponse<NoContent>.Fail(404, $"{blogId} idli blog bulunamadı!");
+        }
+
+        public CustomResponse<List<BlogDto>> GetAllByDeleted()
+        {
+            var blogs = _blogRepository.Where(x => x.IsDeleted).ToList();
+            if (blogs.Any())
+            {
+                var deletedBlogs = _mapper.Map<List<BlogDto>>(blogs);
+                return CustomResponse<List<BlogDto>>.Success(200, deletedBlogs);
+            }
+            return CustomResponse<List<BlogDto>>.Fail(404, "Silinmiş bir blog bulunamadı!");
         }
 
         public bool SetwiseEquivalentTo<T>(List<T> list, List<T> other) where T : IEquatable<T>
@@ -196,5 +211,24 @@ namespace BlogApp.Business.Services
                 return false;
             return true;
         }
+
+         
+
+        /*
+         *GetBlogById
+         *+++++++++++++++GetAllDeletedBlogs
+         *UndoDelete
+         *HardDeleteAsync
+         *GetAllByViewCount
+         *GetAllByCategory
+         *GetAllByPagingAsync
+         *GetAllByUserIdOnFilter
+         *SearchAsync
+         *IncreaseViewCountAsync => görüntüleme sayısını arttır.
+         *CountAsync => blogların toplam sayısı
+         *CountByNonDeletedAsync
+         *GetAllAsyncV2 =>yorumlar kategoriler kullanıcılar sıralamalar vs göre getirir.
+         *GetBlogByIdWithCategoriesAndComments=> GetAsync
+         */
     }
 }
