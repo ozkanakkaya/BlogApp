@@ -59,5 +59,10 @@ namespace BlogApp.Data.Repositories
         {
             return _dbSet.Where(expression);
         }
+
+        public async Task<int> CountAsync(Expression<Func<T, bool>> expression = null)
+        {
+            return await (expression == null ? _dbSet.CountAsync() : _dbSet.CountAsync(expression));
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace BlogApp.API.Controllers
         }
 
         //[Authorize(Roles = "Admin,Author")]
-        [HttpPost("[action]")]
+        [HttpPost]
         public async Task<IActionResult> Add(BlogCreateDto blogDto)
         {
             var result = _blogCreateDtoValidator.Validate(blogDto);
@@ -48,7 +48,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
 
-        [HttpPut("[action]")]
+        [HttpPut]
         public async Task<IActionResult> Update(BlogUpdateDto blogUpdateDto)
         {
             var result = _blogUpdateDtoValidotor.Validate(blogUpdateDto);
@@ -72,7 +72,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
 
-        [HttpPost("[action]")]
+        [HttpDelete("{id}")]//api/blogs/13
         public IActionResult Delete(int blogId)
         {
             var result = _blogService.DeleteAsync(blogId);
@@ -83,7 +83,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Result.Errors));
         }
 
-        [HttpGet("[action]")]
+        [HttpGet]//api/blogs
         public IActionResult GetAllByNonDeletedAndActiveBlogs()
         {
             var blogs = _blogService.GetAllByNonDeletedAndActive();
@@ -105,15 +105,15 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<List<BlogDto>>.Success(200, deletedBlogs.Data));
         }
 
-        [HttpGet("[action]")]
-        public IActionResult GetByUserId(int userId)
+        [HttpGet("[action]/{userId}")]
+        public IActionResult GetBlogsByUserId(int userId)
         {
             var blogs = _blogService.GetByUserId(userId);
             if (blogs.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogDto>>.Success(200, blogs.Data));
+            return CreateActionResult(CustomResponse<PersonalBlogDto>.Success(200, blogs.Data));
         }
     }
 }

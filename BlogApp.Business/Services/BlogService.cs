@@ -221,26 +221,32 @@ namespace BlogApp.Business.Services
             return true;
         }
 
-        public CustomResponse<List<BlogDto>> GetByUserId(int userId)
+        public CustomResponse<PersonalBlogDto> GetByUserId(int userId)
         {
-            var blogs =_blogRepository.Where(x=>x.AppUserId==userId).Include(x => x.AppUser).Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
+            var blogs = _blogRepository.Where(x => x.AppUserId == userId && !x.IsDeleted).Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
             if (blogs.Any())
             {
-                var blogListDto = new List<BlogDto>();
+                var blogListDto = new List<PersonalBlogListDto>();
                 foreach (var blog in blogs)
                 {
-                    var deletedBlog = _mapper.Map<BlogDto>(blog);
-                    deletedBlog.Category = blog.BlogCategories.Select(x => x.Category.Title).FirstOrDefault();
-                    deletedBlog.Username = blog.AppUser.Username;
-                    blogListDto.Add(deletedBlog);
+                    var userBlog = _mapper.Map<PersonalBlogListDto>(blog);
+                    userBlog.Category = blog.BlogCategories.Select(x => x.Category.Title).FirstOrDefault();
+                    blogListDto.Add(userBlog);
                 }
-                return CustomResponse<List<BlogDto>>.Success(200, blogListDto);
+                var personalBlogDto = new PersonalBlogDto();
+                personalBlogDto.Blogs = blogListDto;
+                personalBlogDto.TotalBlogCount = blogs.Count;
+                personalBlogDto.TotalActiveBlogCount = _blogRepository.Where(x => x.IsActive).Count();
+                personalBlogDto.TotalInactiveBlogCount = _blogRepository.Where(x => !x.IsActive && !x.IsDeleted).Count();
+                blogs.ForEach(x => { personalBlogDto.TotalBlogsViewedCount += x.ViewsCount; });
+
+                return CustomResponse<PersonalBlogDto>.Success(200, personalBlogDto);
             }
-            return CustomResponse<List<BlogDto>>.Fail(404, "Silinmiş bir blog bulunamadı!");
+            return CustomResponse<PersonalBlogDto>.Fail(404, "Bir blog bulunamadı!");
         }
 
         /*
-         *GetBlogById
+         *+++++++++++++++GetBlogById
          *+++++++++++++++GetAllDeletedBlogs
          *UndoDelete
          *HardDeleteAsync
