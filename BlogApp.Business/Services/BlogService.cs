@@ -193,9 +193,9 @@ namespace BlogApp.Business.Services
             return CustomResponse<NoContent>.Fail(404, $"{blogId} idli blog bulunamadı!");
         }
 
-        public CustomResponse<List<BlogDto>> GetAllByDeleted()
+        public CustomResponse<List<BlogDto>> GetAllByDeleted()//Admin-Arşiv
         {
-            var blogs = _blogRepository.Where(x => x.IsDeleted).Include(x => x.AppUser).Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
+            var blogs = _blogRepository.Where(x => x.IsDeleted).Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
 
             if (blogs.Any())
             {
@@ -204,7 +204,6 @@ namespace BlogApp.Business.Services
                 {
                     var deletedBlog = _mapper.Map<BlogDto>(blog);
                     deletedBlog.Category = blog.BlogCategories.Select(x => x.Category.Title).FirstOrDefault();
-                    deletedBlog.Username = blog.AppUser.Username;
                     blogListDto.Add(deletedBlog);
                 }
                 return CustomResponse<List<BlogDto>>.Success(200, blogListDto);
@@ -221,9 +220,9 @@ namespace BlogApp.Business.Services
             return true;
         }
 
-        public CustomResponse<PersonalBlogDto> GetByUserId(int userId)
+        public CustomResponse<PersonalBlogDto> GetByUserId(int userId)//Kullanıcı Paneli-Bloglarım
         {
-            var blogs = _blogRepository.Where(x => x.AppUserId == userId && !x.IsDeleted).Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
+            var blogs = _blogRepository.Where(x => x.AppUserId == userId).Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
             if (blogs.Any())
             {
                 var blogListDto = new List<PersonalBlogListDto>();
@@ -236,13 +235,53 @@ namespace BlogApp.Business.Services
                 var personalBlogDto = new PersonalBlogDto();
                 personalBlogDto.Blogs = blogListDto;
                 personalBlogDto.TotalBlogCount = blogs.Count;
-                personalBlogDto.TotalActiveBlogCount = _blogRepository.Where(x => x.IsActive).Count();
-                personalBlogDto.TotalInactiveBlogCount = _blogRepository.Where(x => !x.IsActive && !x.IsDeleted).Count();
+                personalBlogDto.TotalActiveBlogCount = _blogRepository.Where(x => x.IsActive && x.AppUserId == userId).Count();
+                personalBlogDto.TotalInactiveBlogCount = _blogRepository.Where(x => !x.IsActive && x.AppUserId == userId).Count();
                 blogs.ForEach(x => { personalBlogDto.TotalBlogsViewedCount += x.ViewsCount; });
 
                 return CustomResponse<PersonalBlogDto>.Success(200, personalBlogDto);
             }
             return CustomResponse<PersonalBlogDto>.Fail(404, "Bir blog bulunamadı!");
+        }
+
+        public async Task<CustomResponse<int>> CountTotalBlogsAsync()//Admin-Home
+        {
+            var blogsTotalCount = await _blogRepository.CountAsync();
+
+            return blogsTotalCount > -1 ? CustomResponse<int>.Success(200, blogsTotalCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
+        }
+
+        public async Task<CustomResponse<int>> CountActiveBlogsAsync()
+        {
+            var blogsTotalCount = await _blogRepository.CountAsync(x => x.IsActive);
+
+            return blogsTotalCount > -1 ? CustomResponse<int>.Success(200, blogsTotalCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
+
+        }
+
+        public async Task<CustomResponse<int>> CountInActiveBlogsAsync()
+        {
+            var blogsTotalCount = await _blogRepository.CountAsync(x => !x.IsActive);
+
+            return blogsTotalCount > -1 ? CustomResponse<int>.Success(200, blogsTotalCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
+        }
+
+        public CustomResponse<List<BlogDto>> GetAll()//Admin-Home
+        {
+            var blogs = _blogRepository.GetAll().Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
+
+            if (blogs.Any())
+            {
+                var blogListDto = new List<BlogDto>();
+                foreach (var blog in blogs)
+                {
+                    var deletedBlog = _mapper.Map<BlogDto>(blog);
+                    deletedBlog.Category = blog.BlogCategories.Select(x => x.Category.Title).FirstOrDefault();
+                    blogListDto.Add(deletedBlog);
+                }
+                return CustomResponse<List<BlogDto>>.Success(200, blogListDto);
+            }
+            return CustomResponse<List<BlogDto>>.Fail(404, "Bir blog bulunamadı!");
         }
 
         /*
@@ -256,8 +295,8 @@ namespace BlogApp.Business.Services
          *GetAllByUserIdOnFilter
          *SearchAsync
          *IncreaseViewCountAsync => görüntüleme sayısını arttır.
-         *CountAsync => blogların toplam sayısı
-         *CountByNonDeletedAsync
+         *+++++++++++++++CountAsync => blogların toplam sayısı
+         *++CountByNonDeletedAsync
          *GetAllAsyncV2 =>yorumlar kategoriler kullanıcılar sıralamalar vs göre getirir.
          *GetBlogByIdWithCategoriesAndComments=> GetAsync
          */

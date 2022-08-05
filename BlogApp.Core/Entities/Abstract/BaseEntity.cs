@@ -10,7 +10,7 @@
 
         public virtual string CreatedByUsername { get; set; } = "Admin";
 
-        public virtual string UpdatedByUsername { get; set; } = "Admin";
+        public virtual string UpdatedByUsername { get; set; } = "Non";
 
         public virtual bool IsDeleted { get; set; } = false;
 

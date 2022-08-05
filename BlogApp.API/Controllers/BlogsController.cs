@@ -115,5 +115,16 @@ namespace BlogApp.API.Controllers
             }
             return CreateActionResult(CustomResponse<PersonalBlogDto>.Success(200, blogs.Data));
         }
+
+        [HttpGet("[action]")]
+        public IActionResult GetAll()
+        {
+            var deletedBlogs = _blogService.GetAll();
+            if (deletedBlogs.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, deletedBlogs.Errors));
+            }
+            return CreateActionResult(CustomResponse<List<BlogDto>>.Success(200, deletedBlogs.Data));
+        }
     }
 }
