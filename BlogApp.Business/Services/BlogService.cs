@@ -266,7 +266,7 @@ namespace BlogApp.Business.Services
             return blogsTotalCount > -1 ? CustomResponse<int>.Success(200, blogsTotalCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
         }
 
-        public CustomResponse<List<BlogDto>> GetAll()//Admin-Home
+        public CustomResponse<List<BlogDto>> GetAll()//Admin-Home-Bloglar
         {
             var blogs = _blogRepository.GetAll().Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
 
@@ -284,11 +284,41 @@ namespace BlogApp.Business.Services
             return CustomResponse<List<BlogDto>>.Fail(404, "Bir blog bulunamadı!");
         }
 
+        public async Task<CustomResponse<NoContent>> HardDeleteAsync(int blogId)//Admin-Arşiv-Blog
+        {
+            var result = await _blogRepository.AnyAsync(x => x.Id == blogId);
+            if (result)
+            {
+                var blog = _blogRepository.Where(x => x.Id == blogId);
+                 _blogRepository.RemoveRange(blog);
+                _unitOfWork.Commit();
+                return CustomResponse<NoContent>.Success(200);
+            }
+            return CustomResponse<NoContent>.Fail(404, "Bir blog bulunamadı!");
+        }
+
+        public async Task<CustomResponse<NoContent>> UndoDeleteAsync(int blogId)//Admin-Arşiv-Blog
+        {
+            var result = await _blogRepository.AnyAsync(x => x.Id == blogId);
+            if (result)
+            {
+                var blog = _blogRepository.Where(x => x.Id == blogId).FirstOrDefault();
+                blog.IsDeleted = false;
+                blog.IsActive = true;
+                //blog.UpdatedByUsername=
+                //blog.UpdatedDate=
+                _blogRepository.Update(blog);
+                _unitOfWork.Commit();
+                return CustomResponse<NoContent>.Success(200);
+            }
+            return CustomResponse<NoContent>.Fail(404, "Bir blog bulunamadı!");
+        }
+
         /*
          *+++++++++++++++GetBlogById
          *+++++++++++++++GetAllDeletedBlogs
-         *UndoDelete
-         *HardDeleteAsync
+         *+++++++++++++++UndoDelete
+         *+++++++++++++++HardDeleteAsync
          *GetAllByViewCount
          *GetAllByCategory
          *GetAllByPagingAsync
@@ -299,6 +329,9 @@ namespace BlogApp.Business.Services
          *++CountByNonDeletedAsync
          *GetAllAsyncV2 =>yorumlar kategoriler kullanıcılar sıralamalar vs göre getirir.
          *GetBlogByIdWithCategoriesAndComments=> GetAsync
+         *
+         *
+         *
          */
     }
 }

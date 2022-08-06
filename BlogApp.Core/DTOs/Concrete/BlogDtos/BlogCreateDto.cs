@@ -11,5 +11,6 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
         public int AppUserId { get; set; }
         public string Tags { get; set; }
         public List<int> CategoryIds { get; set; }
+        public bool IsActive { get; set; }
     }
 }

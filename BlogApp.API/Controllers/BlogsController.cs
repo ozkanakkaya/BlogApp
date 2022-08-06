@@ -126,5 +126,27 @@ namespace BlogApp.API.Controllers
             }
             return CreateActionResult(CustomResponse<List<BlogDto>>.Success(200, deletedBlogs.Data));
         }
+
+        [HttpDelete("[action]")]
+        public async Task<IActionResult> HardDelete(int blogId)
+        {
+            var result = await _blogService.HardDeleteAsync(blogId);
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+        }
+
+        [HttpPut("[action]")]
+        public async Task<IActionResult> UndoDelete(int blogId)
+        {
+            var result = await _blogService.UndoDeleteAsync(blogId);
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+        }
     }
 }

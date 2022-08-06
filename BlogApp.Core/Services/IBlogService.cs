@@ -13,5 +13,7 @@ namespace BlogApp.Core.Services
         CustomResponse<List<BlogDto>> GetAllByDeleted();
         CustomResponse<PersonalBlogDto> GetByUserId(int userId);
         CustomResponse<List<BlogDto>> GetAll();
+        Task<CustomResponse<NoContent>> HardDeleteAsync(int blogId);
+        Task<CustomResponse<NoContent>> UndoDeleteAsync(int blogId);
     }
 }
