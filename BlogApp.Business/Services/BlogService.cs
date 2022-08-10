@@ -266,6 +266,13 @@ namespace BlogApp.Business.Services
             return blogsTotalCount > -1 ? CustomResponse<int>.Success(200, blogsTotalCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
         }
 
+        public async Task<CustomResponse<int>> CountByDeletedBlogsAsync()
+        {
+            var blogsDeletedCount = await _blogRepository.CountAsync(x => x.IsDeleted);
+
+            return blogsDeletedCount > -1 ? CustomResponse<int>.Success(200, blogsDeletedCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsDeletedCount}");
+        }
+
         public CustomResponse<List<BlogDto>> GetAll()//Admin-Home-Bloglar
         {
             var blogs = _blogRepository.GetAll().Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
@@ -290,7 +297,7 @@ namespace BlogApp.Business.Services
             if (result)
             {
                 var blog = _blogRepository.Where(x => x.Id == blogId);
-                 _blogRepository.RemoveRange(blog);
+                _blogRepository.RemoveRange(blog);
                 _unitOfWork.Commit();
                 return CustomResponse<NoContent>.Success(200);
             }
@@ -313,6 +320,22 @@ namespace BlogApp.Business.Services
             }
             return CustomResponse<NoContent>.Fail(404, "Bir blog bulunamadı!");
         }
+
+        public CustomResponse<string> IncreaseViewCountAsync(int blogId)//Anasayfa-Blog Detayda
+        {
+            var blog = _blogRepository.Where(x => x.Id == blogId).FirstOrDefault();
+            if (blog == null)
+            {
+                return CustomResponse<string>.Fail(404, "Bir blog bulunamadı!");
+            }
+
+            blog.ViewsCount += 1;
+            _blogRepository.Update(blog);
+            _unitOfWork.Commit();
+            return CustomResponse<string>.Success(200, $"{blog.Title} adlı makalenin okunmasıyısı arttırıldı.");
+        }
+
+
 
         /*
          *+++++++++++++++GetBlogById
