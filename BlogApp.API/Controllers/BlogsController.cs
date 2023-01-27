@@ -4,6 +4,8 @@ using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BlogApp.API.Controllers
 {
@@ -147,6 +149,25 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
             }
             return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Search(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
+        {
+            var searchResult = await _blogService.SearchAsync(keyword, currentPage, pageSize, isAscending);
+            if (searchResult.StatusCode == 200 && searchResult.Data.Count > 0)
+            {
+                return CreateActionResult(CustomResponse<BlogSearchModel>.Success(200, new BlogSearchModel
+                {
+                    BlogListDto = searchResult.Data,
+                    CurrentPage = currentPage,
+                    PageSize = pageSize,
+                    TotalCount = searchResult.Data.Count,
+                    IsAscending = isAscending,
+                    Keyword = keyword
+                }));
+            }
+            return CreateActionResult(CustomResponse<NoContent>.Fail(404, "Anahtar kelime bulunamadı!"));
         }
     }
 }

@@ -6,6 +6,7 @@ using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BlogApp.Business.Services
 {
@@ -335,7 +336,50 @@ namespace BlogApp.Business.Services
             return CustomResponse<string>.Success(200, $"{blog.Title} adlı makalenin okunmasıyısı arttırıldı.");
         }
 
+        public async Task<CustomResponse<List<BlogListDto>>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
+        {
+            pageSize = pageSize > 20 ? 20 : pageSize;
 
+            //if (string.IsNullOrWhiteSpace(keyword))
+            //{
+            //    var blogs = _blogRepository.Where(x => x.IsActive && !x.IsDeleted).Include(x => x.BlogCategories).ThenInclude(x => x.Category).Include(x => x.AppUser).ToList();
+            //    var sortedBlogs = isAscending
+            //        ? blogs.OrderBy(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+            //        : blogs.OrderByDescending(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+                //return CustomResponse<BlogListDto>.Success(200, new BlogListDto
+                //{
+                //    Blogs = sortedBlogs,
+                //    CurrentPage = currentPage,
+                //    PageSize = pageSize,
+                //    TotalCount = blogs.Count,
+                //    IsAscending = isAscending
+                //});
+            //}
+
+            var searchedBlogs = await _blogRepository.SearchAsync(new List<Expression<Func<Blog, bool>>>
+            {
+                (x)=>x.Title.Contains(keyword),
+                (x)=>x.BlogCategories.Any(x=>x.Category.Title.Contains(keyword)),
+                (x)=>x.TagBlogs.Any(x=>x.Tag.Name.Contains(keyword))
+            },
+            x=>x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+
+            var searchedAndSortedBlogs = isAscending
+                ? searchedBlogs.OrderBy(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+                : searchedBlogs.OrderByDescending(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+
+                var blogListDto = new List<BlogListDto>();
+                foreach (var blog in searchedAndSortedBlogs)
+                {
+                    var searchedBlog = _mapper.Map<BlogListDto>(blog);
+                    searchedBlog.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
+                    searchedBlog.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
+                    blogListDto.Add(searchedBlog);
+                }
+            return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+        }
 
         /*
          *+++++++++++++++GetBlogById
@@ -346,7 +390,7 @@ namespace BlogApp.Business.Services
          *GetAllByCategory
          *GetAllByPagingAsync
          *GetAllByUserIdOnFilter
-         *SearchAsync
+         *+++++++++++++++SearchAsync
          *IncreaseViewCountAsync => görüntüleme sayısını arttır.
          *+++++++++++++++CountAsync => blogların toplam sayısı
          *++CountByNonDeletedAsync
