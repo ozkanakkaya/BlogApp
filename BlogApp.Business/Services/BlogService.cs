@@ -381,12 +381,38 @@ namespace BlogApp.Business.Services
             return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
         }
 
+        public async Task<CustomResponse<List<BlogListDto>>> GetAllByViewCountAsync(bool isAscending,int? takeSize)//görüntülenme sayısına göre getir
+        {
+            var blogs = await _blogRepository.Where(x => x.IsActive && !x.IsDeleted).Include(x => x.BlogCategories).ThenInclude(x => x.Category).Include(x=>x.TagBlogs).ThenInclude(x=>x.Tag).Include(x => x.AppUser).ToListAsync();
+            var sortedBlogs = isAscending ? blogs.OrderBy(x => x.ViewsCount) : blogs.OrderByDescending(x => x.ViewsCount);
+
+            if (blogs.Any())
+            {
+                var blogListDto = new List<BlogListDto>();
+                foreach (var blog in sortedBlogs)
+                {
+                    var sortedBlog = _mapper.Map<BlogListDto>(blog);
+                    sortedBlog.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
+                    sortedBlog.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
+                    blogListDto.Add(sortedBlog);
+                }
+                return CustomResponse<List<BlogListDto>>.Success(200, takeSize < 1 ? blogListDto.ToList() : blogListDto.Take(takeSize.Value).ToList());
+
+            }
+            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
+
+        }
+
+
+
+
+
         /*
          *+++++++++++++++GetBlogById
          *+++++++++++++++GetAllDeletedBlogs
          *+++++++++++++++UndoDelete
          *+++++++++++++++HardDeleteAsync
-         *GetAllByViewCount
+         *+++++++++++++++GetAllByViewCount
          *GetAllByCategory
          *GetAllByPagingAsync
          *GetAllByUserIdOnFilter

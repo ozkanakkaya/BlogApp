@@ -169,5 +169,18 @@ namespace BlogApp.API.Controllers
             }
             return CreateActionResult(CustomResponse<NoContent>.Fail(404, "Anahtar kelime bulunamadı!"));
         }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllByViewCount(bool isAscending,int takeSize)
+        {
+            var result = await _blogService.GetAllByViewCountAsync(isAscending, takeSize);
+
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
+
+        }
     }
 }

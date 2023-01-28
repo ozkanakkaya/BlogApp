@@ -16,5 +16,6 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<NoContent>> HardDeleteAsync(int blogId);
         Task<CustomResponse<NoContent>> UndoDeleteAsync(int blogId);
         Task<CustomResponse<List<BlogListDto>>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false);
+        Task<CustomResponse<List<BlogListDto>>> GetAllByViewCountAsync(bool isAscending, int? takeSize);
     }
 }
