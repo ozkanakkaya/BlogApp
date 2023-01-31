@@ -4,8 +4,6 @@ using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace BlogApp.API.Controllers
 {
@@ -151,7 +149,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
         }
 
-        [HttpGet("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> Search(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
         {
             var searchResult = await _blogService.SearchAsync(keyword, currentPage, pageSize, isAscending);
@@ -181,6 +179,95 @@ namespace BlogApp.API.Controllers
             }
             return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
 
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllByPaging(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false)
+        {
+            var result = await (categoryId == null
+                ? _blogService.GetAllByPagingAsync(null, currentPage, pageSize, isAscending)
+                : _blogService.GetAllByPagingAsync(categoryId.Value, currentPage, pageSize, isAscending)
+                );
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            }
+
+            return CreateActionResult(CustomResponse<BlogSearchModel>.Success(result.StatusCode, new BlogSearchModel
+            {
+                BlogListDto = result.Data,
+                CurrentPage = currentPage,
+                PageSize = pageSize,
+                TotalCount = result.Data.Count,
+                IsAscending = isAscending,
+            }));
+
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> CountTotalBlogs()
+        {
+            var result = await _blogService.CountTotalBlogsAsync();
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> CountActiveBlogs()
+        {
+            var result = await _blogService.CountActiveBlogsAsync();
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> CountInActiveBlogs()
+        {
+            var result = await _blogService.CountInActiveBlogsAsync();
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> CountByDeletedBlogs()
+        {
+            var result = await _blogService.CountByDeletedBlogsAsync();
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> CountByNonDeletedBlogs()
+        {
+            var result = await _blogService.CountByNonDeletedBlogsAsync();
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult IncreaseViewCount(int blogId)
+        {
+            var result = _blogService.IncreaseViewCountAsync(blogId);
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<string>.Success(result.StatusCode, result.Data));
         }
     }
 }

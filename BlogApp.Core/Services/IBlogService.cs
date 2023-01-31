@@ -17,5 +17,12 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<NoContent>> UndoDeleteAsync(int blogId);
         Task<CustomResponse<List<BlogListDto>>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false);
         Task<CustomResponse<List<BlogListDto>>> GetAllByViewCountAsync(bool isAscending, int? takeSize);
+        Task<CustomResponse<List<BlogListDto>>> GetAllByPagingAsync(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false);
+        Task<CustomResponse<int>> CountTotalBlogsAsync();
+        Task<CustomResponse<int>> CountActiveBlogsAsync();
+        Task<CustomResponse<int>> CountInActiveBlogsAsync();
+        Task<CustomResponse<int>> CountByDeletedBlogsAsync();
+        Task<CustomResponse<int>> CountByNonDeletedBlogsAsync();
+        CustomResponse<string> IncreaseViewCountAsync(int blogId);
     }
 }

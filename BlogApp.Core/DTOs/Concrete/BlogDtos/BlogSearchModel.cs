@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BlogApp.Core.DTOs.Concrete.BlogDtos
 {
-    public class BlogSearchModel : BaseDto
+    public class BlogSearchModel : BaseDto, IDto
     {
         public List<BlogListDto> BlogListDto { get; set; }
         public string Keyword { get; set; }

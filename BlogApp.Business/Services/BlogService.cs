@@ -274,6 +274,13 @@ namespace BlogApp.Business.Services
             return blogsDeletedCount > -1 ? CustomResponse<int>.Success(200, blogsDeletedCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsDeletedCount}");
         }
 
+        public async Task<CustomResponse<int>> CountByNonDeletedBlogsAsync()
+        {
+            var blogsNonDeletedCount = await _blogRepository.CountAsync(x => !x.IsDeleted);
+
+            return blogsNonDeletedCount > -1 ? CustomResponse<int>.Success(200, blogsNonDeletedCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsNonDeletedCount}");
+        }
+
         public CustomResponse<List<BlogDto>> GetAll()//Admin-Home-Bloglar
         {
             var blogs = _blogRepository.GetAll().Include(x => x.BlogCategories).ThenInclude(x => x.Category).ToList();
@@ -333,7 +340,7 @@ namespace BlogApp.Business.Services
             blog.ViewsCount += 1;
             _blogRepository.Update(blog);
             _unitOfWork.Commit();
-            return CustomResponse<string>.Success(200, $"{blog.Title} adlı makalenin okunmasıyısı arttırıldı.");
+            return CustomResponse<string>.Success(200, $"{blog.Title} adlı bloğun okunmasıyısı arttırıldı.");
         }
 
         public async Task<CustomResponse<List<BlogListDto>>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
@@ -391,10 +398,10 @@ namespace BlogApp.Business.Services
                 var blogListDto = new List<BlogListDto>();
                 foreach (var blog in sortedBlogs)
                 {
-                    var sortedBlog = _mapper.Map<BlogListDto>(blog);
-                    sortedBlog.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
-                    sortedBlog.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
-                    blogListDto.Add(sortedBlog);
+                    var blogList = _mapper.Map<BlogListDto>(blog);
+                    blogList.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
+                    blogList.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
+                    blogListDto.Add(blogList);
                 }
                 return CustomResponse<List<BlogListDto>>.Success(200, takeSize < 1 ? blogListDto.ToList() : blogListDto.Take(takeSize.Value).ToList());
 
@@ -403,8 +410,29 @@ namespace BlogApp.Business.Services
 
         }
 
+        public async Task<CustomResponse<List<BlogListDto>>> GetAllByPagingAsync(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false)
+        {
+            pageSize = pageSize > 20 ? 20 : pageSize;
+            var blogs = categoryId == null
+                ? await _blogRepository.Where(x => x.IsActive && !x.IsDeleted).Include(x => x.BlogCategories).ThenInclude(x => x.Category).Include(x => x.TagBlogs).ThenInclude(x => x.Tag).Include(x => x.AppUser).ToListAsync()
+                : await _blogRepository.Where(x => x.BlogCategories.Any(x => x.CategoryId == categoryId) && x.IsActive && !x.IsDeleted).Include(x => x.BlogCategories).ThenInclude(x => x.Category).Include(x => x.TagBlogs).ThenInclude(x => x.Tag).Include(x => x.AppUser).ToListAsync();
 
+            var sortedBlogs = isAscending
+                ? blogs.OrderBy(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+                : blogs.OrderByDescending(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
+            var blogListDto = new List<BlogListDto>();
+            foreach (var blog in sortedBlogs)
+            {
+                var blogList = _mapper.Map<BlogListDto>(blog);
+                blogList.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
+                blogList.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
+                blogList.CategoryId = categoryId != null ? categoryId.Value : null;
+                blogListDto.Add(blogList);
+            }
+            return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+
+        }
 
 
         /*
@@ -417,9 +445,9 @@ namespace BlogApp.Business.Services
          *GetAllByPagingAsync
          *GetAllByUserIdOnFilter
          *+++++++++++++++SearchAsync
-         *IncreaseViewCountAsync => görüntüleme sayısını arttır.
+         *+++++++++++++++IncreaseViewCountAsync => görüntüleme sayısını arttır.
          *+++++++++++++++CountAsync => blogların toplam sayısı
-         *++CountByNonDeletedAsync
+         *+++++++++++++++CountByNonDeletedAsync
          *GetAllAsyncV2 =>yorumlar kategoriler kullanıcılar sıralamalar vs göre getirir.
          *GetBlogByIdWithCategoriesAndComments=> GetAsync
          *

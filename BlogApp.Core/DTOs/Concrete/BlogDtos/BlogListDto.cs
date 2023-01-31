@@ -4,7 +4,7 @@ using BlogApp.Core.Entities.Concrete;
 
 namespace BlogApp.Core.DTOs.Concrete.BlogDtos
 {
-    public class BlogListDto : BaseDto, IDto
+    public class BlogListDto : IDto
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -23,7 +23,7 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
 
 
         //public IList<Blog> Blogs { get; set; }
-        //public int? CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public List<string> Tags { get; set; }
         public List<string> Categories { get; set; }
     }
