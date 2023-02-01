@@ -84,9 +84,9 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet]//api/blogs
-        public IActionResult GetAllByNonDeletedAndActiveBlogs()
+        public async Task<IActionResult> GetAllByNonDeletedAndActiveBlogs()
         {
-            var blogs = _blogService.GetAllByNonDeletedAndActive();
+            var blogs = await _blogService.GetAllByNonDeletedAndActive();
             if (blogs.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
@@ -95,20 +95,20 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet("[action]")]
-        public IActionResult GetAllByDeletedBlogs()
+        public async Task<IActionResult> GetAllByDeletedBlogs()
         {
-            var deletedBlogs = _blogService.GetAllByDeleted();
+            var deletedBlogs = await _blogService.GetAllByDeletedAsync();
             if (deletedBlogs.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, deletedBlogs.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogDto>>.Success(200, deletedBlogs.Data));
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, deletedBlogs.Data));
         }
 
         [HttpGet("[action]/{userId}")]
-        public IActionResult GetBlogsByUserId(int userId)
+        public async Task<IActionResult> GetBlogsByUserId(int userId)
         {
-            var blogs = _blogService.GetByUserId(userId);
+            var blogs = await _blogService.GetAllByUserIdAsync(userId);
             if (blogs.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
@@ -117,14 +117,14 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet("[action]")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var deletedBlogs = _blogService.GetAll();
+            var deletedBlogs = await _blogService.GetAllBlogsAsync();
             if (deletedBlogs.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, deletedBlogs.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogDto>>.Success(200, deletedBlogs.Data));
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, deletedBlogs.Data));
         }
 
         [HttpDelete("[action]")]
@@ -269,5 +269,18 @@ namespace BlogApp.API.Controllers
             }
             return CreateActionResult(CustomResponse<string>.Success(result.StatusCode, result.Data));
         }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllByCategory(int categoryId)
+        {
+            var result = await _blogService.GetAllByCategoryAsync(categoryId);
+
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
+        }
+
     }
 }

@@ -8,11 +8,11 @@ namespace BlogApp.Core.Services
     {
         Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogDto);
         Task<CustomResponse<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto);
-        CustomResponse<List<BlogListDto>> GetAllByNonDeletedAndActive();
+        Task<CustomResponse<List<BlogListDto>>> GetAllByNonDeletedAndActive();
         Task<CustomResponse<NoContent>> DeleteAsync(int blogId);
-        CustomResponse<List<BlogDto>> GetAllByDeleted();
-        CustomResponse<PersonalBlogDto> GetByUserId(int userId);
-        CustomResponse<List<BlogDto>> GetAll();
+        Task<CustomResponse<List<BlogListDto>>> GetAllByDeletedAsync();
+        Task<CustomResponse<PersonalBlogDto>> GetAllByUserIdAsync(int userId);
+        Task<CustomResponse<List<BlogListDto>>> GetAllBlogsAsync();
         Task<CustomResponse<NoContent>> HardDeleteAsync(int blogId);
         Task<CustomResponse<NoContent>> UndoDeleteAsync(int blogId);
         Task<CustomResponse<List<BlogListDto>>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false);
@@ -24,5 +24,6 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<int>> CountByDeletedBlogsAsync();
         Task<CustomResponse<int>> CountByNonDeletedBlogsAsync();
         CustomResponse<string> IncreaseViewCountAsync(int blogId);
+        Task<CustomResponse<List<BlogListDto>>> GetAllByCategoryAsync(int categoryId);
     }
 }

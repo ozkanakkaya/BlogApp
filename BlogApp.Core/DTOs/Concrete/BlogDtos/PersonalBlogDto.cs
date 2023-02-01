@@ -9,7 +9,7 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
 {
     public class PersonalBlogDto : IDto
     {
-        public List<PersonalBlogListDto> Blogs { get; set; }
+        public List<BlogListDto> Blogs { get; set; }
         public int TotalBlogCount { get; set; }
         public int TotalActiveBlogCount { get; set; }
         public int TotalInactiveBlogCount { get; set; }

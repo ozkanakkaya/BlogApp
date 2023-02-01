@@ -19,7 +19,8 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
         public DateTime UpdatedDate { get; set; }
         public string UpdatedByUsername { get; set; }
         public int AppUserId { get; set; }
-
+        public bool IsDeleted { get; set; }
+        public bool IsActive { get; set; }
 
 
         //public IList<Blog> Blogs { get; set; }
