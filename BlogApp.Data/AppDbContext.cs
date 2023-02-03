@@ -72,6 +72,7 @@ namespace BlogApp.Data
                         case EntityState.Added:
                             {
                                 entityReference.CreatedDate = DateTime.Now;
+                                entityReference.UpdatedDate = entityReference.CreatedDate;
                                 //entityReference.CreatedByUsername = username;
                                 break;
                             }

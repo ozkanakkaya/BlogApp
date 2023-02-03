@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BlogApp.Core.DTOs.Concrete.BlogDtos;
 using BlogApp.Core.Entities.Concrete;
+using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
@@ -377,8 +378,8 @@ namespace BlogApp.Business.Services
             x=>x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
 
             var searchedAndSortedBlogs = isAscending
-                ? searchedBlogs.OrderBy(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
-                : searchedBlogs.OrderByDescending(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+                ? searchedBlogs.OrderBy(x => x.UpdatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+                : searchedBlogs.OrderByDescending(x => x.UpdatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
 
                 var blogListDto = new List<BlogListDto>();
@@ -422,8 +423,8 @@ namespace BlogApp.Business.Services
                 : await _blogRepository.Where(x => x.BlogCategories.Any(x => x.CategoryId == categoryId) && x.IsActive && !x.IsDeleted).Include(x => x.BlogCategories).ThenInclude(x => x.Category).Include(x => x.TagBlogs).ThenInclude(x => x.Tag).Include(x => x.AppUser).ToListAsync();
 
             var sortedBlogs = isAscending
-                ? blogs.OrderBy(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
-                : blogs.OrderByDescending(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+                ? blogs.OrderBy(x => x.UpdatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+                : blogs.OrderByDescending(x => x.UpdatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
             var blogListDto = new List<BlogListDto>();
             foreach (var blog in sortedBlogs)
@@ -459,6 +460,134 @@ namespace BlogApp.Business.Services
 
         }
 
+        public async Task<CustomResponse<List<BlogListDto>>> GetAllByUserIdOnFilterAsync(int userId, FilterBy filterBy, OrderBy orderBy, bool isAscending, int takeSize, int categoryId, DateTime startAt, DateTime endAt, int minViewCount, int maxViewCount, int minCommentCount, int maxCommentCount)
+        {
+            var anyUser = await _appUserRepository.AnyAsync(x => x.Id == userId);
+            if (!anyUser)
+            {
+                return CustomResponse<List<BlogListDto>>.Fail(404, $"{userId} numarasına ait bir kullanıcı bulunamadı!");
+            }
+
+            var userBlogs = await _blogRepository.Where(x => x.IsActive && !x.IsDeleted && x.AppUserId == userId).Include(x => x.BlogCategories).ThenInclude(x => x.Category).Include(x => x.TagBlogs).ThenInclude(x => x.Tag).Include(x => x.AppUser).ToListAsync();
+
+            if (userBlogs.Any())
+            {
+                List<Blog> sortedBlogs = new();
+                switch (filterBy)
+                {
+                    case FilterBy.Category:
+                        switch (orderBy)
+                        {
+                            case OrderBy.Date:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(categoryId == 0 ? x => true : x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderBy(x => x.UpdatedDate).ToList()
+                                    : userBlogs.Where(categoryId == 0 ? x => true : x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderByDescending(x => x.UpdatedDate).ToList();
+                                break;
+                            case OrderBy.ViewCount:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(categoryId == 0 ? x => true : x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderBy(x => x.ViewsCount).ToList()
+                                    : userBlogs.Where(categoryId == 0 ? x => true : x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderByDescending(x => x.ViewsCount).ToList();
+                                break;
+                            case OrderBy.CommentCount:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(categoryId == 0 ? x => true : x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderBy(x => x.CommentCount).ToList()
+                                    : userBlogs.Where(categoryId == 0 ? x => true : x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderByDescending(x => x.CommentCount).ToList();
+                                break;
+                        }
+                        break;
+                    case FilterBy.Date:
+                        switch (orderBy)
+                        {
+                            case OrderBy.Date:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderBy(x => x.UpdatedDate).ToList()
+                                    : userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderByDescending(x => x.UpdatedDate).ToList();
+                                break;
+                            case OrderBy.ViewCount:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderBy(x => x.ViewsCount).ToList()
+                                    : userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderByDescending(x => x.ViewsCount).ToList();
+                                break;
+                            case OrderBy.CommentCount:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderBy(x =>
+                                x.CommentCount).ToList()
+                                    : userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderByDescending(x => x.CommentCount).ToList();
+                                break;
+                        }
+                        break;
+                    case FilterBy.ViewCount:
+                        switch (orderBy)
+                        {
+                            case OrderBy.Date:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderBy(x =>
+                                x.UpdatedDate).ToList()
+                                    : userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
+                                x.UpdatedDate).ToList();
+                                break;
+                            case OrderBy.ViewCount:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderBy(x =>
+                                x.ViewsCount).ToList()
+                                    : userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
+                                x.ViewsCount).ToList();
+                                break;
+                            case OrderBy.CommentCount:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderBy(x =>
+                                x.CommentCount).ToList()
+                                    : userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
+                                x.CommentCount).ToList();
+                                break;
+                        }
+                        break;
+                    case FilterBy.CommentCount:
+                        switch (orderBy)
+                        {
+                            case OrderBy.Date:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.CommentCount >= minCommentCount && x.CommentCount <= maxCommentCount).Take(takeSize).OrderBy(x =>
+                                x.UpdatedDate).ToList()
+                                    : userBlogs.Where(x => x.CommentCount >= minCommentCount && x.CommentCount <= maxCommentCount).Take(takeSize).OrderByDescending(x =>
+                                x.UpdatedDate).ToList();
+                                break;
+                            case OrderBy.ViewCount:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.CommentCount >= minCommentCount && x.CommentCount <= maxCommentCount).Take(takeSize).OrderBy(x =>
+                                x.ViewsCount).ToList()
+                                    : userBlogs.Where(x => x.CommentCount >= minCommentCount && x.CommentCount <= maxCommentCount).Take(takeSize).OrderByDescending(x =>
+                                x.ViewsCount).ToList();
+                                break;
+                            case OrderBy.CommentCount:
+                                sortedBlogs = isAscending
+                                    ? userBlogs.Where(x => x.CommentCount >= minCommentCount && x.CommentCount <= maxCommentCount).Take(takeSize).OrderBy(x =>
+                                x.CommentCount).ToList()
+                                    : userBlogs.Where(x => x.CommentCount >= minCommentCount && x.CommentCount <= maxCommentCount).Take(takeSize).OrderByDescending(x =>
+                                x.CommentCount).ToList();
+                                break;
+                        }
+                        break;
+                }
+                if(!sortedBlogs.Any())
+                    return CustomResponse<List<BlogListDto>>.Fail(404, "Kullanıcıya ait gösterilecek bir blog bulunamadı!");
+                var blogListDto = new List<BlogListDto>();
+                foreach (var blog in sortedBlogs)
+                {
+                    var blogList = _mapper.Map<BlogListDto>(blog);
+                    blogList.Categories = blog.BlogCategories.Select(x => x.Category.Title).ToList();
+                    blogList.Tags = blog.TagBlogs.Select(x => x.Tag.Name).ToList();
+                    blogList.CategoryId = categoryId;
+                    blogListDto.Add(blogList);
+                }
+                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+            }
+            return CustomResponse<List<BlogListDto>>.Fail(404, "Kullanıcıya ait gösterilecek bir blog bulunamadı!");
+
+        }
+
+
+
         /*
          *+++++++++++++++GetBlogById
          *+++++++++++++++GetAllDeletedBlogs
@@ -467,7 +596,7 @@ namespace BlogApp.Business.Services
          *+++++++++++++++GetAllByViewCount
          *+++++++++++++++GetAllByCategory
          *+++++++++++++++GetAllByPagingAsync
-         *GetAllByUserIdOnFilter
+         *+++++++++++++++GetAllByUserIdOnFilter
          *+++++++++++++++SearchAsync
          *+++++++++++++++IncreaseViewCountAsync => görüntüleme sayısını arttır.
          *+++++++++++++++CountAsync => blogların toplam sayısı

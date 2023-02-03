@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BlogApp.Core.DTOs.Concrete.BlogDtos;
+using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using FluentValidation;
@@ -282,5 +283,16 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllByUserIdOnFilter(int userId, FilterBy filterBy, OrderBy orderBy, bool isAscending, int takeSize, int categoryId, DateTime startAt, DateTime endAt, int minViewCount, int maxViewCount, int minCommentCount, int maxCommentCount)
+        {
+            var result = await _blogService.GetAllByUserIdOnFilterAsync(userId, filterBy, orderBy, isAscending, takeSize, categoryId, startAt, endAt, minViewCount, maxViewCount, minCommentCount, maxCommentCount);
+
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
+        }
     }
 }

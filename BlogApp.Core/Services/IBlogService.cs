@@ -1,5 +1,6 @@
 ﻿using BlogApp.Core.DTOs.Concrete.BlogDtos;
 using BlogApp.Core.Entities.Concrete;
+using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Response;
 
 namespace BlogApp.Core.Services
@@ -25,5 +26,6 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<int>> CountByNonDeletedBlogsAsync();
         CustomResponse<string> IncreaseViewCountAsync(int blogId);
         Task<CustomResponse<List<BlogListDto>>> GetAllByCategoryAsync(int categoryId);
+        Task<CustomResponse<List<BlogListDto>>> GetAllByUserIdOnFilterAsync(int userId, FilterBy filterBy, OrderBy orderBy, bool isAscending, int takeSize, int categoryId, DateTime startAt, DateTime endAt, int minViewCount, int maxViewCount, int minCommentCount, int maxCommentCount);
     }
 }
