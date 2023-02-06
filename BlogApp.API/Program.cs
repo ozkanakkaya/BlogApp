@@ -42,6 +42,7 @@ var profiles = ProfileHelper.GetProfiles();
 profiles.Add(new AppRoleProfile());
 profiles.Add(new TagProfile());
 profiles.Add(new BlogProfile());
+profiles.Add(new CommentProfile());
 var configuration = new MapperConfiguration(opt =>
 {
     opt.AddProfiles(profiles);

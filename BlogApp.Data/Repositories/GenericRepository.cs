@@ -64,5 +64,41 @@ namespace BlogApp.Data.Repositories
         {
             return await (expression == null ? _dbSet.CountAsync() : _dbSet.CountAsync(expression));
         }
+
+        public async Task<IList<T>> GetAllFilteredAsync(IList<Expression<Func<T,bool>>> predicates, IList<Expression<Func<T,object>>> includeProperties)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (predicates != null && predicates.Any())
+            {
+                foreach (var predicate in predicates)
+                {
+                    query = query.Where(predicate);
+                }
+            }
+
+            if (includeProperties != null && includeProperties.Any())
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    switch (includeProperty.ToString())
+                    {
+                        case string x when x.Contains("BlogCategories"):
+                            query = query.Include(x => (x as Core.Entities.Concrete.Blog).BlogCategories).ThenInclude(x => x.Category);
+                            break;
+                        case string x when x.Contains("TagBlogs"):
+                            query = query.Include(x => (x as Core.Entities.Concrete.Blog).TagBlogs).ThenInclude(x => x.Tag);
+                            break;
+                        default:
+                            query = query.Include(includeProperty);
+                            break;
+                    }
+
+                    //query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.AsNoTracking().ToListAsync();
+        }
     }
 }

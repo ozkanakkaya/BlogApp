@@ -1,5 +1,7 @@
 ﻿
 using BlogApp.Core.DTOs.Abstract;
+using BlogApp.Core.DTOs.Concrete.AppUserDtos;
+using BlogApp.Core.DTOs.Concrete.CommentDtos;
 using BlogApp.Core.Entities.Concrete;
 
 namespace BlogApp.Core.DTOs.Concrete.BlogDtos
@@ -27,5 +29,7 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
         public int? CategoryId { get; set; }
         public List<string> Tags { get; set; }
         public List<string> Categories { get; set; }
+        public List<CommentDto> Comments { get; set; }
+        public AppUserListDto AppUser { get; set; }
     }
 }

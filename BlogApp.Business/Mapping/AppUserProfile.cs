@@ -11,6 +11,7 @@ namespace BlogApp.Business.Mapping
             CreateMap<AppUser, AppUserRegisterDto>().ReverseMap();
             CreateMap<AppUser, AppUserListDto>().ReverseMap();
             CreateMap<AppUser, CheckUserResponseDto>().ReverseMap();
+            CreateMap<AppUser, AppUserDto>().ReverseMap();
         }
     }
 }

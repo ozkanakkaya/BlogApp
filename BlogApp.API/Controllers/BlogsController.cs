@@ -197,6 +197,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<BlogSearchModel>.Success(result.StatusCode, new BlogSearchModel
             {
                 BlogListDto = result.Data,
+                CategoryId = categoryId.HasValue ? categoryId.Value : null,
                 CurrentPage = currentPage,
                 PageSize = pageSize,
                 TotalCount = result.Data.Count,
@@ -293,6 +294,25 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
             }
             return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllFilteredAsync(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser)
+        {
+            var result = await _blogService.GetAllBlogsFilteredAsync(categoryId, userId, isActive, isDeleted, currentPage, pageSize, orderBy, isAscending, includeCategory, includeTag, includeComments, includeUser);
+            if (!result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<BlogSearchModel>.Success(200, new BlogSearchModel
+                {
+                    BlogListDto = result.Data/*.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()*/,
+                    CategoryId = categoryId.HasValue ? categoryId.Value : null,
+                    CurrentPage = currentPage,
+                    PageSize = pageSize,
+                    TotalCount = result.Data.Count,
+                    IsAscending = isAscending,
+                }));
+            }
+            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
         }
     }
 }
