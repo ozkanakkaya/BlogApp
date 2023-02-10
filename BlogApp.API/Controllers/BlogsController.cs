@@ -56,8 +56,8 @@ namespace BlogApp.API.Controllers
 
             if (result.IsValid)
             {
-                var result1 = await _blogService.UpdateBlogAsync(blogUpdateDto);
-                if (result1.StatusCode == 204)
+                var resultUpdate = await _blogService.UpdateBlogAsync(blogUpdateDto);
+                if (resultUpdate.StatusCode == 204)
                 {
                     return CreateActionResult(CustomResponse<NoContent>.Success(204));
                 }
@@ -315,6 +315,18 @@ namespace BlogApp.API.Controllers
                 }));
             }
             return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetByBlogId(int blogId)
+        {
+            var result = await _blogService.GetByBlogId(blogId);
+
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<BlogListDto>.Success(result.StatusCode, result.Data));
         }
     }
 }

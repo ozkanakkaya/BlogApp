@@ -93,7 +93,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto)
         {
-            var oldBlog = _blogRepository.GetBlogById(blogUpdateDto.Id);
+            var oldBlog = await _blogRepository.GetBlogById(blogUpdateDto.Id);
             var blog = _mapper.Map<BlogUpdateDto, Blog>(blogUpdateDto, oldBlog);
 
             if (!SetwiseEquivalentTo<int>(blogUpdateDto.CategoryIds.ToList(), oldBlog.BlogCategories.Select(x => x.CategoryId).ToList()))
@@ -558,7 +558,7 @@ namespace BlogApp.Business.Services
 
             if (includeCategory) includes.Add(x => x.BlogCategories);//.Select(x => (x as BlogCategory).Category)
             if (includeTag) includes.Add(x => x.TagBlogs);
-            if (includeComments) includes.Add(x => x.Comments);
+            if (includeComments) includes.Add(x => x.Comments.Where(x => x.IsActive && !x.IsDeleted));
             if (includeUser) includes.Add(x => x.AppUser);
 
             var blogs = await _blogRepository.GetAllFilteredAsync(predicates, includes);
@@ -588,7 +588,19 @@ namespace BlogApp.Business.Services
 
         }
 
+        public async Task<CustomResponse<BlogListDto>> GetByBlogId(int blogId)//blog detayda kul.
+        {
+            var blog = await _blogRepository.Where(x => x.Id == blogId && x.Comments.Any(x => x.IsActive && !x.IsDeleted)).Include(x => x.BlogCategories).ThenInclude(x => x.Category).Include(x => x.TagBlogs).ThenInclude(x => x.Tag).Include(x => x.AppUser).Include(x => x.Comments).FirstOrDefaultAsync();
 
+            if (blog != null)
+            {
+                var blogDto = _mapper.Map<BlogListDto>(blog);
+
+                return CustomResponse<BlogListDto>.Success(200, blogDto);
+            }
+            return CustomResponse<BlogListDto>.Fail(404, "Gösterilecek bir blog bulunamadı!");
+
+        }
 
 
 
@@ -607,8 +619,8 @@ namespace BlogApp.Business.Services
          *+++++++++++++++IncreaseViewCountAsync => görüntüleme sayısını arttır.
          *+++++++++++++++CountAsync => blogların toplam sayısı
          *+++++++++++++++CountByNonDeletedAsync
-         *GetAllAsyncV2 =>yorumlar kategoriler kullanıcılar sıralamalar vs göre getirir.
-         *GetBlogByIdWithCategoriesAndComments=> GetAsync
+         *+++++++++++++++GetAllAsyncV2 =>yorumlar kategoriler kullanıcılar sıralamalar vs göre getirir.
+         *+++++++++++++++GetBlogByIdWithCategoriesAndComments=> GetAsync
          *
          *GetAllByTagAsync
          *
