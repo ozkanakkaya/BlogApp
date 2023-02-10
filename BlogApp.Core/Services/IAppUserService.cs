@@ -1,5 +1,4 @@
-﻿using BlogApp.Core.DTOs.Concrete.AppRoleDtos;
-using BlogApp.Core.DTOs.Concrete.AppUserDtos;
+﻿using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Response;
 

@@ -1,7 +1,6 @@
 ﻿using BlogApp.Core.DTOs.Abstract;
-using BlogApp.Core.DTOs.Concrete.GenderDtos;
 
-namespace BlogApp.Core.DTOs.Concrete.AppUserDtos
+namespace BlogApp.Core.DTOs.Concrete
 {
     public class AppUserListDto : IDto
     {

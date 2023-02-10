@@ -1,6 +1,6 @@
 ﻿using BlogApp.Core.DTOs.Abstract;
 
-namespace BlogApp.Core.DTOs.Concrete.AppUserDtos
+namespace BlogApp.Core.DTOs.Concrete
 {
     public class AppUserLoginDto : IDto
     {

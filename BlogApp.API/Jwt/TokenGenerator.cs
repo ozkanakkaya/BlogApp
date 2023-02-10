@@ -1,5 +1,4 @@
-﻿using BlogApp.Core.DTOs.Concrete.AppRoleDtos;
-using BlogApp.Core.DTOs.Concrete.AppUserDtos;
+﻿using BlogApp.Core.DTOs.Concrete;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

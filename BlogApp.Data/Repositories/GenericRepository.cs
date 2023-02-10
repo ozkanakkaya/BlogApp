@@ -65,7 +65,7 @@ namespace BlogApp.Data.Repositories
             return await (expression == null ? _dbSet.CountAsync() : _dbSet.CountAsync(expression));
         }
 
-        public async Task<IList<T>> GetAllFilteredAsync(IList<Expression<Func<T,bool>>> predicates, IList<Expression<Func<T,object>>> includeProperties)
+        public async Task<IList<T>> GetAllFilteredAsync(IList<Expression<Func<T, bool>>> predicates, IList<Expression<Func<T, object>>> includeProperties)
         {
             IQueryable<T> query = _dbSet;
 

@@ -4,11 +4,11 @@ using BlogApp.Core.Entities.Concrete;
 
 namespace BlogApp.Business.Mapping
 {
-    public class AppRoleProfile : Profile
+    public class CategoryProfile : Profile
     {
-        public AppRoleProfile()
+        public CategoryProfile()
         {
-            CreateMap<AppRole, AppRoleListDto>().ReverseMap();
+            CreateMap<Category, CategoryDto>().ReverseMap();
         }
     }
 }

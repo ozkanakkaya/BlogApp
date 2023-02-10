@@ -1,10 +1,6 @@
-﻿
-using BlogApp.Core.DTOs.Abstract;
-using BlogApp.Core.DTOs.Concrete.AppUserDtos;
-using BlogApp.Core.DTOs.Concrete.CommentDtos;
-using BlogApp.Core.Entities.Concrete;
+﻿using BlogApp.Core.DTOs.Abstract;
 
-namespace BlogApp.Core.DTOs.Concrete.BlogDtos
+namespace BlogApp.Core.DTOs.Concrete
 {
     public class BlogListDto : IDto
     {
@@ -24,12 +20,10 @@ namespace BlogApp.Core.DTOs.Concrete.BlogDtos
         public bool IsDeleted { get; set; }
         public bool IsActive { get; set; }
 
-
-        //public IList<Blog> Blogs { get; set; }
-        public int? CategoryId { get; set; }
-        public List<string> Tags { get; set; }
-        public List<string> Categories { get; set; }
+        public List<TagDto> Tags { get; set; }
+        public List<CategoryDto> Categories { get; set; }
         public List<CommentDto> Comments { get; set; }
-        public AppUserListDto AppUser { get; set; }
+        public AppUserDto AppUser { get; set; }
+
     }
 }

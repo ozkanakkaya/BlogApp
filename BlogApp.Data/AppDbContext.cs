@@ -1,15 +1,18 @@
 ﻿using BlogApp.Core.Entities.Abstract;
 using BlogApp.Core.Entities.Concrete;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace BlogApp.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AppDbContext(DbContextOptions<AppDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
         {
-
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public DbSet<About> About { get; set; }
@@ -25,69 +28,40 @@ namespace BlogApp.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<TagBlog> TagBlogs { get; set; }
 
-
-        //public override int SaveChanges()
-        //{
-        //    foreach (var item in ChangeTracker.Entries())
-        //    {
-        //        if (item.Entity is AppUser entityReference)
-        //        {
-        //            switch (item.State)
-        //            {
-        //                case EntityState.Added:
-        //                    {
-        //                        entityReference.CreatedDate = DateTime.Now;
-        //                        entityReference.CreatedByUsername = entityReference.Username;
-        //                        break;
-        //                    }
-        //                case EntityState.Modified:
-        //                    {
-        //                        Entry(entityReference).Property(x => x.CreatedDate).IsModified = false;
-        //                        Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
-
-        //                        entityReference.UpdatedDate = DateTime.Now;
-        //                        entityReference.CreatedByUsername = entityReference.Username;
-        //                        break;
-        //                    }
-        //            }
-        //        }
-        //    }
-        //    return base.SaveChanges();
-        //}
-
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override int SaveChanges()
         {
+            var httpContext = _httpContextAccessor.HttpContext;
+
             foreach (var item in ChangeTracker.Entries())
             {
-                //var username = "Admin";
-                //if (item.Entity is AppUser entityReference1)
-                //{
-                //    username = entityReference1.Username;
-                //}
-
                 if (item.Entity is BaseEntity entityReference)
                 {
+                    var username = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                    var methodName = httpContext.Request.Path.Value.Split("/").Last();
+
                     switch (item.State)
                     {
                         case EntityState.Added:
                             {
-                                entityReference.CreatedDate = DateTime.Now;
+                                entityReference.CreatedDate = DateTime.UtcNow;
                                 entityReference.UpdatedDate = entityReference.CreatedDate;
-                                //entityReference.CreatedByUsername = username;
+                                entityReference.CreatedByUsername = username;
                                 break;
                             }
                         case EntityState.Modified:
                             {
+                                if (methodName == "IncreaseViewCount") break;
+
                                 Entry(entityReference).Property(x => x.CreatedDate).IsModified = false;
-                                //Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
-                                entityReference.UpdatedDate = DateTime.Now;
-                                //entityReference.UpdatedByUsername = username;
+                                Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
+                                entityReference.UpdatedDate = DateTime.UtcNow;
+                                entityReference.UpdatedByUsername = username;
                                 break;
                             }
                     }
                 }
             }
-            return base.SaveChangesAsync(cancellationToken);
+            return base.SaveChanges();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

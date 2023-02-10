@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BlogApp.Core.DTOs.Concrete.BlogDtos;
+using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
@@ -85,9 +85,9 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet]//api/blogs
-        public async Task<IActionResult> GetAllByNonDeletedAndActiveBlogs()
+        public async Task<IActionResult> GetAllByActive()
         {
-            var blogs = await _blogService.GetAllByNonDeletedAndActive();
+            var blogs = await _blogService.GetAllBlogsByActive();
             if (blogs.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
@@ -96,7 +96,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllByDeletedBlogs()
+        public async Task<IActionResult> GetAllByDeleted()
         {
             var deletedBlogs = await _blogService.GetAllByDeletedAsync();
             if (deletedBlogs.Errors.Any())
@@ -107,7 +107,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet("[action]/{userId}")]
-        public async Task<IActionResult> GetBlogsByUserId(int userId)
+        public async Task<IActionResult> GetAllByUserId(int userId)
         {
             var blogs = await _blogService.GetAllByUserIdAsync(userId);
             if (blogs.Errors.Any())
@@ -154,23 +154,25 @@ namespace BlogApp.API.Controllers
         public async Task<IActionResult> Search(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
         {
             var searchResult = await _blogService.SearchAsync(keyword, currentPage, pageSize, isAscending);
-            if (searchResult.StatusCode == 200 && searchResult.Data.Count > 0)
+
+            if (searchResult.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<BlogSearchModel>.Success(200, new BlogSearchModel
-                {
-                    BlogListDto = searchResult.Data,
-                    CurrentPage = currentPage,
-                    PageSize = pageSize,
-                    TotalCount = searchResult.Data.Count,
-                    IsAscending = isAscending,
-                    Keyword = keyword
-                }));
+                return CreateActionResult(CustomResponse<NoContent>.Fail(searchResult.StatusCode, searchResult.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, "Anahtar kelime bulunamadı!"));
+
+            return CreateActionResult(CustomResponse<BlogViewModel>.Success(200, new BlogViewModel
+            {
+                BlogListDto = searchResult.Data,
+                CurrentPage = currentPage,
+                PageSize = pageSize,
+                TotalCount = searchResult.Data.Count,
+                IsAscending = isAscending,
+                Keyword = keyword
+            }));
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllByViewCount(bool isAscending,int takeSize)
+        public async Task<IActionResult> GetAllByViewCount(bool isAscending, int takeSize)
         {
             var result = await _blogService.GetAllByViewCountAsync(isAscending, takeSize);
 
@@ -194,7 +196,7 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
             }
 
-            return CreateActionResult(CustomResponse<BlogSearchModel>.Success(result.StatusCode, new BlogSearchModel
+            return CreateActionResult(CustomResponse<BlogViewModel>.Success(result.StatusCode, new BlogViewModel
             {
                 BlogListDto = result.Data,
                 CategoryId = categoryId.HasValue ? categoryId.Value : null,
@@ -229,9 +231,9 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> CountInActiveBlogs()
+        public async Task<IActionResult> CountInactiveBlogs()
         {
-            var result = await _blogService.CountInActiveBlogsAsync();
+            var result = await _blogService.CountInactiveBlogsAsync();
             if (result.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
@@ -302,9 +304,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.GetAllBlogsFilteredAsync(categoryId, userId, isActive, isDeleted, currentPage, pageSize, orderBy, isAscending, includeCategory, includeTag, includeComments, includeUser);
             if (!result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<BlogSearchModel>.Success(200, new BlogSearchModel
+                return CreateActionResult(CustomResponse<BlogViewModel>.Success(200, new BlogViewModel
                 {
-                    BlogListDto = result.Data/*.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()*/,
+                    BlogListDto = result.Data,
                     CategoryId = categoryId.HasValue ? categoryId.Value : null,
                     CurrentPage = currentPage,
                     PageSize = pageSize,

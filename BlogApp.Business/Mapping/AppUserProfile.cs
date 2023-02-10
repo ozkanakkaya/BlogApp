@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BlogApp.Core.DTOs.Concrete.AppUserDtos;
+using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
 
 namespace BlogApp.Business.Mapping

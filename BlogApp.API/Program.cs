@@ -4,8 +4,7 @@ using BlogApp.Business.Helpers;
 using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
 using BlogApp.Business.Validations;
-using BlogApp.Core.DTOs.Concrete.AppUserDtos;
-using BlogApp.Core.DTOs.Concrete.BlogDtos;
+using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
@@ -39,10 +38,12 @@ builder.Services.AddSwaggerGen();
 
 //**Mappleme
 var profiles = ProfileHelper.GetProfiles();
+profiles.Add(new BlogProfile());
 profiles.Add(new AppRoleProfile());
 profiles.Add(new TagProfile());
-profiles.Add(new BlogProfile());
 profiles.Add(new CommentProfile());
+profiles.Add(new CategoryProfile());
+
 var configuration = new MapperConfiguration(opt =>
 {
     opt.AddProfiles(profiles);
@@ -91,6 +92,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateIssuerSigningKey = true
     };
 });
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
