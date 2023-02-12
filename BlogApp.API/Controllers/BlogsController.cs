@@ -320,7 +320,7 @@ namespace BlogApp.API.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> GetByBlogId(int blogId)
         {
-            var result = await _blogService.GetByBlogId(blogId);
+            var result = await _blogService.GetByBlogIdAsync(blogId);
 
             if (result.Errors.Any())
             {

@@ -14,6 +14,8 @@ namespace BlogApp.Core.Repositories
         void Update(T entity);
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entities);
+        Task<IList<T>> SearchAsync(IList<Expression<Func<T, bool>>> predicates, Expression<Func<T, bool>> expression = null, params Expression<Func<T, object>>[] includeProperties);
         Task<IList<T>> GetAllFilteredAsync(IList<Expression<Func<T, bool>>> predicates, IList<Expression<Func<T, object>>> includeProperties);
+        Task<IList<T>> GetAllAsync(Expression<Func<T, bool>> predicate = null, params Expression<Func<T, object>>[] includeProperties);
     }
 }

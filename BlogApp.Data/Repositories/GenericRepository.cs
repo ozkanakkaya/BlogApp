@@ -1,4 +1,6 @@
-﻿using BlogApp.Core.Repositories;
+﻿using BlogApp.Core.Entities.Concrete;
+using BlogApp.Core.Repositories;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -65,6 +67,47 @@ namespace BlogApp.Data.Repositories
             return await (expression == null ? _dbSet.CountAsync() : _dbSet.CountAsync(expression));
         }
 
+        public async Task<IList<T>> SearchAsync(IList<Expression<Func<T, bool>>> predicates, Expression<Func<T, bool>> expression = null, params Expression<Func<T, object>>[] includeProperties)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (predicates.Any())
+            {
+                var predicateChain = PredicateBuilder.New<T>();
+
+                foreach (var predicate in predicates)
+                {
+                    predicateChain.Or(predicate);
+                }
+                query = query.Where(predicateChain);
+            }
+
+            if (expression != null)
+            {
+                query = query.Where(expression);
+            }
+
+            if (includeProperties.Any())
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    switch (includeProperty.ToString())
+                    {
+                        case string x when x.Contains("BlogCategories"):
+                            query = query.Include(x => (x as Blog).BlogCategories).ThenInclude(x => x.Category);
+                            break;
+                        case string x when x.Contains("TagBlogs"):
+                            query = query.Include(x => (x as Blog).TagBlogs).ThenInclude(x => x.Tag);
+                            break;
+                        default:
+                            query = query.Include(includeProperty);
+                            break;
+                    }
+                }
+            }
+            return await query.AsNoTracking().ToListAsync();
+        }
+
         public async Task<IList<T>> GetAllFilteredAsync(IList<Expression<Func<T, bool>>> predicates, IList<Expression<Func<T, object>>> includeProperties)
         {
             IQueryable<T> query = _dbSet;
@@ -84,10 +127,43 @@ namespace BlogApp.Data.Repositories
                     switch (includeProperty.ToString())
                     {
                         case string x when x.Contains("BlogCategories"):
-                            query = query.Include(x => (x as Core.Entities.Concrete.Blog).BlogCategories).ThenInclude(x => x.Category);
+                            query = query.Include(x => (x as Blog).BlogCategories).ThenInclude(x => x.Category);
                             break;
                         case string x when x.Contains("TagBlogs"):
-                            query = query.Include(x => (x as Core.Entities.Concrete.Blog).TagBlogs).ThenInclude(x => x.Tag);
+                            query = query.Include(x => (x as Blog).TagBlogs).ThenInclude(x => x.Tag);
+                            break;
+                        default:
+                            query = query.Include(includeProperty);
+                            break;
+                    }
+
+                    //query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IList<T>> GetAllAsync(Expression<Func<T, bool>> predicate = null, params Expression<Func<T, object>>[] includeProperties)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            if (includeProperties.Any())
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    switch (includeProperty.ToString())
+                    {
+                        case string x when x.Contains("BlogCategories"):
+                            query = query.Include(x => (x as Blog).BlogCategories).ThenInclude(x => x.Category);
+                            break;
+                        case string x when x.Contains("TagBlogs"):
+                            query = query.Include(x => (x as Blog).TagBlogs).ThenInclude(x => x.Tag);
                             break;
                         default:
                             query = query.Include(includeProperty);
