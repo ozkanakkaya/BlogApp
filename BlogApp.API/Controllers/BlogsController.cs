@@ -87,7 +87,18 @@ namespace BlogApp.API.Controllers
         [HttpGet]//api/blogs
         public async Task<IActionResult> GetAllByActive()
         {
-            var blogs = await _blogService.GetAllBlogsByActive();
+            var blogs = await _blogService.GetAllByActiveAsync();
+            if (blogs.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
+            }
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
+        }
+
+        [HttpGet]//api/blogs
+        public async Task<IActionResult> GetAllByNonDeleted()
+        {
+            var blogs = await _blogService.GetAllByNonDeletedAsync();
             if (blogs.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));

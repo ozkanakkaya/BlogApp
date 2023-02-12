@@ -162,19 +162,6 @@ namespace BlogApp.Business.Services
             return CustomResponse<NoContent>.Success(204);
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllBlogsByActive()
-        {
-            var blogs = await _blogRepository.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
-
-            if (blogs.Any())
-            {
-                var blogListDto = blogs.Select(blog => _mapper.Map<BlogListDto>(blog)).ToList();
-
-                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
-            }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
-        }
-
         public async Task<CustomResponse<NoContent>> DeleteAsync(int blogId)
         {
             var blog = _blogRepository.Where(x => x.Id == blogId).FirstOrDefault();
@@ -188,6 +175,32 @@ namespace BlogApp.Business.Services
                 return CustomResponse<NoContent>.Success(200);
             }
             return CustomResponse<NoContent>.Fail(404, $"{blogId} idli blog bulunamadı!");
+        }
+
+        public async Task<CustomResponse<List<BlogListDto>>> GetAllByActiveAsync()
+        {
+            var blogs = await _blogRepository.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+
+            if (blogs.Any())
+            {
+                var blogListDto = blogs.Select(blog => _mapper.Map<BlogListDto>(blog)).ToList();
+
+                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+            }
+            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
+        }
+
+        public async Task<CustomResponse<List<BlogListDto>>> GetAllByNonDeletedAsync()//Aktif ve Pasif bloglar
+        {
+            var blogs = await _blogRepository.GetAllAsync(x => !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+
+            if (blogs.Any())
+            {
+                var blogListDto = blogs.Select(blog => _mapper.Map<BlogListDto>(blog)).ToList();
+
+                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+            }
+            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
         }
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
