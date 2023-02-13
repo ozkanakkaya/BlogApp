@@ -25,10 +25,12 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<int>> CountInactiveBlogsAsync();
         Task<CustomResponse<int>> CountByDeletedBlogsAsync();
         Task<CustomResponse<int>> CountByNonDeletedBlogsAsync();
-        CustomResponse<string> IncreaseViewCountAsync(int blogId);
+        Task<CustomResponse<string>> IncreaseViewCountAsync(int blogId);
         Task<CustomResponse<List<BlogListDto>>> GetAllByCategoryAsync(int categoryId);
         Task<CustomResponse<List<BlogListDto>>> GetAllByUserIdOnFilterAsync(int userId, FilterBy filterBy, OrderBy orderBy, bool isAscending, int takeSize, int categoryId, DateTime startAt, DateTime endAt, int minViewCount, int maxViewCount, int minCommentCount, int maxCommentCount);
         Task<CustomResponse<List<BlogListDto>>> GetAllBlogsFilteredAsync(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser);
         Task<CustomResponse<BlogListDto>> GetByBlogIdAsync(int blogId);
+        Task<CustomResponse<BlogListDto>> GetFilteredByBlogIdAsync(int blogId, bool includeCategory, bool includeTag, bool includeComment, bool includeUser);
+        Task<CustomResponse<List<BlogListDto>>> GetAllByTagAsync(int tagId);
     }
 }

@@ -95,7 +95,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
         }
 
-        [HttpGet]//api/blogs
+        [HttpGet("[action]")]
         public async Task<IActionResult> GetAllByNonDeleted()
         {
             var blogs = await _blogService.GetAllByNonDeletedAsync();
@@ -275,9 +275,9 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet("[action]")]
-        public IActionResult IncreaseViewCount(int blogId)
+        public async Task<IActionResult> IncreaseViewCount(int blogId)
         {
-            var result = _blogService.IncreaseViewCountAsync(blogId);
+            var result = await _blogService.IncreaseViewCountAsync(blogId);
             if (result.Errors.Any())
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
@@ -338,6 +338,30 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
             }
             return CreateActionResult(CustomResponse<BlogListDto>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetFilteredByBlogId(int blogId, bool includeCategory, bool includeTag, bool includeComment, bool includeUser)
+        {
+            var result = await _blogService.GetFilteredByBlogIdAsync(blogId, includeCategory, includeTag, includeComment, includeUser);
+
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<BlogListDto>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllByTag(int tagId)
+        {
+            var result = await _blogService.GetAllByTagAsync(tagId);
+
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
         }
     }
 }
