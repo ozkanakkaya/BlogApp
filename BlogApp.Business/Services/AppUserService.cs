@@ -6,6 +6,8 @@ using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace BlogApp.Business.Services
 {
@@ -16,26 +18,30 @@ namespace BlogApp.Business.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<AppUserLoginDto> _loginValidator;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IValidator<AppUserPasswordChangeDto> _userPasswordChangeDtoValidator;
 
-        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IAppUserRepository appUserRepository, IAppRoleRepository appRoleRepository, IValidator<AppUserLoginDto> loginValidator) : base(repository, unitOfWork)
+        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IAppUserRepository appUserRepository, IAppRoleRepository appRoleRepository, IValidator<AppUserLoginDto> loginValidator, IHttpContextAccessor httpContextAccessor, IValidator<AppUserPasswordChangeDto> userPasswordChangeDtoValidator) : base(repository, unitOfWork)
         {
             _mapper = mapper;
             _appUserRepository = appUserRepository;
             _unitOfWork = unitOfWork;
             _appRoleRepository = appRoleRepository;
             _loginValidator = loginValidator;
+            _httpContextAccessor = httpContextAccessor;
+            _userPasswordChangeDtoValidator = userPasswordChangeDtoValidator;
         }
 
-        public CustomResponse<List<AppRoleListDto>> GetRolesByUserId(int userId)
+        public async Task<CustomResponse<List<AppRoleDto>>> GetRolesByUserId(int userId)
         {
-            var userRoles = _appRoleRepository.GetRolesByUserId(userId);
+            var userRoles = await _appRoleRepository.GetAllAsync(x => x.AppUserRoles.Any(x => x.AppUserId == userId));
 
             if (userRoles == null)
             {
-                return CustomResponse<List<AppRoleListDto>>.Fail(404, $"Id: {userId} kullanıcısının rolleri bulunamadı!");
+                return CustomResponse<List<AppRoleDto>>.Fail(404, $"Id: {userId} kullanıcısının rolleri bulunamadı!");
             }
-            var rolesDto = _mapper.Map<List<AppRoleListDto>>(userRoles);
-            return CustomResponse<List<AppRoleListDto>>.Success(200, rolesDto);
+            var rolesDto = _mapper.Map<List<AppRoleDto>>(userRoles);
+            return CustomResponse<List<AppRoleDto>>.Success(200, rolesDto);
         }
 
         public CustomResponse<CheckUserResponseDto> CheckUser(AppUserLoginDto dto)
@@ -77,5 +83,146 @@ namespace BlogApp.Business.Services
             }
             return CustomResponse<AppUserRegisterDto>.Fail(400, $"'{dto.Username}' kullanıcı adı zaten kayıtlı!");
         }
+
+        public async Task<CustomResponse<List<AppUserListDto>>> GetAllByActiveAsync()
+        {
+            var users = await _appUserRepository.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
+
+            if (users.Any())
+            {
+                var usersDto = users.Select(user => _mapper.Map<AppUserListDto>(user)).ToList();
+
+                return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
+            }
+            return CustomResponse<List<AppUserListDto>>.Fail(404, "Herhangi bir kullanıcı bulunamadı!");
+        }
+
+        public async Task<CustomResponse<AppUserListDto>> GetUserByIdAsync(int userId)
+        {
+            var user = await _appUserRepository.GetAsync(x => x.Id == userId && x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
+
+            if (user != null)
+            {
+                var userDto = _mapper.Map<AppUserListDto>(user);
+
+                return CustomResponse<AppUserListDto>.Success(200, userDto);
+            }
+            return CustomResponse<AppUserListDto>.Fail(404, "Gösterilecek bir kullanıcı bulunamadı!");
+        }
+
+        public async Task<CustomResponse<NoContent>> DeleteAsync(int userId)
+        {
+            var user = await _appUserRepository.GetAsync(x => x.Id == userId);
+            if (user != null)
+            {
+                user.IsDeleted = true;
+                user.IsActive = false;
+
+                _appUserRepository.Update(user);
+                await _unitOfWork.CommitAsync();
+                return CustomResponse<NoContent>.Success(200);
+            }
+            return CustomResponse<NoContent>.Fail(404, $"{user} numaralı kullanıcı bulunamadı!");
+        }
+
+        public async Task<CustomResponse<NoContent>> UndoDeleteAsync(int userId)//Admin-Arşiv-Users
+        {
+            var result = await _appUserRepository.AnyAsync(x => x.Id == userId);
+            if (result)
+            {
+                var user = await _appUserRepository.GetAsync(x => x.Id == userId);
+                user.IsDeleted = false;
+                user.IsActive = true;
+                _appUserRepository.Update(user);
+                await _unitOfWork.CommitAsync();
+                return CustomResponse<NoContent>.Success(200);
+            }
+            return CustomResponse<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
+        }
+
+        public async Task<CustomResponse<NoContent>> HardDeleteAsync(int userId)//Admin-Arşiv-Users
+        {
+            var result = await _appUserRepository.AnyAsync(x => x.Id == userId);
+            if (result)
+            {
+                var user = _appUserRepository.Where(x => x.Id == userId);
+                _appUserRepository.RemoveRange(user);
+                await _unitOfWork.CommitAsync();
+                return CustomResponse<NoContent>.Success(200);
+            }
+            return CustomResponse<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
+        }
+
+        public async Task<CustomResponse<List<AppUserListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
+        {
+            var users = await _appUserRepository.GetAllAsync(x => x.IsDeleted, x => x.AppUserRoles);
+
+            if (users.Any())
+            {
+                var usersDto = users.Select(user => _mapper.Map<AppUserListDto>(user)).ToList();
+
+                return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
+            }
+            return CustomResponse<List<AppUserListDto>>.Fail(404, "Silinmiş bir kullanıcı bulunamadı!");
+        }
+
+        public async Task<CustomResponse<List<AppUserListDto>>> GetAllByInactiveAsync()//Admin-Arşiv
+        {
+            var users = await _appUserRepository.GetAllAsync(x => !x.IsActive & !x.IsDeleted, x => x.AppUserRoles);
+
+            if (users.Any())
+            {
+                var usersDto = users.Select(user => _mapper.Map<AppUserListDto>(user)).ToList();
+
+                return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
+            }
+            return CustomResponse<List<AppUserListDto>>.Fail(404, "Aktif olmayan bir kullanıcı bulunamadı!");
+        }
+
+        public async Task<CustomResponse<NoContent>> UpdateUserAsync(AppUserUpdateDto appUserUpdateDto)
+        {
+            var oldUser = await _appUserRepository.GetAsync(x => x.Id == appUserUpdateDto.Id);
+            var updateUser = _mapper.Map<AppUserUpdateDto, AppUser>(appUserUpdateDto, oldUser);
+            _appUserRepository.Update(updateUser);
+            await _unitOfWork.CommitAsync();
+            return CustomResponse<NoContent>.Success(204);
+
+        }
+
+        public async Task<CustomResponse<NoContent>> PasswordChangeAsync(AppUserPasswordChangeDto appUserPasswordChangeDto)
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            var userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            var user = await _appUserRepository.GetAsync(x => x.Id == int.Parse(userId));
+
+            var isVerified = _appUserRepository.CheckPasswordAsync(user, appUserPasswordChangeDto.CurrentPassword);
+
+            if (isVerified)
+            {
+                var updatePassword = _mapper.Map<AppUserPasswordChangeDto,AppUser>(appUserPasswordChangeDto,user);
+                _appUserRepository.Update(updatePassword);
+                await _unitOfWork.CommitAsync();
+
+                return CustomResponse<NoContent>.Success(204);
+            }
+            else
+            {
+                return CustomResponse<NoContent>.Fail(400, "Mevcut şifrenizi kontrol ediniz!");
+            }
+
+        }
+
+        public async Task<CustomResponse<NoContent>> ActivateUserAsync(int userId)
+        {
+            var user = await _appUserRepository.GetAsync(x => x.Id == userId);
+            if (user.IsActive) 
+                return CustomResponse<NoContent>.Fail(400, "Kullanıcı zaten aktif!");
+            user.IsActive = true;
+            _appUserRepository.Update(user);
+            await _unitOfWork.CommitAsync();
+            return CustomResponse<NoContent>.Success(204);
+        }
+
     }
 }

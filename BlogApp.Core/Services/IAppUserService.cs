@@ -10,6 +10,16 @@ namespace BlogApp.Core.Services
 
         CustomResponse<CheckUserResponseDto> CheckUser(AppUserLoginDto dto);
 
-        CustomResponse<List<AppRoleListDto>> GetRolesByUserId(int userId);
+        Task<CustomResponse<List<AppRoleDto>>> GetRolesByUserId(int userId);
+        Task<CustomResponse<List<AppUserListDto>>> GetAllByActiveAsync();
+        Task<CustomResponse<AppUserListDto>> GetUserByIdAsync(int userId);
+        Task<CustomResponse<NoContent>> DeleteAsync(int userId);
+        Task<CustomResponse<NoContent>> UndoDeleteAsync(int userId);
+        Task<CustomResponse<NoContent>> HardDeleteAsync(int userId);
+        Task<CustomResponse<List<AppUserListDto>>> GetAllByDeletedAsync();
+        Task<CustomResponse<List<AppUserListDto>>> GetAllByInactiveAsync();
+        Task<CustomResponse<NoContent>> UpdateUserAsync(AppUserUpdateDto appUserUpdateDto);
+        Task<CustomResponse<NoContent>> PasswordChangeAsync(AppUserPasswordChangeDto appUserPasswordChangeDto);
+        Task<CustomResponse<NoContent>> ActivateUserAsync(int userId);
     }
 }

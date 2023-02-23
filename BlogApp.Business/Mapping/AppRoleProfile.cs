@@ -8,7 +8,7 @@ namespace BlogApp.Business.Mapping
     {
         public AppRoleProfile()
         {
-            CreateMap<AppRole, AppRoleListDto>().ReverseMap();
+            CreateMap<AppRole, AppRoleDto>().ReverseMap();
         }
     }
 }

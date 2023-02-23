@@ -174,7 +174,7 @@ namespace BlogApp.Business.Services
                 await _unitOfWork.CommitAsync();
                 return CustomResponse<NoContent>.Success(200);
             }
-            return CustomResponse<NoContent>.Fail(404, $"{blogId} idli blog bulunamadı!");
+            return CustomResponse<NoContent>.Fail(404, $"{blogId} numaralı blog bulunamadı!");
         }
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByActiveAsync()
@@ -318,7 +318,7 @@ namespace BlogApp.Business.Services
                 //blog.UpdatedByUsername=
                 //blog.UpdatedDate=
                 _blogRepository.Update(blog);
-                _unitOfWork.Commit();
+                await _unitOfWork.CommitAsync();
                 return CustomResponse<NoContent>.Success(200);
             }
             return CustomResponse<NoContent>.Fail(404, "Bir blog bulunamadı!");

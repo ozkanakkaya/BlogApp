@@ -28,7 +28,7 @@ namespace BlogApp.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<TagBlog> TagBlogs { get; set; }
 
-        public override int SaveChanges()
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var httpContext = _httpContextAccessor.HttpContext;
 
@@ -61,7 +61,7 @@ namespace BlogApp.Data
                     }
                 }
             }
-            return base.SaveChanges();
+            return base.SaveChangesAsync(cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

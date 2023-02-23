@@ -73,15 +73,15 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
 
-        [HttpDelete("{id}")]//api/blogs/13
-        public IActionResult Delete(int blogId)
+        [HttpPut("[action]/{blogId}")]
+        public async Task<IActionResult> Delete(int blogId)
         {
-            var result = _blogService.DeleteAsync(blogId);
+            var result = await _blogService.DeleteAsync(blogId);
 
-            if (!result.Result.Errors.Any())
-                return CreateActionResult(CustomResponse<NoContent>.Success(result.Result.StatusCode));
+            if (!result.Errors.Any())
+                return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Result.Errors));
+            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpGet]//api/blogs
@@ -139,7 +139,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, deletedBlogs.Data));
         }
 
-        [HttpDelete("[action]")]
+        [HttpDelete("{blogId}")]
         public async Task<IActionResult> HardDelete(int blogId)
         {
             var result = await _blogService.HardDeleteAsync(blogId);

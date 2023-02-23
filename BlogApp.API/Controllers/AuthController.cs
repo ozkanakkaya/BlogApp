@@ -50,12 +50,12 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public IActionResult Login(AppUserLoginDto loginDto)
+        public async Task<IActionResult> Login(AppUserLoginDto loginDto)
         {
             var result = _appUserService.CheckUser(loginDto);
             if (!result.Errors.Any())
             {
-                var roleResult = _appUserService.GetRolesByUserId(result.Data.Id);
+                var roleResult = await _appUserService.GetRolesByUserId(result.Data.Id);
                 var token = TokenGenerator.GenerateToken(result.Data, roleResult.Data);
                 return Created("", token);
             }
