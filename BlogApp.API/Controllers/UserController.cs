@@ -1,8 +1,8 @@
-﻿using BlogApp.Core.DTOs.Concrete;
+﻿using AutoMapper;
+using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogApp.API.Controllers
@@ -12,12 +12,15 @@ namespace BlogApp.API.Controllers
         private readonly IAppUserService _userService;
         private readonly IValidator<AppUserUpdateDto> _userUpdateDtoValidator;
         private readonly IValidator<AppUserPasswordChangeDto> _userPasswordChangeDtoValidator;
+        private readonly IMapper _mapper;
 
-        public UserController(IAppUserService userService, IValidator<AppUserUpdateDto> userUpdateDtoValidator, IValidator<AppUserPasswordChangeDto> userPasswordChangeDtoValidator)
+
+        public UserController(IAppUserService userService, IValidator<AppUserUpdateDto> userUpdateDtoValidator, IValidator<AppUserPasswordChangeDto> userPasswordChangeDtoValidator, IMapper mapper)
         {
             _userService = userService;
             _userUpdateDtoValidator = userUpdateDtoValidator;
             _userPasswordChangeDtoValidator = userPasswordChangeDtoValidator;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -69,12 +72,12 @@ namespace BlogApp.API.Controllers
         [HttpDelete("{userId}")]
         public async Task<IActionResult> HardDelete(int userId)
         {
-            var result = await _userService.HardDeleteAsync(userId);
-            if (result.Errors.Any())
+            var user = await _userService.HardDeleteAsync(userId);
+            if (user.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponse<NoContent>.Fail(404, user.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+            return CreateActionResult(CustomResponse<NoContent>.Success(user.StatusCode));
         }
 
         [HttpGet("[action]")]
@@ -101,13 +104,14 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateUser(AppUserUpdateDto appUserUpdateDto)
+        public async Task<IActionResult> UpdateUser([FromForm] AppUserUpdateDto appUserUpdateDto)
         {
             var result = _userUpdateDtoValidator.Validate(appUserUpdateDto);
 
             if (result.IsValid)
             {
                 var resultUpdate = await _userService.UpdateUserAsync(appUserUpdateDto);
+
                 if (resultUpdate.StatusCode == 204)
                 {
                     return CreateActionResult(CustomResponse<NoContent>.Success(204));
@@ -154,6 +158,17 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Fail(activateUser.StatusCode, activateUser.Errors));
             }
             return CreateActionResult(CustomResponse<NoContent>.Success(activateUser.StatusCode, activateUser.Data));
+        }
+
+        [HttpPut("[action]/{userId}")]
+        public async Task<IActionResult> DeleteUserImage(int userId)
+        {
+            var result = await _userService.DeleteUserImageAsync(userId);
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode, result.Data));
         }
     }
 }

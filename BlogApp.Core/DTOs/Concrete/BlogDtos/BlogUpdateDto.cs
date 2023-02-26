@@ -1,4 +1,5 @@
 ﻿using BlogApp.Core.DTOs.Abstract;
+using Microsoft.AspNetCore.Http;
 
 namespace BlogApp.Core.DTOs.Concrete
 {
@@ -8,6 +9,7 @@ namespace BlogApp.Core.DTOs.Concrete
         public string Title { get; set; }
         public string Content { get; set; }
         public string Thumbnail { get; set; }
+        public IFormFile ThumbnailFile { get; set; }
         public string ImageUrl { get; set; }
         public int AppUserId { get; set; }
         public string Tags { get; set; }

@@ -8,15 +8,18 @@ using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
+using BlogApp.Core.Utilities.Abstract;
 using BlogApp.Data;
 using BlogApp.Data.Repositories;
 using BlogApp.Data.UnitOfWork;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
+using FileAccess = BlogApp.Business.Helpers.FileAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +46,7 @@ profiles.Add(new AppRoleProfile());
 profiles.Add(new TagProfile());
 profiles.Add(new CommentProfile());
 profiles.Add(new CategoryProfile());
+profiles.Add(new AppUserProfile());
 
 var configuration = new MapperConfiguration(opt =>
 {
@@ -80,6 +84,9 @@ builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<ITagBlogRepository, TagBlogRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IBlogCategoryRepository, BlogCategoryRepository>();
+builder.Services.AddScoped<IImageHelper, ImageHelper>();
+builder.Services.AddScoped<IFileAccess, FileAccess>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
 {
@@ -106,6 +113,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 //app.UseCustomException();//global hata yakalama için

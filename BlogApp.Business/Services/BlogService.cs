@@ -6,6 +6,7 @@ using BlogApp.Core.Repositories;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
+using BlogApp.Core.Utilities.Abstract;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -22,7 +23,8 @@ namespace BlogApp.Business.Services
         private readonly IBlogCategoryRepository _blogCategoryRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        public BlogService(IGenericRepository<Blog> repository, IUnitOfWork unitOfWork, IAppUserRepository appUserRepository, IMapper mapper, IAppRoleRepository appRoleRepository, IBlogRepository blogRepository, ITagRepository tagRepository, ITagBlogRepository tagBlogRepository, IBlogCategoryRepository blogCategoryRepository) : base(repository, unitOfWork)
+        private readonly IImageHelper _imageHelper;
+        public BlogService(IGenericRepository<Blog> repository, IUnitOfWork unitOfWork, IAppUserRepository appUserRepository, IMapper mapper, IAppRoleRepository appRoleRepository, IBlogRepository blogRepository, ITagRepository tagRepository, ITagBlogRepository tagBlogRepository, IBlogCategoryRepository blogCategoryRepository, IImageHelper imageHelper) : base(repository, unitOfWork)
         {
             _appUserRepository = appUserRepository;
             _mapper = mapper;
@@ -32,12 +34,13 @@ namespace BlogApp.Business.Services
             _tagRepository = tagRepository;
             _tagBlogRepository = tagBlogRepository;
             _blogCategoryRepository = blogCategoryRepository;
+            _imageHelper = imageHelper;
         }
-        public async Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogDto)
+        public async Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogCreateDto)
         {
-            var tagSplit = blogDto.Tags.Split(',');
+            var tagSplit = blogCreateDto.Tags.Split(',');
 
-            var blog = _mapper.Map<Blog>(blogDto);
+            var blog = _mapper.Map<Blog>(blogCreateDto);
             blog.TagBlogs = new List<TagBlog>();
             blog.BlogCategories = new List<BlogCategory>();
 
@@ -75,7 +78,7 @@ namespace BlogApp.Business.Services
                 }
             }
 
-            foreach (var categoryId in blogDto.CategoryIds)
+            foreach (var categoryId in blogCreateDto.CategoryIds)
             {
                 blog.BlogCategories.Add(new BlogCategory
                 {
@@ -85,10 +88,13 @@ namespace BlogApp.Business.Services
             }
             //blog.CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogDto.AppUserId)).Username;
 
+            var thumbnailResult = await _imageHelper.UploadAsync(blogCreateDto.Title, blogCreateDto.ThumbnailFile, ImageType.Post);
+            blog.Thumbnail = thumbnailResult.StatusCode == 200 ? thumbnailResult.Data.FullName : "postImages/defaultThumbnail.png";
+
             await _blogRepository.AddAsync(blog);
             await _unitOfWork.CommitAsync();
 
-            return CustomResponse<BlogCreateDto>.Success(201, blogDto);
+            return CustomResponse<BlogCreateDto>.Success(201, blogCreateDto);
         }
 
         public async Task<CustomResponse<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto)
@@ -156,8 +162,26 @@ namespace BlogApp.Business.Services
 
             //blog.UpdatedByUsername = (await _appUserRepository.GetByIdAsync(blogUpdateDto.AppUserId)).Username;
 
+            bool isNewThumbnailUploaded = false;
+            var oldUserThumbnail = oldBlog.Thumbnail;
+
+            if (blogUpdateDto.ThumbnailFile != null)
+            {
+                var thumbnailResult = await _imageHelper.UploadAsync(blogUpdateDto.Title, blogUpdateDto.ThumbnailFile, ImageType.Post);
+                if (thumbnailResult.StatusCode == 200)
+                    blog.Thumbnail = thumbnailResult.Data.FullName;
+
+                if (oldUserThumbnail != "postImages/defaultThumbnail.png")
+                {
+                    isNewThumbnailUploaded = true;
+                }
+            }
+
             _blogRepository.Update(blog);
             await _unitOfWork.CommitAsync();
+
+            if (isNewThumbnailUploaded)
+                await _imageHelper.DeleteAsync(oldUserThumbnail);
 
             return CustomResponse<NoContent>.Success(204);
         }
@@ -302,6 +326,10 @@ namespace BlogApp.Business.Services
                 var blog = _blogRepository.Where(x => x.Id == blogId);
                 _blogRepository.RemoveRange(blog);
                 await _unitOfWork.CommitAsync();
+
+                if (blog.SingleOrDefault().Thumbnail != "postImages/defaultThumbnail.png")
+                    await _imageHelper.DeleteAsync(blog.SingleOrDefault().Thumbnail);
+
                 return CustomResponse<NoContent>.Success(200);
             }
             return CustomResponse<NoContent>.Fail(404, "Bir blog bulunamadı!");
@@ -414,7 +442,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByCategoryAsync(int categoryId)
         {
-            var blogs = await _blogRepository.GetAllAsync(x => x.BlogCategories.Any(x=>x.CategoryId==categoryId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await _blogRepository.GetAllAsync(x => x.BlogCategories.Any(x => x.CategoryId == categoryId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
 
             if (blogs.Any())
             {

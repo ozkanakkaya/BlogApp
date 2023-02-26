@@ -10,6 +10,7 @@ namespace BlogApp.Core.Response
         public int StatusCode { get; set; }
 
         public List<String> Errors { get; set; } = new List<string>();
+        //public string Message { get; set; }
 
 
         public static CustomResponse<T> Success(int statusCode, T data)
@@ -20,6 +21,10 @@ namespace BlogApp.Core.Response
         {
             return new CustomResponse<T> { StatusCode = statusCode };
         }
+        //public static CustomResponse<T> Success(int statusCode, T data, string message)
+        //{
+        //    return new CustomResponse<T> { Data = data, StatusCode = statusCode, Message = message };
+        //}
 
         public static CustomResponse<T> Fail(int statusCode, List<string> errors)
         {

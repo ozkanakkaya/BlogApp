@@ -21,5 +21,6 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<NoContent>> UpdateUserAsync(AppUserUpdateDto appUserUpdateDto);
         Task<CustomResponse<NoContent>> PasswordChangeAsync(AppUserPasswordChangeDto appUserPasswordChangeDto);
         Task<CustomResponse<NoContent>> ActivateUserAsync(int userId);
+        Task<CustomResponse<NoContent>> DeleteUserImageAsync(int userId);
     }
 }

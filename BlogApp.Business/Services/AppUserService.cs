@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
+using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
+using BlogApp.Core.Utilities.Abstract;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
@@ -19,9 +21,9 @@ namespace BlogApp.Business.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<AppUserLoginDto> _loginValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IValidator<AppUserPasswordChangeDto> _userPasswordChangeDtoValidator;
+        private readonly IImageHelper _imageHelper;
 
-        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IAppUserRepository appUserRepository, IAppRoleRepository appRoleRepository, IValidator<AppUserLoginDto> loginValidator, IHttpContextAccessor httpContextAccessor, IValidator<AppUserPasswordChangeDto> userPasswordChangeDtoValidator) : base(repository, unitOfWork)
+        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IAppUserRepository appUserRepository, IAppRoleRepository appRoleRepository, IValidator<AppUserLoginDto> loginValidator, IHttpContextAccessor httpContextAccessor, IImageHelper imageHelper) : base(repository, unitOfWork)
         {
             _mapper = mapper;
             _appUserRepository = appUserRepository;
@@ -29,7 +31,7 @@ namespace BlogApp.Business.Services
             _appRoleRepository = appRoleRepository;
             _loginValidator = loginValidator;
             _httpContextAccessor = httpContextAccessor;
-            _userPasswordChangeDtoValidator = userPasswordChangeDtoValidator;
+            _imageHelper = imageHelper;
         }
 
         public async Task<CustomResponse<List<AppRoleDto>>> GetRolesByUserId(int userId)
@@ -67,6 +69,9 @@ namespace BlogApp.Business.Services
 
             if (!hasUser)
             {
+                var uploadedImageDtoResult = await _imageHelper.UploadAsync(dto.Username, dto.ImageFile, ImageType.User);
+                dto.ImageUrl = uploadedImageDtoResult.StatusCode == 200 ? uploadedImageDtoResult.Data.FullName : "userImages/defaultUser.png";
+
                 var user = _mapper.Map<AppUser>(dto);
 
                 user.AppUserRoles = new List<AppUserRole>();
@@ -146,8 +151,13 @@ namespace BlogApp.Business.Services
             if (result)
             {
                 var user = _appUserRepository.Where(x => x.Id == userId);
+
                 _appUserRepository.RemoveRange(user);
                 await _unitOfWork.CommitAsync();
+
+                if (user.SingleOrDefault().ImageUrl != "userImages/defaultUser.png")
+                    await _imageHelper.DeleteAsync(user.SingleOrDefault().ImageUrl);
+
                 return CustomResponse<NoContent>.Success(200);
             }
             return CustomResponse<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
@@ -181,12 +191,34 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<NoContent>> UpdateUserAsync(AppUserUpdateDto appUserUpdateDto)
         {
-            var oldUser = await _appUserRepository.GetAsync(x => x.Id == appUserUpdateDto.Id);
-            var updateUser = _mapper.Map<AppUserUpdateDto, AppUser>(appUserUpdateDto, oldUser);
-            _appUserRepository.Update(updateUser);
-            await _unitOfWork.CommitAsync();
-            return CustomResponse<NoContent>.Success(204);
+            bool isNewImageUploaded = false;
 
+            var oldUser = _appUserRepository.Where(x => x.Id == appUserUpdateDto.Id).SingleOrDefault();
+
+            var oldUserImage = oldUser.ImageUrl;
+
+            if (appUserUpdateDto.ImageFile != null)
+            {
+                var uploadedImageDtoResult = await _imageHelper.UploadAsync(oldUser.Username, appUserUpdateDto.ImageFile, ImageType.User);
+                if (uploadedImageDtoResult.StatusCode == 200)
+                    appUserUpdateDto.ImageUrl = uploadedImageDtoResult.Data.FullName;
+
+                if (oldUserImage != "userImages/defaultUser.png")
+                    isNewImageUploaded = true;
+            }
+
+            var updateUser = _mapper.Map<AppUserUpdateDto, AppUser>(appUserUpdateDto, oldUser);
+
+            _appUserRepository.Update(updateUser);
+
+            await _unitOfWork.CommitAsync();
+
+            if (isNewImageUploaded)
+            {
+                await _imageHelper.DeleteAsync(oldUserImage);
+            }
+
+            return CustomResponse<NoContent>.Success(204);
         }
 
         public async Task<CustomResponse<NoContent>> PasswordChangeAsync(AppUserPasswordChangeDto appUserPasswordChangeDto)
@@ -200,7 +232,7 @@ namespace BlogApp.Business.Services
 
             if (isVerified)
             {
-                var updatePassword = _mapper.Map<AppUserPasswordChangeDto,AppUser>(appUserPasswordChangeDto,user);
+                var updatePassword = _mapper.Map<AppUserPasswordChangeDto, AppUser>(appUserPasswordChangeDto, user);
                 _appUserRepository.Update(updatePassword);
                 await _unitOfWork.CommitAsync();
 
@@ -216,7 +248,7 @@ namespace BlogApp.Business.Services
         public async Task<CustomResponse<NoContent>> ActivateUserAsync(int userId)
         {
             var user = await _appUserRepository.GetAsync(x => x.Id == userId);
-            if (user.IsActive) 
+            if (user.IsActive)
                 return CustomResponse<NoContent>.Fail(400, "Kullanıcı zaten aktif!");
             user.IsActive = true;
             _appUserRepository.Update(user);
@@ -224,5 +256,21 @@ namespace BlogApp.Business.Services
             return CustomResponse<NoContent>.Success(204);
         }
 
+        public async Task<CustomResponse<NoContent>> DeleteUserImageAsync(int userId)
+        {
+            var user = _appUserRepository.Where(x => x.Id == userId).SingleOrDefault();
+
+            if (user.ImageUrl != "userImages/defaultUser.png")
+            {
+                user.ImageUrl = "userImages/defaultUser.png";
+                _appUserRepository.Update(user);
+                await _unitOfWork.CommitAsync();
+                await _imageHelper.DeleteAsync(user.ImageUrl);
+
+                return CustomResponse<NoContent>.Success(204);
+            }
+
+            return CustomResponse<NoContent>.Fail(400, "Silinecek bir profil fotoğrafı bulunamadı!");
+        }
     }
 }

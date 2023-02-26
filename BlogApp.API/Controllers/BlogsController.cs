@@ -15,7 +15,7 @@ namespace BlogApp.API.Controllers
         private readonly IValidator<BlogCreateDto> _blogCreateDtoValidator;
         private readonly IValidator<BlogUpdateDto> _blogUpdateDtoValidotor;
 
-        public BlogsController(IBlogService blogService, IMapper mapper, IValidator<BlogCreateDto> blogCreateDtoValidator, IValidator<BlogUpdateDto> blogUpdateDtoValidotor)
+        public BlogsController(IBlogService blogService, IMapper mapper, IValidator<BlogCreateDto> blogCreateDtoValidator, IValidator<BlogUpdateDto> blogUpdateDtoValidotor) /*: base(imageHelper)*/
         {
             _blogService = blogService;
             _mapper = mapper;
@@ -25,15 +25,15 @@ namespace BlogApp.API.Controllers
 
         //[Authorize(Roles = "Admin,Author")]
         [HttpPost]
-        public async Task<IActionResult> Add(BlogCreateDto blogDto)
+        public async Task<IActionResult> Add([FromForm] BlogCreateDto blogCreateDto)
         {
-            var result = _blogCreateDtoValidator.Validate(blogDto);
+            var result = _blogCreateDtoValidator.Validate(blogCreateDto);
 
             if (result.IsValid)
             {
                 //var createDto = _mapper.Map<BlogCreateDto>(blogDto);
 
-                var addResult = await _blogService.AddBlogWithTagsAndCategoriesAsync(blogDto);
+                var addResult = await _blogService.AddBlogWithTagsAndCategoriesAsync(blogCreateDto);
                 //if (!addResult.Errors.Any())
                 return CreateActionResult(CustomResponse<BlogCreateDto>.Success(201, addResult.Data));
                 //return CreateActionResult(CustomResponse<BlogCreateDto>.Fail(addResult.StatusCode, addResult.Errors));
@@ -50,7 +50,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(BlogUpdateDto blogUpdateDto)
+        public async Task<IActionResult> Update([FromForm] BlogUpdateDto blogUpdateDto)
         {
             var result = _blogUpdateDtoValidotor.Validate(blogUpdateDto);
 

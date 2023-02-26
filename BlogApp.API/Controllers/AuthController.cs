@@ -2,6 +2,7 @@
 using BlogApp.API.Jwt;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums;
+using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using FluentValidation;
@@ -16,8 +17,7 @@ namespace BlogApp.API.Controllers
         private readonly IAppUserService _appUserService;
 
         private readonly IValidator<AppUserRegisterDto> _validator;
-
-        public AuthController(IMapper mapper, IAppUserService appUserService, IValidator<AppUserRegisterDto> validator)
+        public AuthController(IMapper mapper, IAppUserService appUserService, IValidator<AppUserRegisterDto> validator) /*: base(imageHelper)*/
         {
             _mapper = mapper;
             _appUserService = appUserService;
@@ -25,7 +25,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register(AppUserRegisterDto registerDto)
+        public async Task<IActionResult> Register([FromForm] AppUserRegisterDto registerDto)
         {
             var result = _validator.Validate(registerDto);
 
@@ -37,7 +37,7 @@ namespace BlogApp.API.Controllers
                 {
                     return CreateActionResult(CustomResponse<AppUserRegisterDto>.Fail(user.StatusCode, user.Errors));
                 }
-                return CreateActionResult(user);
+                return CreateActionResult(CustomResponse<AppUserRegisterDto>.Success(user.StatusCode, user.Data));
             }
 
             foreach (var error in result.Errors)

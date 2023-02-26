@@ -7,6 +7,13 @@ namespace BlogApp.API.Controllers
     [ApiController]
     public class CustomBaseController : ControllerBase
     {
+        //public CustomBaseController(IImageHelper imageHelper)
+        //{
+        //    ImageHelper = imageHelper;
+        //}
+
+        //protected IImageHelper ImageHelper { get; }
+
         public IActionResult CreateActionResult<T>(CustomResponse<T> response)
         {
             if (response.StatusCode == 204)
