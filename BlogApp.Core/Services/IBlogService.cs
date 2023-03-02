@@ -17,9 +17,9 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<List<BlogListDto>>> GetAllBlogsAsync();
         Task<CustomResponse<NoContent>> HardDeleteAsync(int blogId);
         Task<CustomResponse<NoContent>> UndoDeleteAsync(int blogId);
-        Task<CustomResponse<List<BlogListDto>>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false);
+        Task<CustomResponse<BlogViewModel>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false);
         Task<CustomResponse<List<BlogListDto>>> GetAllByViewCountAsync(bool isAscending, int? takeSize);
-        Task<CustomResponse<List<BlogListDto>>> GetAllByPagingAsync(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false);
+        Task<CustomResponse<BlogViewModel>> GetAllByPagingAsync(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false);
         Task<CustomResponse<int>> CountTotalBlogsAsync();
         Task<CustomResponse<int>> CountActiveBlogsAsync();
         Task<CustomResponse<int>> CountInactiveBlogsAsync();
@@ -28,7 +28,7 @@ namespace BlogApp.Core.Services
         Task<CustomResponse<string>> IncreaseViewCountAsync(int blogId);
         Task<CustomResponse<List<BlogListDto>>> GetAllByCategoryAsync(int categoryId);
         Task<CustomResponse<List<BlogListDto>>> GetAllByUserIdOnFilterAsync(int userId, FilterBy filterBy, OrderBy orderBy, bool isAscending, int takeSize, int categoryId, DateTime startAt, DateTime endAt, int minViewCount, int maxViewCount, int minCommentCount, int maxCommentCount);
-        Task<CustomResponse<List<BlogListDto>>> GetAllBlogsFilteredAsync(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser);
+        Task<CustomResponse<BlogViewModel>> GetAllBlogsFilteredAsync(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser);
         Task<CustomResponse<BlogListDto>> GetByBlogIdAsync(int blogId);
         Task<CustomResponse<BlogListDto>> GetFilteredByBlogIdAsync(int blogId, bool includeCategory, bool includeTag, bool includeComment, bool includeUser);
         Task<CustomResponse<List<BlogListDto>>> GetAllByTagAsync(int tagId);

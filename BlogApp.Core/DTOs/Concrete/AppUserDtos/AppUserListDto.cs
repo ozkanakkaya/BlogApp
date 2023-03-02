@@ -17,5 +17,5 @@ namespace BlogApp.Core.DTOs.Concrete
         public int GenderId { get; set; }
 
         public List<AppRoleDto> Roles { get; set; }
-}
+    }
 }

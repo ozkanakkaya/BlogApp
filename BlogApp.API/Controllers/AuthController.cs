@@ -2,7 +2,6 @@
 using BlogApp.API.Jwt;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums;
-using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using FluentValidation;
@@ -10,14 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlogApp.API.Controllers
 {
-    public class AuthController : CustomBaseController
+    public class AuthController : CustomControllerBase
     {
         private readonly IMapper _mapper;
-
         private readonly IAppUserService _appUserService;
-
         private readonly IValidator<AppUserRegisterDto> _validator;
-        public AuthController(IMapper mapper, IAppUserService appUserService, IValidator<AppUserRegisterDto> validator) /*: base(imageHelper)*/
+        public AuthController(IMapper mapper, IAppUserService appUserService, IValidator<AppUserRegisterDto> validator)
         {
             _mapper = mapper;
             _appUserService = appUserService;

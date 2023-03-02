@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class AppUserUpdateDto :IDto
+    public class AppUserUpdateDto : IDto
     {
         public int Id { get; set; }
         public int GenderId { get; set; }

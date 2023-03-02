@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlogApp.API.Controllers
 {
-    public class BlogsController : CustomBaseController
+    public class BlogController : CustomControllerBase
     {
         private readonly IBlogService _blogService;
         private readonly IMapper _mapper;
         private readonly IValidator<BlogCreateDto> _blogCreateDtoValidator;
         private readonly IValidator<BlogUpdateDto> _blogUpdateDtoValidotor;
 
-        public BlogsController(IBlogService blogService, IMapper mapper, IValidator<BlogCreateDto> blogCreateDtoValidator, IValidator<BlogUpdateDto> blogUpdateDtoValidotor) /*: base(imageHelper)*/
+        public BlogController(IBlogService blogService, IMapper mapper, IValidator<BlogCreateDto> blogCreateDtoValidator, IValidator<BlogUpdateDto> blogUpdateDtoValidotor)
         {
             _blogService = blogService;
             _mapper = mapper;
@@ -171,15 +171,7 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Fail(searchResult.StatusCode, searchResult.Errors));
             }
 
-            return CreateActionResult(CustomResponse<BlogViewModel>.Success(200, new BlogViewModel
-            {
-                BlogListDto = searchResult.Data,
-                CurrentPage = currentPage,
-                PageSize = pageSize,
-                TotalCount = searchResult.Data.Count,
-                IsAscending = isAscending,
-                Keyword = keyword
-            }));
+            return CreateActionResult(CustomResponse<BlogViewModel>.Success(200, searchResult.Data));
         }
 
         [HttpGet("[action]")]
@@ -207,16 +199,7 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
             }
 
-            return CreateActionResult(CustomResponse<BlogViewModel>.Success(result.StatusCode, new BlogViewModel
-            {
-                BlogListDto = result.Data,
-                CategoryId = categoryId.HasValue ? categoryId.Value : null,
-                CurrentPage = currentPage,
-                PageSize = pageSize,
-                TotalCount = result.Data.Count,
-                IsAscending = isAscending,
-            }));
-
+            return CreateActionResult(CustomResponse<BlogViewModel>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -315,15 +298,7 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.GetAllBlogsFilteredAsync(categoryId, userId, isActive, isDeleted, currentPage, pageSize, orderBy, isAscending, includeCategory, includeTag, includeComments, includeUser);
             if (!result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<BlogViewModel>.Success(200, new BlogViewModel
-                {
-                    BlogListDto = result.Data,
-                    CategoryId = categoryId.HasValue ? categoryId.Value : null,
-                    CurrentPage = currentPage,
-                    PageSize = pageSize,
-                    TotalCount = result.Data.Count,
-                    IsAscending = isAscending,
-                }));
+                return CreateActionResult(CustomResponse<BlogViewModel>.Success(200, result.Data));
             }
             return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
         }

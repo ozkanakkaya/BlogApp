@@ -14,7 +14,6 @@ using BlogApp.Data.Repositories;
 using BlogApp.Data.UnitOfWork;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
@@ -71,6 +70,8 @@ builder.Services.AddScoped<IValidator<AppUserUpdateDto>, AppUserUpdateDtoValidat
 builder.Services.AddScoped<IValidator<AppUserPasswordChangeDto>, AppUserPasswordChangeDtoValidator>();
 builder.Services.AddScoped<IValidator<BlogCreateDto>, BlogCreateDtoValidator>();
 builder.Services.AddScoped<IValidator<BlogUpdateDto>, BlogUpdateDtoValidator>();
+builder.Services.AddScoped<IValidator<CategoryCreateDto>, CategoryCreateDtoValidator>();
+builder.Services.AddScoped<IValidator<CategoryUpdateDto>, CategoryUpdateDtoValidator>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
@@ -84,6 +85,9 @@ builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<ITagBlogRepository, TagBlogRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IBlogCategoryRepository, BlogCategoryRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 builder.Services.AddScoped<IImageHelper, ImageHelper>();
 builder.Services.AddScoped<IFileAccess, FileAccess>();
 

@@ -9,26 +9,19 @@ using BlogApp.Core.UnitOfWork;
 using BlogApp.Core.Utilities.Abstract;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BlogApp.Business.Services
 {
     public class AppUserService : Service<AppUser>, IAppUserService
     {
-        private readonly IAppUserRepository _appUserRepository;
-        private readonly IAppRoleRepository _appRoleRepository;
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<AppUserLoginDto> _loginValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IImageHelper _imageHelper;
 
-        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IAppUserRepository appUserRepository, IAppRoleRepository appRoleRepository, IValidator<AppUserLoginDto> loginValidator, IHttpContextAccessor httpContextAccessor, IImageHelper imageHelper) : base(repository, unitOfWork)
+        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<AppUserLoginDto> loginValidator, IHttpContextAccessor httpContextAccessor, IImageHelper imageHelper) : base(repository, unitOfWork, mapper)
         {
-            _mapper = mapper;
-            _appUserRepository = appUserRepository;
-            _unitOfWork = unitOfWork;
-            _appRoleRepository = appRoleRepository;
             _loginValidator = loginValidator;
             _httpContextAccessor = httpContextAccessor;
             _imageHelper = imageHelper;
@@ -36,13 +29,13 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<AppRoleDto>>> GetRolesByUserId(int userId)
         {
-            var userRoles = await _appRoleRepository.GetAllAsync(x => x.AppUserRoles.Any(x => x.AppUserId == userId));
+            var userRoles = await UnitOfWork.Roles.GetAllAsync(x => x.AppUserRoles.Any(x => x.AppUserId == userId));
 
             if (userRoles == null)
             {
                 return CustomResponse<List<AppRoleDto>>.Fail(404, $"Id: {userId} kullanıcısının rolleri bulunamadı!");
             }
-            var rolesDto = _mapper.Map<List<AppRoleDto>>(userRoles);
+            var rolesDto = Mapper.Map<List<AppRoleDto>>(userRoles);
             return CustomResponse<List<AppRoleDto>>.Success(200, rolesDto);
         }
 
@@ -51,11 +44,11 @@ namespace BlogApp.Business.Services
             var result = _loginValidator.Validate(dto);
             if (result.IsValid)
             {
-                var user = _appUserRepository.GetAppUserWithLoginInfo(dto.Username, dto.Password);
+                var user = UnitOfWork.Users.GetAppUserWithLoginInfo(dto.Username, dto.Password);
 
                 if (user != null)
                 {
-                    var userDto = _mapper.Map<CheckUserResponseDto>(user);
+                    var userDto = Mapper.Map<CheckUserResponseDto>(user);
                     return CustomResponse<CheckUserResponseDto>.Success(200, userDto);
                 }
                 return CustomResponse<CheckUserResponseDto>.Fail(404, "Kullanıcı adı veya parola hatalıdır.");
@@ -65,14 +58,14 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<AppUserRegisterDto>> RegisterWithRoleAsync(AppUserRegisterDto dto, int roleId)
         {
-            var hasUser = await _appUserRepository.AnyAsync(x => x.Username == dto.Username);
+            var hasUser = await UnitOfWork.Users.AnyAsync(x => x.Username == dto.Username);
 
             if (!hasUser)
             {
                 var uploadedImageDtoResult = await _imageHelper.UploadAsync(dto.Username, dto.ImageFile, ImageType.User);
                 dto.ImageUrl = uploadedImageDtoResult.StatusCode == 200 ? uploadedImageDtoResult.Data.FullName : "userImages/defaultUser.png";
 
-                var user = _mapper.Map<AppUser>(dto);
+                var user = Mapper.Map<AppUser>(dto);
 
                 user.AppUserRoles = new List<AppUserRole>();
                 user.AppUserRoles.Add(new AppUserRole
@@ -81,8 +74,8 @@ namespace BlogApp.Business.Services
                     AppRoleId = roleId
                 });
 
-                await _appUserRepository.AddAsync(user);
-                await _unitOfWork.CommitAsync();
+                await UnitOfWork.Users.AddAsync(user);
+                await UnitOfWork.CommitAsync();
 
                 return CustomResponse<AppUserRegisterDto>.Success(201, dto);
             }
@@ -91,11 +84,11 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<AppUserListDto>>> GetAllByActiveAsync()
         {
-            var users = await _appUserRepository.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
+            var users = await UnitOfWork.Users.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
 
             if (users.Any())
             {
-                var usersDto = users.Select(user => _mapper.Map<AppUserListDto>(user)).ToList();
+                var usersDto = users.Select(user => Mapper.Map<AppUserListDto>(user)).ToList();
 
                 return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
             }
@@ -104,11 +97,11 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<AppUserListDto>> GetUserByIdAsync(int userId)
         {
-            var user = await _appUserRepository.GetAsync(x => x.Id == userId && x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
+            var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId && x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
 
             if (user != null)
             {
-                var userDto = _mapper.Map<AppUserListDto>(user);
+                var userDto = Mapper.Map<AppUserListDto>(user);
 
                 return CustomResponse<AppUserListDto>.Success(200, userDto);
             }
@@ -117,59 +110,61 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<NoContent>> DeleteAsync(int userId)
         {
-            var user = await _appUserRepository.GetAsync(x => x.Id == userId);
+            var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
             if (user != null)
             {
                 user.IsDeleted = true;
                 user.IsActive = false;
 
-                _appUserRepository.Update(user);
-                await _unitOfWork.CommitAsync();
-                return CustomResponse<NoContent>.Success(200);
+                UnitOfWork.Users.Update(user);
+                await UnitOfWork.CommitAsync();
+                return CustomResponse<NoContent>.Success(204);
             }
-            return CustomResponse<NoContent>.Fail(404, $"{user} numaralı kullanıcı bulunamadı!");
+            return CustomResponse<NoContent>.Fail(404, $"{userId} numaralı kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponse<NoContent>> UndoDeleteAsync(int userId)//Admin-Arşiv-Users
         {
-            var result = await _appUserRepository.AnyAsync(x => x.Id == userId);
+            var result = await UnitOfWork.Users.AnyAsync(x => x.Id == userId);
             if (result)
             {
-                var user = await _appUserRepository.GetAsync(x => x.Id == userId);
+                var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
                 user.IsDeleted = false;
                 user.IsActive = true;
-                _appUserRepository.Update(user);
-                await _unitOfWork.CommitAsync();
-                return CustomResponse<NoContent>.Success(200);
+                UnitOfWork.Users.Update(user);
+                await UnitOfWork.CommitAsync();
+                return CustomResponse<NoContent>.Success(204);
             }
             return CustomResponse<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponse<NoContent>> HardDeleteAsync(int userId)//Admin-Arşiv-Users
         {
-            var result = await _appUserRepository.AnyAsync(x => x.Id == userId);
+            var result = await UnitOfWork.Users.AnyAsync(x => x.Id == userId);
             if (result)
             {
-                var user = _appUserRepository.Where(x => x.Id == userId);
+                var user = UnitOfWork.Users.Where(x => x.Id == userId);
 
-                _appUserRepository.RemoveRange(user);
-                await _unitOfWork.CommitAsync();
+                var imageUrl = await user.Select(x => x.ImageUrl).FirstOrDefaultAsync();
 
-                if (user.SingleOrDefault().ImageUrl != "userImages/defaultUser.png")
-                    await _imageHelper.DeleteAsync(user.SingleOrDefault().ImageUrl);
+                UnitOfWork.Users.RemoveRange(user);
+                await UnitOfWork.CommitAsync();
 
-                return CustomResponse<NoContent>.Success(200);
+                if (imageUrl != "userImages/defaultUser.png")
+                    await _imageHelper.DeleteAsync(imageUrl);
+
+                return CustomResponse<NoContent>.Success(204);
             }
             return CustomResponse<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponse<List<AppUserListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
         {
-            var users = await _appUserRepository.GetAllAsync(x => x.IsDeleted, x => x.AppUserRoles);
+            var users = await UnitOfWork.Users.GetAllAsync(x => x.IsDeleted, x => x.AppUserRoles);
 
             if (users.Any())
             {
-                var usersDto = users.Select(user => _mapper.Map<AppUserListDto>(user)).ToList();
+                var usersDto = users.Select(user => Mapper.Map<AppUserListDto>(user)).ToList();
 
                 return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
             }
@@ -178,11 +173,11 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<AppUserListDto>>> GetAllByInactiveAsync()//Admin-Arşiv
         {
-            var users = await _appUserRepository.GetAllAsync(x => !x.IsActive & !x.IsDeleted, x => x.AppUserRoles);
+            var users = await UnitOfWork.Users.GetAllAsync(x => !x.IsActive & !x.IsDeleted, x => x.AppUserRoles);
 
             if (users.Any())
             {
-                var usersDto = users.Select(user => _mapper.Map<AppUserListDto>(user)).ToList();
+                var usersDto = users.Select(user => Mapper.Map<AppUserListDto>(user)).ToList();
 
                 return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
             }
@@ -193,7 +188,7 @@ namespace BlogApp.Business.Services
         {
             bool isNewImageUploaded = false;
 
-            var oldUser = _appUserRepository.Where(x => x.Id == appUserUpdateDto.Id).SingleOrDefault();
+            var oldUser = UnitOfWork.Users.Where(x => x.Id == appUserUpdateDto.Id).SingleOrDefault();
 
             var oldUserImage = oldUser.ImageUrl;
 
@@ -207,11 +202,11 @@ namespace BlogApp.Business.Services
                     isNewImageUploaded = true;
             }
 
-            var updateUser = _mapper.Map<AppUserUpdateDto, AppUser>(appUserUpdateDto, oldUser);
+            var updateUser = Mapper.Map<AppUserUpdateDto, AppUser>(appUserUpdateDto, oldUser);
 
-            _appUserRepository.Update(updateUser);
+            UnitOfWork.Users.Update(updateUser);
 
-            await _unitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync();
 
             if (isNewImageUploaded)
             {
@@ -226,15 +221,15 @@ namespace BlogApp.Business.Services
             var httpContext = _httpContextAccessor.HttpContext;
             var userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-            var user = await _appUserRepository.GetAsync(x => x.Id == int.Parse(userId));
+            var user = await UnitOfWork.Users.GetAsync(x => x.Id == int.Parse(userId));
 
-            var isVerified = _appUserRepository.CheckPasswordAsync(user, appUserPasswordChangeDto.CurrentPassword);
+            var isVerified = UnitOfWork.Users.CheckPasswordAsync(user, appUserPasswordChangeDto.CurrentPassword);
 
             if (isVerified)
             {
-                var updatePassword = _mapper.Map<AppUserPasswordChangeDto, AppUser>(appUserPasswordChangeDto, user);
-                _appUserRepository.Update(updatePassword);
-                await _unitOfWork.CommitAsync();
+                var updatePassword = Mapper.Map<AppUserPasswordChangeDto, AppUser>(appUserPasswordChangeDto, user);
+                UnitOfWork.Users.Update(updatePassword);
+                await UnitOfWork.CommitAsync();
 
                 return CustomResponse<NoContent>.Success(204);
             }
@@ -247,24 +242,24 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<NoContent>> ActivateUserAsync(int userId)
         {
-            var user = await _appUserRepository.GetAsync(x => x.Id == userId);
+            var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
             if (user.IsActive)
                 return CustomResponse<NoContent>.Fail(400, "Kullanıcı zaten aktif!");
             user.IsActive = true;
-            _appUserRepository.Update(user);
-            await _unitOfWork.CommitAsync();
+            UnitOfWork.Users.Update(user);
+            await UnitOfWork.CommitAsync();
             return CustomResponse<NoContent>.Success(204);
         }
 
         public async Task<CustomResponse<NoContent>> DeleteUserImageAsync(int userId)
         {
-            var user = _appUserRepository.Where(x => x.Id == userId).SingleOrDefault();
+            var user = UnitOfWork.Users.Where(x => x.Id == userId).SingleOrDefault();
 
             if (user.ImageUrl != "userImages/defaultUser.png")
             {
                 user.ImageUrl = "userImages/defaultUser.png";
-                _appUserRepository.Update(user);
-                await _unitOfWork.CommitAsync();
+                UnitOfWork.Users.Update(user);
+                await UnitOfWork.CommitAsync();
                 await _imageHelper.DeleteAsync(user.ImageUrl);
 
                 return CustomResponse<NoContent>.Success(204);
@@ -272,5 +267,21 @@ namespace BlogApp.Business.Services
 
             return CustomResponse<NoContent>.Fail(400, "Silinecek bir profil fotoğrafı bulunamadı!");
         }
+
+        public async Task<CustomResponse<int>> CountTotalAsync()
+        {
+            var categoriesCount = await UnitOfWork.Users.CountAsync();
+
+            return categoriesCount > -1 ? CustomResponse<int>.Success(200, categoriesCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {categoriesCount}");
+        }
+
+        public async Task<CustomResponse<int>> CountByNonDeletedAsync()
+        {
+            var categoriesCount = await UnitOfWork.Users.CountAsync(x => !x.IsDeleted);
+
+            return categoriesCount > -1 ? CustomResponse<int>.Success(200, categoriesCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {categoriesCount}");
+        }
+
+
     }
 }

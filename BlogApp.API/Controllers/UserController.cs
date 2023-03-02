@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlogApp.API.Controllers
 {
-    public class UserController : CustomBaseController
+    public class UserController : CustomControllerBase
     {
         private readonly IAppUserService _userService;
         private readonly IValidator<AppUserUpdateDto> _userUpdateDtoValidator;
@@ -148,7 +148,7 @@ namespace BlogApp.API.Controllers
 
             return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
         }
-        
+
         [HttpGet("[action]/{userId}")]
         public async Task<IActionResult> ActivateUser(int userId)
         {
@@ -169,6 +169,28 @@ namespace BlogApp.API.Controllers
                 return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
             }
             return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> CountTotal()
+        {
+            var result = await _userService.CountTotalAsync();
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> CountByNonDeleted()
+        {
+            var result = await _userService.CountByNonDeletedAsync();
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BlogApp.Core.Repositories;
+﻿using AutoMapper;
+using BlogApp.Core.Repositories;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
@@ -9,25 +10,28 @@ namespace BlogApp.Business.Services
     public class Service<T> : IService<T> where T : class
     {
         private readonly IGenericRepository<T> _repository;
-        private readonly IUnitOfWork _unitOfWork;
+        protected IUnitOfWork UnitOfWork;
+        protected IMapper Mapper;
 
-        public Service(IGenericRepository<T> repository, IUnitOfWork unitOfWork)
+
+        public Service(IGenericRepository<T> repository, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _repository = repository;
-            _unitOfWork = unitOfWork;
+            UnitOfWork = unitOfWork;
+            Mapper = mapper;
         }
 
         public async Task<T> AddAsync(T entity)
         {
             await _repository.AddAsync(entity);
-            await _unitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync();
             return entity;
         }
 
         public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities)
         {
             await _repository.AddRangeAsync(entities);
-            await _unitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync();
             return entities;
         }
 
@@ -49,19 +53,19 @@ namespace BlogApp.Business.Services
         public async Task RemoveAsync(T entity)
         {
             _repository.Remove(entity);
-            await _unitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync();
         }
 
         public async Task RemoveRangeAsync(IEnumerable<T> entities)
         {
             _repository.RemoveRange(entities);
-            await _unitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync();
         }
 
         public async Task UpdateAsync(T entity)
         {
             _repository.Update(entity);
-            await _unitOfWork.CommitAsync();
+            await UnitOfWork.CommitAsync();
         }
 
         public IQueryable<T> Where(Expression<Func<T, bool>> expression)

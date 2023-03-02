@@ -13,7 +13,6 @@ namespace BlogApp.Data.Configurations
             builder.Property(x => x.Firstname).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Lastname).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Username).HasMaxLength(100).IsRequired();
-            builder.Property(x => x.Username).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Email).HasMaxLength(100).IsRequired();
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);
             builder.Property(x => x.Password).HasMaxLength(50).IsRequired();

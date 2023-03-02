@@ -1,8 +1,6 @@
 ﻿using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Repositories;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace BlogApp.Data.Repositories
 {

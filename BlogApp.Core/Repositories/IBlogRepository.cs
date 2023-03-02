@@ -1,5 +1,4 @@
 ﻿using BlogApp.Core.Entities.Concrete;
-using System.Linq.Expressions;
 
 namespace BlogApp.Core.Repositories
 {
