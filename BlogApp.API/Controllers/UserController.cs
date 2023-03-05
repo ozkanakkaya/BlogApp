@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlogApp.API.Filter;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
@@ -129,13 +130,16 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost("[action]")]
+        [CheckUserId]
         public async Task<IActionResult> PasswordChange(AppUserPasswordChangeDto appUserPasswordChangeDto)
         {
             var result = _userPasswordChangeDtoValidator.Validate(appUserPasswordChangeDto);
 
             if (result.IsValid)
             {
-                var resultUpdate = await _userService.PasswordChangeAsync(appUserPasswordChangeDto);
+                var userId = HttpContext.Items["userId"] as string;
+
+                var resultUpdate = await _userService.PasswordChangeAsync(appUserPasswordChangeDto, userId);
 
                 return !resultUpdate.Errors.Any()
                     ? CreateActionResult(CustomResponse<NoContent>.Success(204))

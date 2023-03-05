@@ -1,4 +1,5 @@
 ﻿using BlogApp.Core.Repositories;
+using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
 using BlogApp.Data.Repositories;
 
@@ -14,6 +15,7 @@ namespace BlogApp.Data.UnitOfWork
         private AppRoleRepository _roleRepository;
         private BlogCategoryRepository _blogCategoryRepository;
         private TagBlogRepository _blogTagRepository;
+        private CommentRepository _commentRepository;
 
         public UnitOfWork(AppDbContext context)
         {
@@ -27,6 +29,7 @@ namespace BlogApp.Data.UnitOfWork
         public IAppRoleRepository Roles => _roleRepository ??= new AppRoleRepository(_context);
         public IBlogCategoryRepository BlogCategory => _blogCategoryRepository ??= new BlogCategoryRepository(_context);
         public ITagBlogRepository BlogTag => _blogTagRepository ??= new TagBlogRepository(_context);
+        public ICommentRepository Comments => _commentRepository ??= new CommentRepository(_context);
 
         public void Commit()
         {

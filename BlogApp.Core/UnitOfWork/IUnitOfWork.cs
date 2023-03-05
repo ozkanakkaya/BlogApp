@@ -11,6 +11,7 @@ namespace BlogApp.Core.UnitOfWork
         IAppRoleRepository Roles { get; }
         IBlogCategoryRepository BlogCategory { get; }
         ITagBlogRepository BlogTag { get; }
+        ICommentRepository Comments { get; }
         Task CommitAsync();
         void Commit();
     }

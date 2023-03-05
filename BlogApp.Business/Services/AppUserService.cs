@@ -17,13 +17,11 @@ namespace BlogApp.Business.Services
     public class AppUserService : Service<AppUser>, IAppUserService
     {
         private readonly IValidator<AppUserLoginDto> _loginValidator;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IImageHelper _imageHelper;
 
-        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<AppUserLoginDto> loginValidator, IHttpContextAccessor httpContextAccessor, IImageHelper imageHelper) : base(repository, unitOfWork, mapper)
+        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<AppUserLoginDto> loginValidator, IImageHelper imageHelper) : base(repository, unitOfWork, mapper)
         {
             _loginValidator = loginValidator;
-            _httpContextAccessor = httpContextAccessor;
             _imageHelper = imageHelper;
         }
 
@@ -216,11 +214,8 @@ namespace BlogApp.Business.Services
             return CustomResponse<NoContent>.Success(204);
         }
 
-        public async Task<CustomResponse<NoContent>> PasswordChangeAsync(AppUserPasswordChangeDto appUserPasswordChangeDto)
+        public async Task<CustomResponse<NoContent>> PasswordChangeAsync(AppUserPasswordChangeDto appUserPasswordChangeDto, string userId)
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            var userId = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == int.Parse(userId));
 
             var isVerified = UnitOfWork.Users.CheckPasswordAsync(user, appUserPasswordChangeDto.CurrentPassword);

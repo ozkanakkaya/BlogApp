@@ -1,4 +1,5 @@
 using AutoMapper;
+using BlogApp.API.Filter;
 using BlogApp.API.Jwt;
 using BlogApp.Business.Helpers;
 using BlogApp.Business.Mapping;
@@ -72,7 +73,10 @@ builder.Services.AddScoped<IValidator<BlogCreateDto>, BlogCreateDtoValidator>();
 builder.Services.AddScoped<IValidator<BlogUpdateDto>, BlogUpdateDtoValidator>();
 builder.Services.AddScoped<IValidator<CategoryCreateDto>, CategoryCreateDtoValidator>();
 builder.Services.AddScoped<IValidator<CategoryUpdateDto>, CategoryUpdateDtoValidator>();
+builder.Services.AddScoped<IValidator<CommentCreateDto>, CommentCreateDtoValidator>();
+builder.Services.AddScoped<IValidator<CommentUpdateDto>, CommentUpdateDtoValidator>();
 
+builder.Services.AddScoped<CheckUserIdAttribute>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -87,6 +91,7 @@ builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IBlogCategoryRepository, BlogCategoryRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddScoped<IImageHelper, ImageHelper>();
 builder.Services.AddScoped<IFileAccess, FileAccess>();

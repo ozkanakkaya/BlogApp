@@ -45,7 +45,7 @@ namespace BlogApp.Data
                             {
                                 entityReference.CreatedDate = DateTime.UtcNow;
                                 entityReference.UpdatedDate = entityReference.CreatedDate;
-                                entityReference.CreatedByUsername = username != null ? username : "Non";
+                                if(username != null) entityReference.CreatedByUsername = username;
                                 break;
                             }
                         case EntityState.Modified:
@@ -55,7 +55,7 @@ namespace BlogApp.Data
                                 Entry(entityReference).Property(x => x.CreatedDate).IsModified = false;
                                 Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
                                 entityReference.UpdatedDate = DateTime.UtcNow;
-                                entityReference.UpdatedByUsername = username != null ? username : "Non";
+                                if (username != null) entityReference.UpdatedByUsername = username;
                                 break;
                             }
                     }
