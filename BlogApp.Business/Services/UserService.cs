@@ -16,28 +16,28 @@ namespace BlogApp.Business.Services
 {
     public class UserService : Service<AppUser>, IUserService
     {
-        private readonly IValidator<AppUserLoginDto> _loginValidator;
+        private readonly IValidator<UserLoginDto> _loginValidator;
         private readonly IImageHelper _imageHelper;
 
-        public UserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<AppUserLoginDto> loginValidator, IImageHelper imageHelper) : base(repository, unitOfWork, mapper)
+        public UserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<UserLoginDto> loginValidator, IImageHelper imageHelper) : base(repository, unitOfWork, mapper)
         {
             _loginValidator = loginValidator;
             _imageHelper = imageHelper;
         }
 
-        public async Task<CustomResponse<List<AppRoleDto>>> GetRolesByUserId(int userId)
+        public async Task<CustomResponse<List<RoleDto>>> GetRolesByUserId(int userId)
         {
             var userRoles = await UnitOfWork.Roles.GetAllAsync(x => x.AppUserRoles.Any(x => x.AppUserId == userId));
 
             if (userRoles == null)
             {
-                return CustomResponse<List<AppRoleDto>>.Fail(404, $"Id: {userId} kullanıcısının rolleri bulunamadı!");
+                return CustomResponse<List<RoleDto>>.Fail(404, $"Id: {userId} kullanıcısının rolleri bulunamadı!");
             }
-            var rolesDto = Mapper.Map<List<AppRoleDto>>(userRoles);
-            return CustomResponse<List<AppRoleDto>>.Success(200, rolesDto);
+            var rolesDto = Mapper.Map<List<RoleDto>>(userRoles);
+            return CustomResponse<List<RoleDto>>.Success(200, rolesDto);
         }
 
-        public CustomResponse<CheckUserResponseDto> CheckUser(AppUserLoginDto dto)
+        public CustomResponse<CheckUserResponseDto> CheckUser(UserLoginDto dto)
         {
             var result = _loginValidator.Validate(dto);
             if (result.IsValid)
@@ -54,7 +54,7 @@ namespace BlogApp.Business.Services
             return CustomResponse<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola boş geçilemez.");
         }
 
-        public async Task<CustomResponse<AppUserRegisterDto>> RegisterWithRoleAsync(AppUserRegisterDto dto, int roleId)
+        public async Task<CustomResponse<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId)
         {
             var hasUser = await UnitOfWork.Users.AnyAsync(x => x.Username == dto.Username);
 
@@ -75,35 +75,35 @@ namespace BlogApp.Business.Services
                 await UnitOfWork.Users.AddAsync(user);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponse<AppUserRegisterDto>.Success(201, dto);
+                return CustomResponse<UserRegisterDto>.Success(201, dto);
             }
-            return CustomResponse<AppUserRegisterDto>.Fail(400, $"'{dto.Username}' kullanıcı adı zaten kayıtlı!");
+            return CustomResponse<UserRegisterDto>.Fail(400, $"'{dto.Username}' kullanıcı adı zaten kayıtlı!");
         }
 
-        public async Task<CustomResponse<List<AppUserListDto>>> GetAllByActiveAsync()
+        public async Task<CustomResponse<List<UserListDto>>> GetAllByActiveAsync()
         {
             var users = await UnitOfWork.Users.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
 
             if (users.Any())
             {
-                var usersDto = users.Select(user => Mapper.Map<AppUserListDto>(user)).ToList();
+                var usersDto = users.Select(user => Mapper.Map<UserListDto>(user)).ToList();
 
-                return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
+                return CustomResponse<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponse<List<AppUserListDto>>.Fail(404, "Herhangi bir kullanıcı bulunamadı!");
+            return CustomResponse<List<UserListDto>>.Fail(404, "Herhangi bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<AppUserListDto>> GetUserByIdAsync(int userId)
+        public async Task<CustomResponse<UserListDto>> GetUserByIdAsync(int userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId && x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
 
             if (user != null)
             {
-                var userDto = Mapper.Map<AppUserListDto>(user);
+                var userDto = Mapper.Map<UserListDto>(user);
 
-                return CustomResponse<AppUserListDto>.Success(200, userDto);
+                return CustomResponse<UserListDto>.Success(200, userDto);
             }
-            return CustomResponse<AppUserListDto>.Fail(404, "Gösterilecek bir kullanıcı bulunamadı!");
+            return CustomResponse<UserListDto>.Fail(404, "Gösterilecek bir kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponse<NoContent>> DeleteAsync(int userId)
@@ -156,33 +156,33 @@ namespace BlogApp.Business.Services
             return CustomResponse<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<List<AppUserListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
+        public async Task<CustomResponse<List<UserListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
         {
             var users = await UnitOfWork.Users.GetAllAsync(x => x.IsDeleted, x => x.AppUserRoles);
 
             if (users.Any())
             {
-                var usersDto = users.Select(user => Mapper.Map<AppUserListDto>(user)).ToList();
+                var usersDto = users.Select(user => Mapper.Map<UserListDto>(user)).ToList();
 
-                return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
+                return CustomResponse<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponse<List<AppUserListDto>>.Fail(404, "Silinmiş bir kullanıcı bulunamadı!");
+            return CustomResponse<List<UserListDto>>.Fail(404, "Silinmiş bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<List<AppUserListDto>>> GetAllByInactiveAsync()//Admin-Arşiv
+        public async Task<CustomResponse<List<UserListDto>>> GetAllByInactiveAsync()//Admin-Arşiv
         {
             var users = await UnitOfWork.Users.GetAllAsync(x => !x.IsActive & !x.IsDeleted, x => x.AppUserRoles);
 
             if (users.Any())
             {
-                var usersDto = users.Select(user => Mapper.Map<AppUserListDto>(user)).ToList();
+                var usersDto = users.Select(user => Mapper.Map<UserListDto>(user)).ToList();
 
-                return CustomResponse<List<AppUserListDto>>.Success(200, usersDto);
+                return CustomResponse<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponse<List<AppUserListDto>>.Fail(404, "Aktif olmayan bir kullanıcı bulunamadı!");
+            return CustomResponse<List<UserListDto>>.Fail(404, "Aktif olmayan bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> UpdateUserAsync(AppUserUpdateDto appUserUpdateDto)
+        public async Task<CustomResponse<NoContent>> UpdateUserAsync(UserUpdateDto appUserUpdateDto)
         {
             bool isNewImageUploaded = false;
 
@@ -200,7 +200,7 @@ namespace BlogApp.Business.Services
                     isNewImageUploaded = true;
             }
 
-            var updateUser = Mapper.Map<AppUserUpdateDto, AppUser>(appUserUpdateDto, oldUser);
+            var updateUser = Mapper.Map<UserUpdateDto, AppUser>(appUserUpdateDto, oldUser);
 
             UnitOfWork.Users.Update(updateUser);
 
@@ -214,7 +214,7 @@ namespace BlogApp.Business.Services
             return CustomResponse<NoContent>.Success(204);
         }
 
-        public async Task<CustomResponse<NoContent>> PasswordChangeAsync(AppUserPasswordChangeDto appUserPasswordChangeDto, string userId)
+        public async Task<CustomResponse<NoContent>> PasswordChangeAsync(UserPasswordChangeDto appUserPasswordChangeDto, string userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == int.Parse(userId));
 
@@ -222,7 +222,7 @@ namespace BlogApp.Business.Services
 
             if (isVerified)
             {
-                var updatePassword = Mapper.Map<AppUserPasswordChangeDto, AppUser>(appUserPasswordChangeDto, user);
+                var updatePassword = Mapper.Map<UserPasswordChangeDto, AppUser>(appUserPasswordChangeDto, user);
                 UnitOfWork.Users.Update(updatePassword);
                 await UnitOfWork.CommitAsync();
 

@@ -3,13 +3,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class AppUserRegisterDto : IDto
+    public class UserUpdateDto : IDto
     {
+        public int Id { get; set; }
+        public int GenderId { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string ImageUrl { get; set; }
@@ -17,6 +16,5 @@ namespace BlogApp.Core.DTOs.Concrete
         public string About { get; set; }
         public string GitHubLink { get; set; }
         public string WebsiteLink { get; set; }
-        public int GenderId { get; set; }
     }
 }

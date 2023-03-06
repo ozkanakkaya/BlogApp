@@ -2,9 +2,10 @@
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class AppUserListDto : IDto
+    public class UserDto : IDto
     {
         public int Id { get; set; }
+        public int GenderId { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
         public string Username { get; set; }
@@ -14,8 +15,6 @@ namespace BlogApp.Core.DTOs.Concrete
         public string About { get; set; }
         public string GitHubLink { get; set; }
         public string WebsiteLink { get; set; }
-        public int GenderId { get; set; }
 
-        public List<AppRoleDto> Roles { get; set; }
     }
 }

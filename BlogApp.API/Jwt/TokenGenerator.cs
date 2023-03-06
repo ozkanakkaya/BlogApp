@@ -8,7 +8,7 @@ namespace BlogApp.API.Jwt
 {
     public class TokenGenerator
     {
-        public static TokenResponse GenerateToken(CheckUserResponseDto dto, List<AppRoleDto> roles)
+        public static TokenResponse GenerateToken(CheckUserResponseDto dto, List<RoleDto> roles)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenSettings.Key));
 

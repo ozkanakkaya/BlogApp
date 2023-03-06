@@ -13,8 +13,8 @@ namespace BlogApp.API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IUserService _UserService;
-        private readonly IValidator<AppUserRegisterDto> _validator;
-        public AuthController(IMapper mapper, IUserService appUserService, IValidator<AppUserRegisterDto> validator)
+        private readonly IValidator<UserRegisterDto> _validator;
+        public AuthController(IMapper mapper, IUserService appUserService, IValidator<UserRegisterDto> validator)
         {
             _mapper = mapper;
             _UserService = appUserService;
@@ -22,7 +22,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register([FromForm] AppUserRegisterDto registerDto)
+        public async Task<IActionResult> Register([FromForm] UserRegisterDto registerDto)
         {
             var result = _validator.Validate(registerDto);
 
@@ -32,9 +32,9 @@ namespace BlogApp.API.Controllers
 
                 if (user.Errors.Any())//aynı kullanıcı adı kayıtlıysa girer
                 {
-                    return CreateActionResult(CustomResponse<AppUserRegisterDto>.Fail(user.StatusCode, user.Errors));
+                    return CreateActionResult(CustomResponse<UserRegisterDto>.Fail(user.StatusCode, user.Errors));
                 }
-                return CreateActionResult(CustomResponse<AppUserRegisterDto>.Success(user.StatusCode, user.Data));
+                return CreateActionResult(CustomResponse<UserRegisterDto>.Success(user.StatusCode, user.Data));
             }
 
             foreach (var error in result.Errors)
@@ -47,7 +47,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login(AppUserLoginDto loginDto)
+        public async Task<IActionResult> Login(UserLoginDto loginDto)
         {
             var result = _UserService.CheckUser(loginDto);
             if (!result.Errors.Any())

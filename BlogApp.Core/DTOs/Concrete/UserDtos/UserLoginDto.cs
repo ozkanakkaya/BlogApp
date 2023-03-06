@@ -2,7 +2,7 @@
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class AppUserLoginDto : IDto
+    public class UserLoginDto : IDto
     {
         public string Username { get; set; }
 

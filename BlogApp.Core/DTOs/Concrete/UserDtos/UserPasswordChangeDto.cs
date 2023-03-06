@@ -2,7 +2,7 @@
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class AppUserPasswordChangeDto : IDto
+    public class UserPasswordChangeDto : IDto
     {
         public string CurrentPassword { get; set; }
         public string NewPassword { get; set; }

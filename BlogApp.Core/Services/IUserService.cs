@@ -6,20 +6,20 @@ namespace BlogApp.Core.Services
 {
     public interface IUserService : IService<AppUser>
     {
-        Task<CustomResponse<AppUserRegisterDto>> RegisterWithRoleAsync(AppUserRegisterDto dto, int roleId);
+        Task<CustomResponse<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId);
 
-        CustomResponse<CheckUserResponseDto> CheckUser(AppUserLoginDto dto);
+        CustomResponse<CheckUserResponseDto> CheckUser(UserLoginDto dto);
 
-        Task<CustomResponse<List<AppRoleDto>>> GetRolesByUserId(int userId);
-        Task<CustomResponse<List<AppUserListDto>>> GetAllByActiveAsync();
-        Task<CustomResponse<AppUserListDto>> GetUserByIdAsync(int userId);
+        Task<CustomResponse<List<RoleDto>>> GetRolesByUserId(int userId);
+        Task<CustomResponse<List<UserListDto>>> GetAllByActiveAsync();
+        Task<CustomResponse<UserListDto>> GetUserByIdAsync(int userId);
         Task<CustomResponse<NoContent>> DeleteAsync(int userId);
         Task<CustomResponse<NoContent>> UndoDeleteAsync(int userId);
         Task<CustomResponse<NoContent>> HardDeleteAsync(int userId);
-        Task<CustomResponse<List<AppUserListDto>>> GetAllByDeletedAsync();
-        Task<CustomResponse<List<AppUserListDto>>> GetAllByInactiveAsync();
-        Task<CustomResponse<NoContent>> UpdateUserAsync(AppUserUpdateDto appUserUpdateDto);
-        Task<CustomResponse<NoContent>> PasswordChangeAsync(AppUserPasswordChangeDto appUserPasswordChangeDto, string userId);
+        Task<CustomResponse<List<UserListDto>>> GetAllByDeletedAsync();
+        Task<CustomResponse<List<UserListDto>>> GetAllByInactiveAsync();
+        Task<CustomResponse<NoContent>> UpdateUserAsync(UserUpdateDto appUserUpdateDto);
+        Task<CustomResponse<NoContent>> PasswordChangeAsync(UserPasswordChangeDto appUserPasswordChangeDto, string userId);
         Task<CustomResponse<NoContent>> ActivateUserAsync(int userId);
         Task<CustomResponse<NoContent>> DeleteUserImageAsync(int userId);
         Task<CustomResponse<int>> CountTotalAsync();

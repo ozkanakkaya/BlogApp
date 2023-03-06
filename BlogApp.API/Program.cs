@@ -65,10 +65,10 @@ builder.Services.AddDbContext<AppDbContext>(x =>
 });
 //builder.Services.AddScoped(typeof());
 //builder.Services.AddValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>();//diðer kullaným
-builder.Services.AddScoped<IValidator<AppUserRegisterDto>, UserRegisterDtoValidator>();
-builder.Services.AddScoped<IValidator<AppUserLoginDto>, UserLoginDtoValidator>();
-builder.Services.AddScoped<IValidator<AppUserUpdateDto>, UserUpdateDtoValidator>();
-builder.Services.AddScoped<IValidator<AppUserPasswordChangeDto>, UserPasswordChangeDtoValidator>();
+builder.Services.AddScoped<IValidator<UserRegisterDto>, UserRegisterDtoValidator>();
+builder.Services.AddScoped<IValidator<UserLoginDto>, UserLoginDtoValidator>();
+builder.Services.AddScoped<IValidator<UserUpdateDto>, UserUpdateDtoValidator>();
+builder.Services.AddScoped<IValidator<UserPasswordChangeDto>, UserPasswordChangeDtoValidator>();
 builder.Services.AddScoped<IValidator<BlogCreateDto>, BlogCreateDtoValidator>();
 builder.Services.AddScoped<IValidator<BlogUpdateDto>, BlogUpdateDtoValidator>();
 builder.Services.AddScoped<IValidator<CategoryCreateDto>, CategoryCreateDtoValidator>();

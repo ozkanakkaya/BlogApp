@@ -11,12 +11,12 @@ namespace BlogApp.API.Controllers
     public class UserController : CustomControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IValidator<AppUserUpdateDto> _userUpdateDtoValidator;
-        private readonly IValidator<AppUserPasswordChangeDto> _userPasswordChangeDtoValidator;
+        private readonly IValidator<UserUpdateDto> _userUpdateDtoValidator;
+        private readonly IValidator<UserPasswordChangeDto> _userPasswordChangeDtoValidator;
         private readonly IMapper _mapper;
 
 
-        public UserController(IUserService userService, IValidator<AppUserUpdateDto> userUpdateDtoValidator, IValidator<AppUserPasswordChangeDto> userPasswordChangeDtoValidator, IMapper mapper)
+        public UserController(IUserService userService, IValidator<UserUpdateDto> userUpdateDtoValidator, IValidator<UserPasswordChangeDto> userPasswordChangeDtoValidator, IMapper mapper)
         {
             _userService = userService;
             _userUpdateDtoValidator = userUpdateDtoValidator;
@@ -33,7 +33,7 @@ namespace BlogApp.API.Controllers
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, users.Errors));
             }
-            return CreateActionResult(CustomResponse<List<AppUserListDto>>.Success(200, users.Data));
+            return CreateActionResult(CustomResponse<List<UserListDto>>.Success(200, users.Data));
         }
 
         [HttpGet("{userId}")]//api/blogs/1
@@ -45,7 +45,7 @@ namespace BlogApp.API.Controllers
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, users.Errors));
             }
-            return CreateActionResult(CustomResponse<AppUserListDto>.Success(200, users.Data));
+            return CreateActionResult(CustomResponse<UserListDto>.Success(200, users.Data));
         }
 
         [HttpPut("[action]/{userId}")]
@@ -89,7 +89,7 @@ namespace BlogApp.API.Controllers
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(deletedUsers.StatusCode, deletedUsers.Errors));
             }
-            return CreateActionResult(CustomResponse<List<AppUserListDto>>.Success(deletedUsers.StatusCode, deletedUsers.Data));
+            return CreateActionResult(CustomResponse<List<UserListDto>>.Success(deletedUsers.StatusCode, deletedUsers.Data));
         }
 
         [HttpGet("[action]")]
@@ -101,11 +101,11 @@ namespace BlogApp.API.Controllers
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, users.Errors));
             }
-            return CreateActionResult(CustomResponse<List<AppUserListDto>>.Success(200, users.Data));
+            return CreateActionResult(CustomResponse<List<UserListDto>>.Success(200, users.Data));
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromForm] AppUserUpdateDto appUserUpdateDto)
+        public async Task<IActionResult> UpdateUser([FromForm] UserUpdateDto appUserUpdateDto)
         {
             var result = _userUpdateDtoValidator.Validate(appUserUpdateDto);
 
@@ -131,7 +131,7 @@ namespace BlogApp.API.Controllers
 
         [HttpPost("[action]")]
         [CheckUserId]
-        public async Task<IActionResult> PasswordChange(AppUserPasswordChangeDto appUserPasswordChangeDto)
+        public async Task<IActionResult> PasswordChange(UserPasswordChangeDto appUserPasswordChangeDto)
         {
             var result = _userPasswordChangeDtoValidator.Validate(appUserPasswordChangeDto);
 

@@ -23,7 +23,7 @@ namespace BlogApp.Core.DTOs.Concrete
         public List<TagDto> Tags { get; set; }
         public List<CategoryDto> Categories { get; set; }
         public List<CommentListDto> Comments { get; set; }
-        public AppUserDto AppUser { get; set; }
+        public UserDto AppUser { get; set; }
 
     }
 }

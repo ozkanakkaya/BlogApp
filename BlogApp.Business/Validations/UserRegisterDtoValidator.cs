@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace BlogApp.Business.Validations
 {
-    public class UserRegisterDtoValidator : AbstractValidator<AppUserRegisterDto>
+    public class UserRegisterDtoValidator : AbstractValidator<UserRegisterDto>
     {
         public UserRegisterDtoValidator()
         {

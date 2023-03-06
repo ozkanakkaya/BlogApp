@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Repositories;
+using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
 
@@ -11,7 +13,6 @@ namespace BlogApp.Business.Services
         public RoleService(IGenericRepository<AppRole> repository, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, unitOfWork, mapper)
         {
         }
-
 
     }
 }

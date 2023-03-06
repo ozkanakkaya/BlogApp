@@ -2,7 +2,7 @@
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class AppRoleDto : IDto
+    public class RoleDto : IDto
     {
         public int Id { get; set; }
 
