@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace BlogApp.Business.Validations
 {
-    public class AppUserRegisterDtoValidator : AbstractValidator<AppUserRegisterDto>
+    public class UserRegisterDtoValidator : AbstractValidator<AppUserRegisterDto>
     {
-        public AppUserRegisterDtoValidator()
+        public UserRegisterDtoValidator()
         {
             RuleFor(x => x.Firstname).MinimumLength(3).WithMessage("Ad alanı en az 3 karakter olmalıdır.").NotEmpty().WithMessage("Ad alanı boş geçilemez.");
             RuleFor(x => x.Lastname).MinimumLength(2).WithMessage("Soyad alanı en az 2 karakter olmalıdır.").NotEmpty().WithMessage("Soyad alanı boş geçilemez.");

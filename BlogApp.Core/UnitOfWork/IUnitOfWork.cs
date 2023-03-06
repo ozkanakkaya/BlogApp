@@ -5,10 +5,10 @@ namespace BlogApp.Core.UnitOfWork
     public interface IUnitOfWork : IAsyncDisposable
     {
         ICategoryRepository Categories { get; }
-        IAppUserRepository Users { get; }
+        IUserRepository Users { get; }
         IBlogRepository Blogs { get; }
         ITagRepository Tags { get; }
-        IAppRoleRepository Roles { get; }
+        IRoleRepository Roles { get; }
         IBlogCategoryRepository BlogCategory { get; }
         ITagBlogRepository BlogTag { get; }
         ICommentRepository Comments { get; }

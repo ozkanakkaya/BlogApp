@@ -3,9 +3,9 @@ using BlogApp.Core.Repositories;
 
 namespace BlogApp.Data.Repositories
 {
-    public class AppUserRepository : GenericRepository<AppUser>, IAppUserRepository
+    public class UserRepository : GenericRepository<AppUser>, IUserRepository
     {
-        public AppUserRepository(AppDbContext context) : base(context)
+        public UserRepository(AppDbContext context) : base(context)
         {
         }
 

@@ -9,7 +9,7 @@ namespace BlogApp.Business.Helpers
         {
             return new List<Profile>
             {
-                new AppUserProfile(),
+                new UserProfile(),
             };
         }
     }

@@ -10,13 +10,13 @@ namespace BlogApp.API.Controllers
 {
     public class UserController : CustomControllerBase
     {
-        private readonly IAppUserService _userService;
+        private readonly IUserService _userService;
         private readonly IValidator<AppUserUpdateDto> _userUpdateDtoValidator;
         private readonly IValidator<AppUserPasswordChangeDto> _userPasswordChangeDtoValidator;
         private readonly IMapper _mapper;
 
 
-        public UserController(IAppUserService userService, IValidator<AppUserUpdateDto> userUpdateDtoValidator, IValidator<AppUserPasswordChangeDto> userPasswordChangeDtoValidator, IMapper mapper)
+        public UserController(IUserService userService, IValidator<AppUserUpdateDto> userUpdateDtoValidator, IValidator<AppUserPasswordChangeDto> userPasswordChangeDtoValidator, IMapper mapper)
         {
             _userService = userService;
             _userUpdateDtoValidator = userUpdateDtoValidator;

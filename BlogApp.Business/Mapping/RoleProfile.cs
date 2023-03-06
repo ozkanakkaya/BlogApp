@@ -4,9 +4,9 @@ using BlogApp.Core.Entities.Concrete;
 
 namespace BlogApp.Business.Mapping
 {
-    public class AppRoleProfile : Profile
+    public class RoleProfile : Profile
     {
-        public AppRoleProfile()
+        public RoleProfile()
         {
             CreateMap<AppRole, AppRoleDto>().ReverseMap();
         }

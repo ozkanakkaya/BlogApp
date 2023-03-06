@@ -2,7 +2,7 @@
 
 namespace BlogApp.Core.Repositories
 {
-    public interface IAppRoleRepository : IGenericRepository<AppRole>
+    public interface IRoleRepository : IGenericRepository<AppRole>
     {
         List<AppRole> GetRolesByUserId(int userId);
     }

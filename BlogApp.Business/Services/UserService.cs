@@ -14,12 +14,12 @@ using System.Security.Claims;
 
 namespace BlogApp.Business.Services
 {
-    public class AppUserService : Service<AppUser>, IAppUserService
+    public class UserService : Service<AppUser>, IUserService
     {
         private readonly IValidator<AppUserLoginDto> _loginValidator;
         private readonly IImageHelper _imageHelper;
 
-        public AppUserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<AppUserLoginDto> loginValidator, IImageHelper imageHelper) : base(repository, unitOfWork, mapper)
+        public UserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<AppUserLoginDto> loginValidator, IImageHelper imageHelper) : base(repository, unitOfWork, mapper)
         {
             _loginValidator = loginValidator;
             _imageHelper = imageHelper;

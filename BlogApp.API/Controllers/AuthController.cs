@@ -12,12 +12,12 @@ namespace BlogApp.API.Controllers
     public class AuthController : CustomControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IAppUserService _appUserService;
+        private readonly IUserService _UserService;
         private readonly IValidator<AppUserRegisterDto> _validator;
-        public AuthController(IMapper mapper, IAppUserService appUserService, IValidator<AppUserRegisterDto> validator)
+        public AuthController(IMapper mapper, IUserService appUserService, IValidator<AppUserRegisterDto> validator)
         {
             _mapper = mapper;
-            _appUserService = appUserService;
+            _UserService = appUserService;
             _validator = validator;
         }
 
@@ -28,7 +28,7 @@ namespace BlogApp.API.Controllers
 
             if (result.IsValid)
             {
-                var user = await _appUserService.RegisterWithRoleAsync(registerDto, (int)RoleType.Member);
+                var user = await _UserService.RegisterWithRoleAsync(registerDto, (int)RoleType.Member);
 
                 if (user.Errors.Any())//aynı kullanıcı adı kayıtlıysa girer
                 {
@@ -49,10 +49,10 @@ namespace BlogApp.API.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Login(AppUserLoginDto loginDto)
         {
-            var result = _appUserService.CheckUser(loginDto);
+            var result = _UserService.CheckUser(loginDto);
             if (!result.Errors.Any())
             {
-                var roleResult = await _appUserService.GetRolesByUserId(result.Data.Id);
+                var roleResult = await _UserService.GetRolesByUserId(result.Data.Id);
                 var token = TokenGenerator.GenerateToken(result.Data, roleResult.Data);
                 return Created("", token);
             }

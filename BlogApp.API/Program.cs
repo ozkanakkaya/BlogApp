@@ -42,11 +42,11 @@ builder.Services.AddSwaggerGen();
 //**Mappleme
 var profiles = ProfileHelper.GetProfiles();
 profiles.Add(new BlogProfile());
-profiles.Add(new AppRoleProfile());
+profiles.Add(new RoleProfile());
 profiles.Add(new TagProfile());
 profiles.Add(new CommentProfile());
 profiles.Add(new CategoryProfile());
-profiles.Add(new AppUserProfile());
+profiles.Add(new UserProfile());
 
 var configuration = new MapperConfiguration(opt =>
 {
@@ -65,10 +65,10 @@ builder.Services.AddDbContext<AppDbContext>(x =>
 });
 //builder.Services.AddScoped(typeof());
 //builder.Services.AddValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>();//diðer kullaným
-builder.Services.AddScoped<IValidator<AppUserRegisterDto>, AppUserRegisterDtoValidator>();
-builder.Services.AddScoped<IValidator<AppUserLoginDto>, AppUserLoginDtoValidator>();
-builder.Services.AddScoped<IValidator<AppUserUpdateDto>, AppUserUpdateDtoValidator>();
-builder.Services.AddScoped<IValidator<AppUserPasswordChangeDto>, AppUserPasswordChangeDtoValidator>();
+builder.Services.AddScoped<IValidator<AppUserRegisterDto>, UserRegisterDtoValidator>();
+builder.Services.AddScoped<IValidator<AppUserLoginDto>, UserLoginDtoValidator>();
+builder.Services.AddScoped<IValidator<AppUserUpdateDto>, UserUpdateDtoValidator>();
+builder.Services.AddScoped<IValidator<AppUserPasswordChangeDto>, UserPasswordChangeDtoValidator>();
 builder.Services.AddScoped<IValidator<BlogCreateDto>, BlogCreateDtoValidator>();
 builder.Services.AddScoped<IValidator<BlogUpdateDto>, BlogUpdateDtoValidator>();
 builder.Services.AddScoped<IValidator<CategoryCreateDto>, CategoryCreateDtoValidator>();
@@ -80,9 +80,9 @@ builder.Services.AddScoped<CheckUserIdAttribute>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped<IAppUserService, AppUserService>();
-builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
-builder.Services.AddScoped<IAppRoleRepository, AppRoleRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();

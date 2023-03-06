@@ -4,9 +4,9 @@ using BlogApp.Core.Entities.Concrete;
 
 namespace BlogApp.Business.Mapping
 {
-    public class AppUserProfile : Profile
+    public class UserProfile : Profile
     {
-        public AppUserProfile()
+        public UserProfile()
         {
             CreateMap<AppUser, AppUserRegisterDto>().ReverseMap();
             CreateMap<AppUser, AppUserUpdateDto>().ReverseMap();

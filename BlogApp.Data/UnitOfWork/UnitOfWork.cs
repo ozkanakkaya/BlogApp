@@ -9,10 +9,10 @@ namespace BlogApp.Data.UnitOfWork
     {
         private readonly AppDbContext _context;
         private CategoryRepository _categoryRepository;
-        private AppUserRepository _userRepository;
+        private UserRepository _userRepository;
         private BlogRepository _blogRepository;
         private TagRepository _tagRepository;
-        private AppRoleRepository _roleRepository;
+        private RoleRepository _roleRepository;
         private BlogCategoryRepository _blogCategoryRepository;
         private TagBlogRepository _blogTagRepository;
         private CommentRepository _commentRepository;
@@ -23,10 +23,10 @@ namespace BlogApp.Data.UnitOfWork
         }
 
         public ICategoryRepository Categories => _categoryRepository ??= new CategoryRepository(_context);
-        public IAppUserRepository Users => _userRepository ??= new AppUserRepository(_context);
+        public IUserRepository Users => _userRepository ??= new UserRepository(_context);
         public IBlogRepository Blogs => _blogRepository ??= new BlogRepository(_context);
         public ITagRepository Tags => _tagRepository ??= new TagRepository(_context);
-        public IAppRoleRepository Roles => _roleRepository ??= new AppRoleRepository(_context);
+        public IRoleRepository Roles => _roleRepository ??= new RoleRepository(_context);
         public IBlogCategoryRepository BlogCategory => _blogCategoryRepository ??= new BlogCategoryRepository(_context);
         public ITagBlogRepository BlogTag => _blogTagRepository ??= new TagBlogRepository(_context);
         public ICommentRepository Comments => _commentRepository ??= new CommentRepository(_context);

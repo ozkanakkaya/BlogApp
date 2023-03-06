@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace BlogApp.Business.Validations
 {
-    public class AppUserPasswordChangeDtoValidator : AbstractValidator<AppUserPasswordChangeDto>
+    public class UserPasswordChangeDtoValidator : AbstractValidator<AppUserPasswordChangeDto>
     {
-        public AppUserPasswordChangeDtoValidator()
+        public UserPasswordChangeDtoValidator()
         {
             RuleFor(x => x.CurrentPassword)
                 .NotEmpty().WithMessage("'{PropertyName}' alanı boş geçilemez.")

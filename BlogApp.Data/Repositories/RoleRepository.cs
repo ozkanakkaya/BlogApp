@@ -3,9 +3,9 @@ using BlogApp.Core.Repositories;
 
 namespace BlogApp.Data.Repositories
 {
-    public class AppRoleRepository : GenericRepository<AppRole>, IAppRoleRepository
+    public class RoleRepository : GenericRepository<AppRole>, IRoleRepository
     {
-        public AppRoleRepository(AppDbContext context) : base(context)
+        public RoleRepository(AppDbContext context) : base(context)
         {
         }
         public List<AppRole> GetRolesByUserId(int userId)
