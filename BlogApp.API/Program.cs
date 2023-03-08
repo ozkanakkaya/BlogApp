@@ -6,6 +6,7 @@ using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
 using BlogApp.Business.Validations;
 using BlogApp.Core.DTOs.Concrete;
+using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
@@ -15,6 +16,7 @@ using BlogApp.Data.Repositories;
 using BlogApp.Data.UnitOfWork;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
@@ -96,7 +98,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 
 builder.Services.AddScoped<IImageHelper, ImageHelper>();
 builder.Services.AddScoped<IFileAccess, FileAccess>();
-
+builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
 {

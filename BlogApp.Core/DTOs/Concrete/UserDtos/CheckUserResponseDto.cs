@@ -6,7 +6,5 @@ namespace BlogApp.Core.DTOs.Concrete
     {
         public int Id { get; set; }
         public string Username { get; set; }
-        //public List<AppRoleListDto> AppUserRoles { get; set; }
-        //public bool IsExist { get; set; } = false;
     }
 }

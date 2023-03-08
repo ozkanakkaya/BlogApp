@@ -8,9 +8,8 @@ using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
 using BlogApp.Core.Utilities.Abstract;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace BlogApp.Business.Services
 {
@@ -18,26 +17,34 @@ namespace BlogApp.Business.Services
     {
         private readonly IValidator<UserLoginDto> _loginValidator;
         private readonly IImageHelper _imageHelper;
+        private readonly IPasswordHasher<AppUser> _passwordHasher;
 
-        public UserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<UserLoginDto> loginValidator, IImageHelper imageHelper) : base(repository, unitOfWork, mapper)
+        public UserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<UserLoginDto> loginValidator, IImageHelper imageHelper, IPasswordHasher<AppUser> passwordHasher) : base(repository, unitOfWork, mapper)
         {
             _loginValidator = loginValidator;
             _imageHelper = imageHelper;
+            _passwordHasher = passwordHasher;
         }
 
-        public CustomResponse<CheckUserResponseDto> CheckUser(UserLoginDto dto)
+        public async Task<CustomResponse<CheckUserResponseDto>> CheckUserAsync(UserLoginDto loginDto)
         {
-            var result = _loginValidator.Validate(dto);
+            var result = _loginValidator.Validate(loginDto);
             if (result.IsValid)
             {
-                var user = UnitOfWork.Users.GetAppUserWithLoginInfo(dto.Username, dto.Password);
-
+                //var user = UnitOfWork.Users.GetAppUserWithLoginInfo(dto.Username, dto.Password);
+                var user = await UnitOfWork.Users.GetAsync(x => x.Username == loginDto.Username);
                 if (user != null)
                 {
-                    var userDto = Mapper.Map<CheckUserResponseDto>(user);
-                    return CustomResponse<CheckUserResponseDto>.Success(200, userDto);
+                    var resultPassword = _passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
+
+                    if (resultPassword == PasswordVerificationResult.Success)
+                    {
+                        var userDto = Mapper.Map<CheckUserResponseDto>(user);
+                        return CustomResponse<CheckUserResponseDto>.Success(200, userDto);
+                    }
+                    return CustomResponse<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola hatalıdır.");
                 }
-                return CustomResponse<CheckUserResponseDto>.Fail(404, "Kullanıcı adı veya parola hatalıdır.");
+                return CustomResponse<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola hatalıdır.");
             }
             return CustomResponse<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola boş geçilemez.");
         }
@@ -49,9 +56,10 @@ namespace BlogApp.Business.Services
             if (!hasUser)
             {
                 var uploadedImageDtoResult = await _imageHelper.UploadAsync(dto.Username, dto.ImageFile, ImageType.User);
-                dto.ImageUrl = uploadedImageDtoResult.StatusCode == 200 ? uploadedImageDtoResult.Data.FullName : "userImages/defaultUser.png";
 
                 var user = Mapper.Map<AppUser>(dto);
+                user.Password = _passwordHasher.HashPassword(user, dto.Password);
+                user.ImageUrl = uploadedImageDtoResult.StatusCode == 200 ? uploadedImageDtoResult.Data.FullName : "userImages/defaultUser.png";
 
                 user.AppUserRoles = new List<AppUserRole>();
                 user.AppUserRoles.Add(new AppUserRole
@@ -202,16 +210,17 @@ namespace BlogApp.Business.Services
             return CustomResponse<NoContent>.Success(204);
         }
 
-        public async Task<CustomResponse<NoContent>> PasswordChangeAsync(UserPasswordChangeDto appUserPasswordChangeDto, string userId)
+        public async Task<CustomResponse<NoContent>> PasswordChangeAsync(UserPasswordChangeDto userPasswordChangeDto, string userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == int.Parse(userId));
 
-            var isVerified = UnitOfWork.Users.CheckPasswordAsync(user, appUserPasswordChangeDto.CurrentPassword);
+            var resultPassword = _passwordHasher.VerifyHashedPassword(user, user.Password, userPasswordChangeDto.CurrentPassword);
 
-            if (isVerified)
+            if (resultPassword == PasswordVerificationResult.Success)
             {
-                var updatePassword = Mapper.Map<UserPasswordChangeDto, AppUser>(appUserPasswordChangeDto, user);
-                UnitOfWork.Users.Update(updatePassword);
+                user.Password = _passwordHasher.HashPassword(user, userPasswordChangeDto.NewPassword);
+
+                UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();
 
                 return CustomResponse<NoContent>.Success(204);
@@ -220,7 +229,6 @@ namespace BlogApp.Business.Services
             {
                 return CustomResponse<NoContent>.Fail(400, "Mevcut şifrenizi kontrol ediniz!");
             }
-
         }
 
         public async Task<CustomResponse<NoContent>> ActivateUserAsync(int userId)
@@ -264,7 +272,5 @@ namespace BlogApp.Business.Services
 
             return categoriesCount > -1 ? CustomResponse<int>.Success(200, categoriesCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {categoriesCount}");
         }
-
-
     }
 }

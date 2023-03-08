@@ -49,9 +49,9 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login(UserLoginDto loginDto)
+        public async Task<IActionResult> Login([FromForm] UserLoginDto loginDto)
         {
-            var result = _userService.CheckUser(loginDto);
+            var result = await _userService.CheckUserAsync(loginDto);
             if (!result.Errors.Any())
             {
                 var roleResult = await _roleService.GetAllByUserIdAsync(result.Data.Id);

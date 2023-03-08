@@ -131,7 +131,7 @@ namespace BlogApp.API.Controllers
 
         [HttpPost("[action]")]
         [CheckUserId]
-        public async Task<IActionResult> PasswordChange(UserPasswordChangeDto appUserPasswordChangeDto)
+        public async Task<IActionResult> PasswordChange([FromForm] UserPasswordChangeDto appUserPasswordChangeDto)
         {
             var result = _userPasswordChangeDtoValidator.Validate(appUserPasswordChangeDto);
 
