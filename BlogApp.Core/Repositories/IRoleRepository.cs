@@ -4,6 +4,6 @@ namespace BlogApp.Core.Repositories
 {
     public interface IRoleRepository : IGenericRepository<AppRole>
     {
-        List<AppRole> GetRolesByUserId(int userId);
+        Task<IList<string>> GetRolesByUserIdAsync(int userId);
     }
 }

@@ -2,6 +2,7 @@
 {
     public enum RoleType
     {
-        Member = 21
+        Member = 21,
+        BlogRead = 6
     }
 }

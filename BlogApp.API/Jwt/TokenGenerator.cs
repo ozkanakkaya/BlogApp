@@ -8,7 +8,7 @@ namespace BlogApp.API.Jwt
 {
     public class TokenGenerator
     {
-        public static TokenResponse GenerateToken(CheckUserResponseDto dto, List<RoleDto> roles)
+        public static TokenResponse GenerateToken(CheckUserResponseDto dto, RoleListDto roles)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenSettings.Key));
 
@@ -16,7 +16,7 @@ namespace BlogApp.API.Jwt
 
             List<Claim> claims = new List<Claim>();
 
-            foreach (var role in roles)
+            foreach (var role in roles.Roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.Definition));
             }

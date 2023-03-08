@@ -25,18 +25,6 @@ namespace BlogApp.Business.Services
             _imageHelper = imageHelper;
         }
 
-        public async Task<CustomResponse<List<RoleDto>>> GetRolesByUserId(int userId)
-        {
-            var userRoles = await UnitOfWork.Roles.GetAllAsync(x => x.AppUserRoles.Any(x => x.AppUserId == userId));
-
-            if (userRoles == null)
-            {
-                return CustomResponse<List<RoleDto>>.Fail(404, $"Id: {userId} kullanıcısının rolleri bulunamadı!");
-            }
-            var rolesDto = Mapper.Map<List<RoleDto>>(userRoles);
-            return CustomResponse<List<RoleDto>>.Success(200, rolesDto);
-        }
-
         public CustomResponse<CheckUserResponseDto> CheckUser(UserLoginDto dto)
         {
             var result = _loginValidator.Validate(dto);

@@ -16,6 +16,7 @@ namespace BlogApp.Data.UnitOfWork
         private BlogCategoryRepository _blogCategoryRepository;
         private TagBlogRepository _blogTagRepository;
         private CommentRepository _commentRepository;
+        private UserRoleRepository _userRoleRepository;
 
         public UnitOfWork(AppDbContext context)
         {
@@ -30,6 +31,7 @@ namespace BlogApp.Data.UnitOfWork
         public IBlogCategoryRepository BlogCategory => _blogCategoryRepository ??= new BlogCategoryRepository(_context);
         public ITagBlogRepository BlogTag => _blogTagRepository ??= new TagBlogRepository(_context);
         public ICommentRepository Comments => _commentRepository ??= new CommentRepository(_context);
+        public IUserRoleRepository UserRoles => _userRoleRepository ??= new UserRoleRepository(_context);
 
         public void Commit()
         {

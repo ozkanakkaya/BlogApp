@@ -88,15 +88,12 @@ namespace BlogApp.Business.Services
 
             if (!SetwiseEquivalentTo<int>(blogUpdateDto.CategoryIds.ToList(), oldBlog.BlogCategories.Select(x => x.CategoryId).ToList()))
             {
-                UnitOfWork.BlogCategory.RemoveRange(await UnitOfWork.BlogCategory.Where(x => x.BlogId == oldBlog.Id).ToListAsync());
-
-                blog.BlogCategories = new List<BlogCategory>();
+                blog.BlogCategories.Clear();
 
                 foreach (var catId in blogUpdateDto.CategoryIds)
                 {
                     blog.BlogCategories.Add(new BlogCategory
                     {
-                        Blog = blog,
                         CategoryId = catId
                     });
                 }
@@ -104,10 +101,8 @@ namespace BlogApp.Business.Services
 
             if (!SetwiseEquivalentTo<string>(blogUpdateDto.Tags.Split(',').Select(x => x.Trim()).ToList(), oldBlog.TagBlogs.Select(x => x.Tag.Name).ToList()))
             {
-                UnitOfWork.BlogTag.RemoveRange(await UnitOfWork.BlogTag.Where(x => x.BlogId == oldBlog.Id).ToListAsync());
-
+                blog.TagBlogs.Clear();
                 var tagSplit = blogUpdateDto.Tags.Split(',');
-                blog.TagBlogs = new List<TagBlog>();
 
                 foreach (var tag in tagSplit)
                 {
@@ -129,7 +124,6 @@ namespace BlogApp.Business.Services
 
                         blog.TagBlogs.Add(new TagBlog
                         {
-                            Blog = blog,
                             TagId = tagModel.Id
                         });
                     }
@@ -137,7 +131,6 @@ namespace BlogApp.Business.Services
                     {
                         blog.TagBlogs.Add(new TagBlog
                         {
-                            Blog = blog,
                             TagId = checkTag.Id
                         });
                     }
