@@ -14,7 +14,7 @@ namespace BlogApp.Data.UnitOfWork
         private TagRepository _tagRepository;
         private RoleRepository _roleRepository;
         private BlogCategoryRepository _blogCategoryRepository;
-        private TagBlogRepository _blogTagRepository;
+        private BlogTagRepository _blogTagRepository;
         private CommentRepository _commentRepository;
         private UserRoleRepository _userRoleRepository;
 
@@ -28,8 +28,8 @@ namespace BlogApp.Data.UnitOfWork
         public IBlogRepository Blogs => _blogRepository ??= new BlogRepository(_context);
         public ITagRepository Tags => _tagRepository ??= new TagRepository(_context);
         public IRoleRepository Roles => _roleRepository ??= new RoleRepository(_context);
-        public IBlogCategoryRepository BlogCategory => _blogCategoryRepository ??= new BlogCategoryRepository(_context);
-        public ITagBlogRepository BlogTag => _blogTagRepository ??= new TagBlogRepository(_context);
+        public IBlogCategoryRepository BlogCategories => _blogCategoryRepository ??= new BlogCategoryRepository(_context);
+        public IBlogTagRepository BlogTags => _blogTagRepository ??= new BlogTagRepository(_context);
         public ICommentRepository Comments => _commentRepository ??= new CommentRepository(_context);
         public IUserRoleRepository UserRoles => _userRoleRepository ??= new UserRoleRepository(_context);
 

@@ -7,7 +7,7 @@ namespace BlogApp.Business.Validations
     {
         public CategoryCreateDtoValidator()
         {
-            RuleFor(x => x.Title)
+            RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("'{PropertyName}' alanı boş geçilemez.")
                 .MinimumLength(3).WithMessage("'{PropertyName}' alanı en az {MinLength} karakter olmalıdır.")
                 .MaximumLength(100).WithMessage("'{PropertyName}' alanı en fazla {MaxLength} karakter olmalıdır.")

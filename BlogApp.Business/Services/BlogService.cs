@@ -25,7 +25,7 @@ namespace BlogApp.Business.Services
             var tagSplit = blogCreateDto.Tags.Split(',');
 
             var blog = Mapper.Map<Blog>(blogCreateDto);
-            blog.TagBlogs = new List<TagBlog>();
+            blog.BlogTags = new List<BlogTag>();
             blog.BlogCategories = new List<BlogCategory>();
 
             foreach (var tag in tagSplit)
@@ -46,7 +46,7 @@ namespace BlogApp.Business.Services
                     await UnitOfWork.Tags.AddAsync(tagModel);
                     await UnitOfWork.CommitAsync();
 
-                    blog.TagBlogs.Add(new TagBlog
+                    blog.BlogTags.Add(new BlogTag
                     {
                         Blog = blog,
                         TagId = tagModel.Id
@@ -54,7 +54,7 @@ namespace BlogApp.Business.Services
                 }
                 else
                 {
-                    blog.TagBlogs.Add(new TagBlog
+                    blog.BlogTags.Add(new BlogTag
                     {
                         Blog = blog,
                         TagId = checkTag.Id
@@ -72,8 +72,8 @@ namespace BlogApp.Business.Services
             }
             //blog.CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogDto.AppUserId)).Username;
 
-            var thumbnailResult = await _imageHelper.UploadAsync(blogCreateDto.Title, blogCreateDto.ThumbnailFile, ImageType.Post);
-            blog.Thumbnail = thumbnailResult.StatusCode == 200 ? thumbnailResult.Data.FullName : "postImages/defaultThumbnail.png";
+            var imageResult = await _imageHelper.UploadAsync(blogCreateDto.Title, blogCreateDto.ImageFile, ImageType.Post);
+            blog.ImageUrl = imageResult.StatusCode == 200 ? imageResult.Data.FullName : "postImages/defaultImage.png";
 
             await UnitOfWork.Blogs.AddAsync(blog);
             await UnitOfWork.CommitAsync();
@@ -99,9 +99,9 @@ namespace BlogApp.Business.Services
                 }
             }
 
-            if (!SetwiseEquivalentTo<string>(blogUpdateDto.Tags.Split(',').Select(x => x.Trim()).ToList(), oldBlog.TagBlogs.Select(x => x.Tag.Name).ToList()))
+            if (!SetwiseEquivalentTo<string>(blogUpdateDto.Tags.Split(',').Select(x => x.Trim()).ToList(), oldBlog.BlogTags.Select(x => x.Tag.Name).ToList()))
             {
-                blog.TagBlogs.Clear();
+                blog.BlogTags.Clear();
                 var tagSplit = blogUpdateDto.Tags.Split(',');
 
                 foreach (var tag in tagSplit)
@@ -122,14 +122,14 @@ namespace BlogApp.Business.Services
                         await UnitOfWork.Tags.AddAsync(tagModel);
                         await UnitOfWork.CommitAsync();
 
-                        blog.TagBlogs.Add(new TagBlog
+                        blog.BlogTags.Add(new BlogTag
                         {
                             TagId = tagModel.Id
                         });
                     }
                     else
                     {
-                        blog.TagBlogs.Add(new TagBlog
+                        blog.BlogTags.Add(new BlogTag
                         {
                             TagId = checkTag.Id
                         });
@@ -139,26 +139,26 @@ namespace BlogApp.Business.Services
 
             //blog.UpdatedByUsername = (await _appUserRepository.GetByIdAsync(blogUpdateDto.AppUserId)).Username;
 
-            bool isNewThumbnailUploaded = false;
-            var oldUserThumbnail = oldBlog.Thumbnail;
+            bool isNewImageUploaded = false;
+            var oldUserImage = oldBlog.ImageUrl;
 
-            if (blogUpdateDto.ThumbnailFile != null)
+            if (blogUpdateDto.ImageFile != null)
             {
-                var thumbnailResult = await _imageHelper.UploadAsync(blogUpdateDto.Title, blogUpdateDto.ThumbnailFile, ImageType.Post);
-                if (thumbnailResult.StatusCode == 200)
-                    blog.Thumbnail = thumbnailResult.Data.FullName;
+                var imageResult = await _imageHelper.UploadAsync(blogUpdateDto.Title, blogUpdateDto.ImageFile, ImageType.Post);
+                if (imageResult.StatusCode == 200)
+                    blog.ImageUrl = imageResult.Data.FullName;
 
-                if (oldUserThumbnail != "postImages/defaultThumbnail.png")
+                if (oldUserImage != "postImages/defaultImage.png")
                 {
-                    isNewThumbnailUploaded = true;
+                    isNewImageUploaded = true;
                 }
             }
 
             UnitOfWork.Blogs.Update(blog);
             await UnitOfWork.CommitAsync();
 
-            if (isNewThumbnailUploaded)
-                await _imageHelper.DeleteAsync(oldUserThumbnail);
+            if (isNewImageUploaded)
+                await _imageHelper.DeleteAsync(oldUserImage);
 
             return CustomResponse<NoContent>.Success(204);
         }
@@ -180,7 +180,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByActiveAsync()
         {
-            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (blogs.Any())
             {
@@ -193,7 +193,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByNonDeletedAsync()//Aktif ve Pasif bloglar
         {
-            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (blogs.Any())
             {
@@ -206,7 +206,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
         {
-            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (blogs.Any())
             {
@@ -228,7 +228,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<PersonalBlogDto>> GetAllByUserIdAsync(int userId)//Kullanıcı Paneli-Bloglarım
         {
-            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.AppUserId == userId && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.UserId == userId && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (blogs.Any())
             {
@@ -237,9 +237,9 @@ namespace BlogApp.Business.Services
                 var personalBlogDto = new PersonalBlogDto();
                 personalBlogDto.Blogs = blogListDto;
                 personalBlogDto.TotalBlogCount = blogs.Count;
-                personalBlogDto.TotalActiveBlogCount = await UnitOfWork.Blogs.Where(x => x.IsActive && x.AppUserId == userId).CountAsync();
-                personalBlogDto.TotalInactiveBlogCount = await UnitOfWork.Blogs.Where(x => !x.IsActive && x.AppUserId == userId).CountAsync();
-                blogs.ForEach(x => { personalBlogDto.TotalBlogsViewedCount += x.ViewsCount; });
+                personalBlogDto.TotalActiveBlogCount = await UnitOfWork.Blogs.Where(x => x.IsActive && x.UserId == userId).CountAsync();
+                personalBlogDto.TotalInactiveBlogCount = await UnitOfWork.Blogs.Where(x => !x.IsActive && x.UserId == userId).CountAsync();
+                blogs.ForEach(x => { personalBlogDto.TotalBlogsViewedCount += x.ViewCount; });
 
                 return CustomResponse<PersonalBlogDto>.Success(200, personalBlogDto);
             }
@@ -284,7 +284,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllBlogsAsync()//Admin-Home-Bloglar
         {
-            var blogs = await UnitOfWork.Blogs.GetAllAsync(null, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await UnitOfWork.Blogs.GetAllAsync(null, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (blogs.Any())
             {
@@ -302,13 +302,13 @@ namespace BlogApp.Business.Services
             {
                 var blog = UnitOfWork.Blogs.Where(x => x.Id == blogId);
 
-                var thumbnail = await blog.Select(x => x.Thumbnail).FirstOrDefaultAsync();
+                var image = await blog.Select(x => x.ImageUrl).FirstOrDefaultAsync();
 
                 UnitOfWork.Blogs.RemoveRange(blog);
                 await UnitOfWork.CommitAsync();
 
-                if (thumbnail != "postImages/defaultThumbnail.png")
-                    await _imageHelper.DeleteAsync(thumbnail);
+                if (image != "postImages/defaultImage.png")
+                    await _imageHelper.DeleteAsync(image);
 
                 return CustomResponse<NoContent>.Success(204);
             }
@@ -340,7 +340,7 @@ namespace BlogApp.Business.Services
                 return CustomResponse<string>.Fail(404, "Bir blog bulunamadı!");
             }
 
-            blog.ViewsCount += 1;
+            blog.ViewCount += 1;
             UnitOfWork.Blogs.Update(blog);
             await UnitOfWork.CommitAsync();
             return CustomResponse<string>.Success(200, $"{blog.Title} adlı bloğun okunmasıyısı arttırıldı.");
@@ -368,11 +368,11 @@ namespace BlogApp.Business.Services
             var searchedBlogs = await UnitOfWork.Blogs.SearchAsync(new List<Expression<Func<Blog, bool>>>
             {
                 (x)=>x.Title.Contains(keyword),
-                (x)=>x.BlogCategories.Any(x=>x.Category.Title.Contains(keyword)),
-                (x)=>x.TagBlogs.Any(x=>x.Tag.Name.Contains(keyword))
+                (x)=>x.BlogCategories.Any(x=>x.Category.Name.Contains(keyword)),
+                (x)=>x.BlogTags.Any(x=>x.Tag.Name.Contains(keyword))
             },
             x => x.IsActive && !x.IsDeleted,
-            x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (!searchedBlogs.Any())
                 return CustomResponse<BlogViewModel>.Fail(404, "Aradığınız anahtar kelime bulunamadı!");
@@ -396,9 +396,9 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByViewCountAsync(bool isAscending, int? takeSize)
         {
-            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
-            var sortedBlogs = isAscending ? blogs.OrderBy(x => x.ViewsCount) : blogs.OrderByDescending(x => x.ViewsCount);
+            var sortedBlogs = isAscending ? blogs.OrderBy(x => x.ViewCount) : blogs.OrderByDescending(x => x.ViewCount);
 
             if (blogs.Any())
             {
@@ -415,8 +415,8 @@ namespace BlogApp.Business.Services
         {
             pageSize = pageSize > 20 ? 20 : pageSize;
             var blogs = categoryId == null
-                ? await UnitOfWork.Blogs.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser)
-                : await UnitOfWork.Blogs.GetAllAsync(x => x.BlogCategories.Any(x => x.CategoryId == categoryId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+                ? await UnitOfWork.Blogs.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User)
+                : await UnitOfWork.Blogs.GetAllAsync(x => x.BlogCategories.Any(x => x.CategoryId == categoryId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             var sortedBlogs = isAscending
                 ? blogs.OrderBy(x => x.UpdatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
@@ -438,7 +438,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByCategoryAsync(int categoryId)
         {
-            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.BlogCategories.Any(x => x.CategoryId == categoryId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.BlogCategories.Any(x => x.CategoryId == categoryId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (blogs.Any())
             {
@@ -458,7 +458,7 @@ namespace BlogApp.Business.Services
                 return CustomResponse<List<BlogListDto>>.Fail(404, $"{userId} numarasına ait bir kullanıcı bulunamadı!");
             }
 
-            var userBlogs = await UnitOfWork.Blogs.GetAllAsync(x => x.AppUserId == userId && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var userBlogs = await UnitOfWork.Blogs.GetAllAsync(x => x.UserId == userId && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (userBlogs.Any())
             {
@@ -475,8 +475,8 @@ namespace BlogApp.Business.Services
                                 break;
                             case OrderBy.ViewCount:
                                 sortedBlogs = isAscending
-                                    ? userBlogs.Where(x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderBy(x => x.ViewsCount).ToList()
-                                    : userBlogs.Where(x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderByDescending(x => x.ViewsCount).ToList();
+                                    ? userBlogs.Where(x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderBy(x => x.ViewCount).ToList()
+                                    : userBlogs.Where(x => x.BlogCategories.Any(x => x.CategoryId == categoryId)).Take(takeSize).OrderByDescending(x => x.ViewCount).ToList();
                                 break;
                             case OrderBy.CommentCount:
                                 sortedBlogs = isAscending
@@ -495,8 +495,8 @@ namespace BlogApp.Business.Services
                                 break;
                             case OrderBy.ViewCount:
                                 sortedBlogs = isAscending
-                                    ? userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderBy(x => x.ViewsCount).ToList()
-                                    : userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderByDescending(x => x.ViewsCount).ToList();
+                                    ? userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderBy(x => x.ViewCount).ToList()
+                                    : userBlogs.Where(x => x.UpdatedDate >= startAt && x.UpdatedDate <= endAt).Take(takeSize).OrderByDescending(x => x.ViewCount).ToList();
                                 break;
                             case OrderBy.CommentCount:
                                 sortedBlogs = isAscending
@@ -511,23 +511,23 @@ namespace BlogApp.Business.Services
                         {
                             case OrderBy.Date:
                                 sortedBlogs = isAscending
-                                    ? userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderBy(x =>
+                                    ? userBlogs.Where(x => x.ViewCount >= minViewCount && x.ViewCount <= maxViewCount).Take(takeSize).OrderBy(x =>
                                 x.UpdatedDate).ToList()
-                                    : userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
+                                    : userBlogs.Where(x => x.ViewCount >= minViewCount && x.ViewCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
                                 x.UpdatedDate).ToList();
                                 break;
                             case OrderBy.ViewCount:
                                 sortedBlogs = isAscending
-                                    ? userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderBy(x =>
-                                x.ViewsCount).ToList()
-                                    : userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
-                                x.ViewsCount).ToList();
+                                    ? userBlogs.Where(x => x.ViewCount >= minViewCount && x.ViewCount <= maxViewCount).Take(takeSize).OrderBy(x =>
+                                x.ViewCount).ToList()
+                                    : userBlogs.Where(x => x.ViewCount >= minViewCount && x.ViewCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
+                                x.ViewCount).ToList();
                                 break;
                             case OrderBy.CommentCount:
                                 sortedBlogs = isAscending
-                                    ? userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderBy(x =>
+                                    ? userBlogs.Where(x => x.ViewCount >= minViewCount && x.ViewCount <= maxViewCount).Take(takeSize).OrderBy(x =>
                                 x.CommentCount).ToList()
-                                    : userBlogs.Where(x => x.ViewsCount >= minViewCount && x.ViewsCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
+                                    : userBlogs.Where(x => x.ViewCount >= minViewCount && x.ViewCount <= maxViewCount).Take(takeSize).OrderByDescending(x =>
                                 x.CommentCount).ToList();
                                 break;
                         }
@@ -545,9 +545,9 @@ namespace BlogApp.Business.Services
                             case OrderBy.ViewCount:
                                 sortedBlogs = isAscending
                                     ? userBlogs.Where(x => x.CommentCount >= minCommentCount && x.CommentCount <= maxCommentCount).Take(takeSize).OrderBy(x =>
-                                x.ViewsCount).ToList()
+                                x.ViewCount).ToList()
                                     : userBlogs.Where(x => x.CommentCount >= minCommentCount && x.CommentCount <= maxCommentCount).Take(takeSize).OrderByDescending(x =>
-                                x.ViewsCount).ToList();
+                                x.ViewCount).ToList();
                                 break;
                             case OrderBy.CommentCount:
                                 sortedBlogs = isAscending
@@ -590,16 +590,16 @@ namespace BlogApp.Business.Services
                 {
                     return CustomResponse<BlogViewModel>.Fail(404, "Böyle bir kullanıcı bulunamadı!");
                 }
-                predicates.Add(x => x.AppUserId == userId.Value);
+                predicates.Add(x => x.UserId == userId.Value);
             }
 
             if (isActive.HasValue) predicates.Add(x => x.IsActive == isActive.Value);
             if (isDeleted.HasValue) predicates.Add(x => x.IsDeleted == isDeleted.Value);
 
             if (includeCategory) includes.Add(x => x.BlogCategories);
-            if (includeTag) includes.Add(x => x.TagBlogs);
+            if (includeTag) includes.Add(x => x.BlogTags);
             if (includeComments) includes.Add(x => x.Comments.Where(x => x.IsActive && !x.IsDeleted));
-            if (includeUser) includes.Add(x => x.AppUser);
+            if (includeUser) includes.Add(x => x.User);
 
             var blogs = await UnitOfWork.Blogs.GetAllByListedAsync(predicates, includes);
 
@@ -638,7 +638,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<BlogListDto>> GetByBlogIdAsync(int blogId)//blog detayda kul.
         {
-            var blog = await UnitOfWork.Blogs.GetAsync(x => x.Id == blogId, x => x.AppUser, x => x.BlogCategories, x => x.TagBlogs, x => x.Comments.Where(x => x.IsActive && !x.IsDeleted));
+            var blog = await UnitOfWork.Blogs.GetAsync(x => x.Id == blogId, x => x.User, x => x.BlogCategories, x => x.BlogTags, x => x.Comments.Where(x => x.IsActive && !x.IsDeleted));
 
             if (blog != null)
             {
@@ -656,9 +656,9 @@ namespace BlogApp.Business.Services
             List<Expression<Func<Blog, object>>> includes = new List<Expression<Func<Blog, object>>>();
 
             if (includeCategory) includes.Add(x => x.BlogCategories);
-            if (includeTag) includes.Add(x => x.TagBlogs);
+            if (includeTag) includes.Add(x => x.BlogTags);
             if (includeComment) includes.Add(x => x.Comments);
-            if (includeUser) includes.Add(x => x.AppUser);
+            if (includeUser) includes.Add(x => x.User);
             predicates.Add(x => x.Id == blogId);
 
             var blog = await UnitOfWork.Blogs.GetByListedAsync(predicates, includes);
@@ -674,7 +674,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<BlogListDto>>> GetAllByTagAsync(int tagId)
         {
-            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.TagBlogs.Any(x => x.TagId == tagId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.TagBlogs, x => x.AppUser);
+            var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.BlogTags.Any(x => x.TagId == tagId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
             if (blogs.Any())
             {

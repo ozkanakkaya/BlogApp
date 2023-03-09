@@ -4,7 +4,7 @@ namespace BlogApp.Core.DTOs.Concrete
 {
     public class CategoryCreateDto : IDto
     {
-        public string Title { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
         public bool IsActive { get; set; } = true;
     }

@@ -13,13 +13,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.Business.Services
 {
-    public class UserService : Service<AppUser>, IUserService
+    public class UserService : Service<User>, IUserService
     {
         private readonly IValidator<UserLoginDto> _loginValidator;
         private readonly IImageHelper _imageHelper;
-        private readonly IPasswordHasher<AppUser> _passwordHasher;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public UserService(IGenericRepository<AppUser> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<UserLoginDto> loginValidator, IImageHelper imageHelper, IPasswordHasher<AppUser> passwordHasher) : base(repository, unitOfWork, mapper)
+        public UserService(IGenericRepository<User> repository, IUnitOfWork unitOfWork, IMapper mapper, IValidator<UserLoginDto> loginValidator, IImageHelper imageHelper, IPasswordHasher<User> passwordHasher) : base(repository, unitOfWork, mapper)
         {
             _loginValidator = loginValidator;
             _imageHelper = imageHelper;
@@ -35,7 +35,7 @@ namespace BlogApp.Business.Services
                 var user = await UnitOfWork.Users.GetAsync(x => x.Username == loginDto.Username);
                 if (user != null)
                 {
-                    var resultPassword = _passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
+                    var resultPassword = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
 
                     if (resultPassword == PasswordVerificationResult.Success)
                     {
@@ -57,15 +57,15 @@ namespace BlogApp.Business.Services
             {
                 var uploadedImageDtoResult = await _imageHelper.UploadAsync(dto.Username, dto.ImageFile, ImageType.User);
 
-                var user = Mapper.Map<AppUser>(dto);
-                user.Password = _passwordHasher.HashPassword(user, dto.Password);
+                var user = Mapper.Map<User>(dto);
+                user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
                 user.ImageUrl = uploadedImageDtoResult.StatusCode == 200 ? uploadedImageDtoResult.Data.FullName : "userImages/defaultUser.png";
 
-                user.AppUserRoles = new List<AppUserRole>();
-                user.AppUserRoles.Add(new AppUserRole
+                user.UserRoles = new List<UserRole>();
+                user.UserRoles.Add(new UserRole
                 {
-                    AppUser = user,
-                    AppRoleId = roleId
+                    User = user,
+                    RoleId = roleId
                 });
 
                 await UnitOfWork.Users.AddAsync(user);
@@ -78,7 +78,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<UserListDto>>> GetAllByActiveAsync()
         {
-            var users = await UnitOfWork.Users.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
+            var users = await UnitOfWork.Users.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.UserRoles);
 
             if (users.Any())
             {
@@ -91,7 +91,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<UserListDto>> GetUserByIdAsync(int userId)
         {
-            var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId && x.IsActive && !x.IsDeleted, x => x.AppUserRoles);
+            var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId && x.IsActive && !x.IsDeleted, x => x.UserRoles);
 
             if (user != null)
             {
@@ -154,7 +154,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<UserListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
         {
-            var users = await UnitOfWork.Users.GetAllAsync(x => x.IsDeleted, x => x.AppUserRoles);
+            var users = await UnitOfWork.Users.GetAllAsync(x => x.IsDeleted, x => x.UserRoles);
 
             if (users.Any())
             {
@@ -167,7 +167,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<List<UserListDto>>> GetAllByInactiveAsync()//Admin-Arşiv
         {
-            var users = await UnitOfWork.Users.GetAllAsync(x => !x.IsActive & !x.IsDeleted, x => x.AppUserRoles);
+            var users = await UnitOfWork.Users.GetAllAsync(x => !x.IsActive & !x.IsDeleted, x => x.UserRoles);
 
             if (users.Any())
             {
@@ -196,7 +196,7 @@ namespace BlogApp.Business.Services
                     isNewImageUploaded = true;
             }
 
-            var updateUser = Mapper.Map<UserUpdateDto, AppUser>(appUserUpdateDto, oldUser);
+            var updateUser = Mapper.Map<UserUpdateDto, User>(appUserUpdateDto, oldUser);
 
             UnitOfWork.Users.Update(updateUser);
 
@@ -214,11 +214,11 @@ namespace BlogApp.Business.Services
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == int.Parse(userId));
 
-            var resultPassword = _passwordHasher.VerifyHashedPassword(user, user.Password, userPasswordChangeDto.CurrentPassword);
+            var resultPassword = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, userPasswordChangeDto.CurrentPassword);
 
             if (resultPassword == PasswordVerificationResult.Success)
             {
-                user.Password = _passwordHasher.HashPassword(user, userPasswordChangeDto.NewPassword);
+                user.PasswordHash = _passwordHasher.HashPassword(user, userPasswordChangeDto.NewPassword);
 
                 UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();

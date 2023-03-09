@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BlogApp.Core.Repositories
 {
-    public interface IUserRoleRepository : IGenericRepository<AppUserRole>
+    public interface IUserRoleRepository : IGenericRepository<UserRole>
     {
     }
 }

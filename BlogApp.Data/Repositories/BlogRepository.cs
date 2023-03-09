@@ -12,7 +12,7 @@ namespace BlogApp.Data.Repositories
 
         public async Task<Blog> GetBlogById(int blogId)
         {
-            return await _context.Blogs.Where(x => x.Id == blogId).Include(x => x.BlogCategories).Include(x => x.TagBlogs).ThenInclude(x => x.Tag).FirstOrDefaultAsync();
+            return await _context.Blogs.Where(x => x.Id == blogId).Include(x => x.BlogCategories).Include(x => x.BlogTags).ThenInclude(x => x.Tag).FirstOrDefaultAsync();
         }
     }
 }

@@ -65,6 +65,14 @@ builder.Services.AddDbContext<AppDbContext>(x =>
         option.MigrationsAssembly(Assembly.GetAssembly(typeof(AppDbContext)).GetName().Name);
     });
 });
+
+//builder.Services.AddScoped<AppDbContext>(provider =>
+//{
+//    var context = provider.GetService<AppDbContext>();
+//    context.Database.EnsureCreated(); // Veritabanýnýz yoksa oluþturulmasýný saðlar
+//    return context;
+//});
+
 //builder.Services.AddScoped(typeof());
 //builder.Services.AddValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>();//diðer kullaným
 builder.Services.AddScoped<IValidator<UserRegisterDto>, UserRegisterDtoValidator>();
@@ -88,7 +96,7 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
-builder.Services.AddScoped<ITagBlogRepository, TagBlogRepository>();
+builder.Services.AddScoped<IBlogTagRepository, BlogTagRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IBlogCategoryRepository, BlogCategoryRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -98,7 +106,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 
 builder.Services.AddScoped<IImageHelper, ImageHelper>();
 builder.Services.AddScoped<IFileAccess, FileAccess>();
-builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
 {

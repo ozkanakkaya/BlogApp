@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BlogApp.Data.Configurations
 {
-    public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
+    public class UserConfiguration : IEntityTypeConfiguration<User>
     {
-        public void Configure(EntityTypeBuilder<AppUser> builder)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).UseIdentityColumn();
@@ -15,7 +15,7 @@ namespace BlogApp.Data.Configurations
             builder.Property(x => x.Username).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Email).HasMaxLength(100).IsRequired();
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);
-            builder.Property(x => x.Password).HasMaxLength(150).IsRequired();
+            builder.Property(x => x.PasswordHash).HasMaxLength(200).IsRequired();
             builder.Property(x => x.ImageUrl).HasMaxLength(500);
             builder.Property(x => x.About).HasMaxLength(1000);
             builder.Property(x => x.GitHubLink).HasMaxLength(250);
@@ -27,7 +27,7 @@ namespace BlogApp.Data.Configurations
             builder.Property(a => a.CreatedDate).IsRequired();
             builder.Property(a => a.UpdatedDate).IsRequired();
 
-            builder.HasOne(x => x.Gender).WithMany(x => x.AppUsers).HasForeignKey(x => x.GenderId);
+            builder.HasOne(x => x.Gender).WithMany(x => x.Users).HasForeignKey(x => x.GenderId);
         }
     }
 }

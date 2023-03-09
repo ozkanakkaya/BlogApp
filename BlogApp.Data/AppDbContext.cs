@@ -1,5 +1,6 @@
 ﻿using BlogApp.Core.Entities.Abstract;
 using BlogApp.Core.Entities.Concrete;
+using BlogApp.Data.Seed;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -16,9 +17,9 @@ namespace BlogApp.Data
         }
 
         public DbSet<About> About { get; set; }
-        public DbSet<AppRole> AppRoles { get; set; }
-        public DbSet<AppUser> AppUsers { get; set; }
-        public DbSet<AppUserRole> AppUserRoles { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<BlogCategory> BlogCategories { get; set; }
@@ -26,7 +27,7 @@ namespace BlogApp.Data
         public DbSet<Gender> Genders { get; set; }
         public DbSet<Contact> Contact { get; set; }
         public DbSet<Tag> Tags { get; set; }
-        public DbSet<TagBlog> TagBlogs { get; set; }
+        public DbSet<BlogTag> BlogTags { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -43,7 +44,7 @@ namespace BlogApp.Data
                     {
                         case EntityState.Added:
                             {
-                                entityReference.CreatedDate = DateTime.UtcNow;
+                                entityReference.CreatedDate = DateTime.Now;
                                 entityReference.UpdatedDate = entityReference.CreatedDate;
                                 if(username != null) entityReference.CreatedByUsername = username;
                                 break;
@@ -54,7 +55,7 @@ namespace BlogApp.Data
 
                                 Entry(entityReference).Property(x => x.CreatedDate).IsModified = false;
                                 Entry(entityReference).Property(x => x.CreatedByUsername).IsModified = false;
-                                entityReference.UpdatedDate = DateTime.UtcNow;
+                                entityReference.UpdatedDate = DateTime.Now;
                                 if (username != null) entityReference.UpdatedByUsername = username;
                                 break;
                             }
@@ -68,6 +69,7 @@ namespace BlogApp.Data
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());//entity configurationlarını uygular
             base.OnModelCreating(modelBuilder);
+            modelBuilder.SeedData();
         }
     }
 }

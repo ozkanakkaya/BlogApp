@@ -16,7 +16,7 @@ namespace BlogApp.Business.Services
         }
         public async Task<CustomResponse<CategoryCreateDto>> AddAsync(CategoryCreateDto categoryCreateDto)
         {
-            var hasCategory = await UnitOfWork.Categories.AnyAsync(x => x.Title == categoryCreateDto.Title);
+            var hasCategory = await UnitOfWork.Categories.AnyAsync(x => x.Name == categoryCreateDto.Name);
 
             if (!hasCategory)
             {

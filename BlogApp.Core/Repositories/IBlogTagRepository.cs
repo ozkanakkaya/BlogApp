@@ -2,7 +2,7 @@
 
 namespace BlogApp.Core.Repositories
 {
-    public interface ITagBlogRepository : IGenericRepository<TagBlog>
+    public interface IBlogTagRepository : IGenericRepository<BlogTag>
     {
     }
 }

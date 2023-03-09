@@ -12,7 +12,7 @@ namespace BlogApp.Business.Mapping
             CreateMap<Blog, BlogUpdateDto>().ReverseMap();
             CreateMap<Blog, BlogListDto>()
                 .ForPath(dest => dest.Categories, opt => opt.MapFrom(src => src.BlogCategories.Select(x => x.Category)))
-                .ForPath(dest => dest.Tags, opt => opt.MapFrom(src => src.TagBlogs.Select(x => x.Tag)))
+                .ForPath(dest => dest.Tags, opt => opt.MapFrom(src => src.BlogTags.Select(x => x.Tag)))
                 .ReverseMap();
             CreateMap<Blog, BlogDto>().ReverseMap();
         }

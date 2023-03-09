@@ -4,7 +4,7 @@ using BlogApp.Core.Response;
 
 namespace BlogApp.Core.Services
 {
-    public interface IUserService : IService<AppUser>
+    public interface IUserService : IService<User>
     {
         Task<CustomResponse<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId);
         Task<CustomResponse<CheckUserResponseDto>> CheckUserAsync(UserLoginDto dto);

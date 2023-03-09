@@ -96,8 +96,8 @@ namespace BlogApp.Data.Repositories
                         case string x when x.Contains("BlogCategories"):
                             query = query.Include(x => (x as Blog).BlogCategories).ThenInclude(x => x.Category);
                             break;
-                        case string x when x.Contains("TagBlogs"):
-                            query = query.Include(x => (x as Blog).TagBlogs).ThenInclude(x => x.Tag);
+                        case string x when x.Contains("BlogTags"):
+                            query = query.Include(x => (x as Blog).BlogTags).ThenInclude(x => x.Tag);
                             break;
                         default:
                             query = query.Include(includeProperty);
@@ -129,11 +129,11 @@ namespace BlogApp.Data.Repositories
                         case string x when x.Contains("BlogCategories"):
                             query = query.Include(x => (x as Blog).BlogCategories).ThenInclude(x => x.Category);
                             break;
-                        case string x when x.Contains("TagBlogs"):
-                            query = query.Include(x => (x as Blog).TagBlogs).ThenInclude(x => x.Tag);
+                        case string x when x.Contains("BlogTags"):
+                            query = query.Include(x => (x as Blog).BlogTags).ThenInclude(x => x.Tag);
                             break;
-                        case string x when x.Contains("AppUserRoles"):
-                            query = query.Include(x => (x as AppUser).AppUserRoles).ThenInclude(x => x.AppRole);
+                        case string x when x.Contains("UserRoles"):
+                            query = query.Include(x => (x as User).UserRoles).ThenInclude(x => x.Role);
                             break;
                         default:
                             query = query.Include(includeProperty);
@@ -168,11 +168,11 @@ namespace BlogApp.Data.Repositories
                         case string x when x.Contains("BlogCategories"):
                             query = query.Include(x => (x as Blog).BlogCategories).ThenInclude(x => x.Category);
                             break;
-                        case string x when x.Contains("TagBlogs"):
-                            query = query.Include(x => (x as Blog).TagBlogs).ThenInclude(x => x.Tag);
+                        case string x when x.Contains("BlogTags"):
+                            query = query.Include(x => (x as Blog).BlogTags).ThenInclude(x => x.Tag);
                             break;
-                        case string x when x.Contains("AppUserRoles"):
-                            query = query.Include(x => (x as AppUser).AppUserRoles).ThenInclude(x => x.AppRole);
+                        case string x when x.Contains("UserRoles"):
+                            query = query.Include(x => (x as User).UserRoles).ThenInclude(x => x.Role);
                             break;
                         default:
                             query = query.Include(includeProperty);
@@ -205,11 +205,11 @@ namespace BlogApp.Data.Repositories
                         case string x when x.Contains("BlogCategories"):
                             query = query.Include(x => (x as Blog).BlogCategories).ThenInclude(x => x.Category);
                             break;
-                        case string x when x.Contains("TagBlogs"):
-                            query = query.Include(x => (x as Blog).TagBlogs).ThenInclude(x => x.Tag);
+                        case string x when x.Contains("BlogTags"):
+                            query = query.Include(x => (x as Blog).BlogTags).ThenInclude(x => x.Tag);
                             break;
-                        case string x when x.Contains("AppUserRoles"):
-                            query = query.Include(x => (x as AppUser).AppUserRoles).ThenInclude(x => x.AppRole);
+                        case string x when x.Contains("UserRoles"):
+                            query = query.Include(x => (x as User).UserRoles).ThenInclude(x => x.Role);
                             break;
                         default:
                             query = query.Include(includeProperty);
@@ -241,11 +241,11 @@ namespace BlogApp.Data.Repositories
                         case string x when x.Contains("BlogCategories"):
                             query = query.Include(x => (x as Blog).BlogCategories).ThenInclude(x => x.Category);
                             break;
-                        case string x when x.Contains("TagBlogs"):
-                            query = query.Include(x => (x as Blog).TagBlogs).ThenInclude(x => x.Tag);
+                        case string x when x.Contains("BlogTags"):
+                            query = query.Include(x => (x as Blog).BlogTags).ThenInclude(x => x.Tag);
                             break;
-                        case string x when x.Contains("AppUserRoles"):
-                            query = query.Include(x => (x as AppUser).AppUserRoles).ThenInclude(x => x.AppRole);
+                        case string x when x.Contains("UserRoles"):
+                            query = query.Include(x => (x as User).UserRoles).ThenInclude(x => x.Role);
                             break;
                         default:
                             query = query.Include(includeProperty);

@@ -4,7 +4,7 @@ using BlogApp.Core.Response;
 
 namespace BlogApp.Core.Services
 {
-    public interface IRoleService : IService<AppRole>
+    public interface IRoleService : IService<Role>
     {
         Task<CustomResponse<RoleListDto>> GetAllRolesAsync();
         Task<CustomResponse<RoleListDto>> GetAllByUserIdAsync(int userId);

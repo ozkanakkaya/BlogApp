@@ -3,20 +3,20 @@ using BlogApp.Core.Repositories;
 
 namespace BlogApp.Data.Repositories
 {
-    public class UserRepository : GenericRepository<AppUser>, IUserRepository
+    public class UserRepository : GenericRepository<User>, IUserRepository
     {
         public UserRepository(AppDbContext context) : base(context)
         {
         }
 
-        public bool CheckPasswordAsync(AppUser user, string currentPassword)
+        public bool CheckPasswordAsync(User user, string currentPassword)
         {
-            return _context.AppUsers.Any(x => x.Username == user.Username && x.Password == currentPassword);
+            return _context.Users.Any(x => x.Username == user.Username && x.PasswordHash == currentPassword);
         }
 
-        public AppUser GetAppUserWithLoginInfo(string username, string password)
+        public User GetAppUserWithLoginInfo(string username, string password)
         {
-            return _context.AppUsers.Where(x => x.Username == username && x.Password == password)/*.Include(x=>x.AppUserRoles)*/.SingleOrDefault();
+            return _context.Users.Where(x => x.Username == username && x.PasswordHash == password)/*.Include(x=>x.AppUserRoles)*/.SingleOrDefault();
         }
     }
 }

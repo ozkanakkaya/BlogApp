@@ -4,9 +4,9 @@
     {
         public virtual int Id { get; set; }
 
-        public virtual DateTime CreatedDate { get; set; }
+        public virtual DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public virtual DateTime UpdatedDate { get; set; }
+        public virtual DateTime UpdatedDate { get; set; } = DateTime.Now;
 
         public virtual string CreatedByUsername { get; set; } = "Admin";
 

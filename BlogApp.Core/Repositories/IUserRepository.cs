@@ -2,9 +2,9 @@
 
 namespace BlogApp.Core.Repositories
 {
-    public interface IUserRepository : IGenericRepository<AppUser>
+    public interface IUserRepository : IGenericRepository<User>
     {
-        AppUser GetAppUserWithLoginInfo(string username, string password);
-        bool CheckPasswordAsync(AppUser user, string currentPassword);
+        User GetAppUserWithLoginInfo(string username, string password);
+        bool CheckPasswordAsync(User user, string currentPassword);
     }
 }

@@ -18,7 +18,7 @@ namespace BlogApp.API.Jwt
 
             foreach (var role in roles.Roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role.Definition));
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
             }
 
             claims.Add(new Claim(ClaimTypes.Name, dto.Username));

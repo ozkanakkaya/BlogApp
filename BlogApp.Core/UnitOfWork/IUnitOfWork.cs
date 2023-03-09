@@ -9,8 +9,8 @@ namespace BlogApp.Core.UnitOfWork
         IBlogRepository Blogs { get; }
         ITagRepository Tags { get; }
         IRoleRepository Roles { get; }
-        IBlogCategoryRepository BlogCategory { get; }
-        ITagBlogRepository BlogTag { get; }
+        IBlogCategoryRepository BlogCategories { get; }
+        IBlogTagRepository BlogTags { get; }
         ICommentRepository Comments { get; }
         IUserRoleRepository UserRoles { get; }
         Task CommitAsync();

@@ -8,15 +8,15 @@ namespace BlogApp.Business.Mapping
     {
         public UserProfile()
         {
-            CreateMap<AppUser, UserRegisterDto>().ReverseMap();
-            CreateMap<AppUser, UserUpdateDto>().ReverseMap();
-            CreateMap<AppUser, UserListDto>()
-                .ForPath(dest => dest.Roles, opt => opt.MapFrom(src => src.AppUserRoles.Select(x => x.AppRole)))
+            CreateMap<User, UserRegisterDto>().ReverseMap();
+            CreateMap<User, UserUpdateDto>().ReverseMap();
+            CreateMap<User, UserListDto>()
+                .ForPath(dest => dest.Roles, opt => opt.MapFrom(src => src.UserRoles.Select(x => x.Role)))
                 .ReverseMap();
-            CreateMap<AppUser, CheckUserResponseDto>().ReverseMap();
-            CreateMap<AppUser, UserDto>().ReverseMap();
-            CreateMap<AppUser, UserPasswordChangeDto>()
-                .ForPath(dest => dest.NewPassword, opt => opt.MapFrom(src => src.Password))
+            CreateMap<User, CheckUserResponseDto>().ReverseMap();
+            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, UserPasswordChangeDto>()
+                .ForPath(dest => dest.NewPassword, opt => opt.MapFrom(src => src.PasswordHash))
                 .ReverseMap();
         }
     }

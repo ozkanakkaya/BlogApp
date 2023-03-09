@@ -15,10 +15,10 @@ namespace BlogApp.API.Controllers
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
         private readonly IValidator<UserRegisterDto> _validator;
-        public AuthController(IMapper mapper, IUserService appUserService, IValidator<UserRegisterDto> validator, IRoleService roleService)
+        public AuthController(IMapper mapper, IUserService userService, IValidator<UserRegisterDto> validator, IRoleService roleService)
         {
             _mapper = mapper;
-            _userService = appUserService;
+            _userService = userService;
             _validator = validator;
             _roleService = roleService;
         }

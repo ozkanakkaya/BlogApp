@@ -7,7 +7,6 @@ namespace BlogApp.Core.DTOs.Concrete
         public int Id { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
-        public string Thumbnail { get; set; }
         public string ImageUrl { get; set; }
         public int ViewsCount { get; set; } = 0;
         public int CommentCount { get; set; } = 0;
@@ -16,14 +15,14 @@ namespace BlogApp.Core.DTOs.Concrete
         public string CreatedByUsername { get; set; }
         public DateTime UpdatedDate { get; set; }
         public string UpdatedByUsername { get; set; }
-        public int AppUserId { get; set; }
+        public int UserId { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsActive { get; set; }
 
         public List<TagDto> Tags { get; set; }
         public List<CategoryDto> Categories { get; set; }
-        public List<CommentListDto> Comments { get; set; }
-        public UserDto AppUser { get; set; }
+        public List<CommentDto> Comments { get; set; }
+        public UserDto User { get; set; }
 
     }
 }

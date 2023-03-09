@@ -7,6 +7,5 @@ namespace BlogApp.Core.DTOs.Concrete
         public int Id { get; set; }
         public string Content { get; set; }
         public bool IsActive { get; set; }
-        //public int BlogId { get; set; }
     }
 }

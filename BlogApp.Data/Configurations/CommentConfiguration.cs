@@ -11,7 +11,6 @@ namespace BlogApp.Data.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.Content).HasMaxLength(1000).IsRequired();
-            builder.Property(x => x.Username).HasMaxLength(50).IsRequired();
             builder.Property(x => x.Email).HasMaxLength(100).IsRequired();
             builder.Property(x => x.IsActive).IsRequired();
             builder.Property(x => x.IsDeleted).IsRequired();

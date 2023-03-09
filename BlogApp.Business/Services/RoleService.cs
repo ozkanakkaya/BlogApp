@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.Business.Services
 {
-    public class RoleService : Service<AppRole>, IRoleService
+    public class RoleService : Service<Role>, IRoleService
     {
-        public RoleService(IGenericRepository<AppRole> repository, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, unitOfWork, mapper)
+        public RoleService(IGenericRepository<Role> repository, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, unitOfWork, mapper)
         {
         }
         public async Task<CustomResponse<RoleListDto>> GetAllRolesAsync()
@@ -31,7 +31,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<RoleListDto>> GetAllByUserIdAsync(int userId)
         {
-            var userRoles = await UnitOfWork.Roles.GetAllAsync(x => x.AppUserRoles.Any(x => x.AppUserId == userId));
+            var userRoles = await UnitOfWork.Roles.GetAllAsync(x => x.UserRoles.Any(x => x.UserId == userId));
 
             if (userRoles == null)
             {
@@ -57,12 +57,12 @@ namespace BlogApp.Business.Services
 
             foreach (var role in roles)
             {
-                var aea = role.Definition;
+                var aea = role.Name;
                 RoleAssignDto roleAssignDto = new()
                 {
                     RoleId = role.Id,
-                    RoleName = role.Definition,
-                    HasRole = userRoles.Contains(role.Definition)
+                    RoleName = role.Name,
+                    HasRole = userRoles.Contains(role.Name)
                 };
                 userRoleAssignDto.RoleAssignments.Add(roleAssignDto);
             }
@@ -71,7 +71,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponse<UserRoleAssignDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto)
         {
-            var user = await UnitOfWork.Users.Where(x => x.Id == userRoleAssignDto.UserId).Include(x => x.AppUserRoles).SingleOrDefaultAsync();
+            var user = await UnitOfWork.Users.Where(x => x.Id == userRoleAssignDto.UserId).Include(x => x.UserRoles).SingleOrDefaultAsync();
 
             var userNewRoles = new HashSet<int>(
                 userRoleAssignDto.RoleAssignments
@@ -81,27 +81,27 @@ namespace BlogApp.Business.Services
 
             if (userNewRoles.Count <= 0)
             {
-                user.AppUserRoles.Clear();
-                user.AppUserRoles.Add(new AppUserRole
+                user.UserRoles.Clear();
+                user.UserRoles.Add(new UserRole
                 {
-                    AppRoleId = (int)RoleType.Member//default role
+                    RoleId = (int)RoleType.Member//default role
                 });
             }
             else
             {
                 var userOldRoles = new HashSet<int>(
-                await UnitOfWork.UserRoles.Where(x => x.AppUserId == user.Id)
-                .Select(x => x.AppRoleId)
+                await UnitOfWork.UserRoles.Where(x => x.UserId == user.Id)
+                .Select(x => x.RoleId)
                 .ToListAsync()
 );
                 if (!userNewRoles.SetEquals(userOldRoles))
                 {
-                    user.AppUserRoles.Clear();
+                    user.UserRoles.Clear();
                     foreach (var roleId in userNewRoles)
                     {
-                        user.AppUserRoles.Add(new AppUserRole
+                        user.UserRoles.Add(new UserRole
                         {
-                            AppRoleId = roleId
+                            RoleId = roleId
                         });
                     }
                 }

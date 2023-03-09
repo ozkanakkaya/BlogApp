@@ -27,7 +27,6 @@ namespace BlogApp.Business.Services
             if (user == null) return CustomResponse<CommentDto>.Fail(400, "Kullanıcı bilgileri getirilemedi!");
 
             var comment = Mapper.Map<Comment>(commentCreateDto);
-            comment.Username = user.Username;
             comment.Email = user.Email;
             comment.IsActive = false;
             await UnitOfWork.Comments.AddAsync(comment);

@@ -4,16 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.Data.Repositories
 {
-    public class RoleRepository : GenericRepository<AppRole>, IRoleRepository
+    public class RoleRepository : GenericRepository<Role>, IRoleRepository
     {
         public RoleRepository(AppDbContext context) : base(context)
         {
         }
         public async Task<IList<string>> GetRolesByUserIdAsync(int userId)
         {
-            return await _context.AppRoles
-               .Where(role => role.AppUserRoles.Any(ur => ur.AppUserId == userId))
-               .Select(role => role.Definition)
+            return await _context.Roles
+               .Where(role => role.UserRoles.Any(ur => ur.UserId == userId))
+               .Select(role => role.Name)
                .ToListAsync();
         }
 

@@ -26,7 +26,7 @@ namespace BlogApp.Data.Configurations
                 new()
                 {
                     Id=3,
-                    Definition="Undefined "
+                    Definition="Undefined"
                 }
             });
         }
