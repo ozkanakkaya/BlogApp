@@ -9,6 +9,9 @@ namespace BlogApp.Business.Mapping
         public TagProfile()
         {
             CreateMap<Tag, TagDto>().ReverseMap();
+            CreateMap<Tag, TagListDto>().ReverseMap();
+            CreateMap<Tag, TagUpdateDto>().ReverseMap();
+
         }
     }
 }

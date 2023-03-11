@@ -51,7 +51,7 @@ namespace BlogApp.API.Controllers
             var result = await _categoryService.DeleteAsync(categoryId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+                return CreateActionResult(CustomResponse<CategoryDto>.Success(result.StatusCode, result.Data));
 
             return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
         }
@@ -64,7 +64,7 @@ namespace BlogApp.API.Controllers
             {
                 return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+            return CreateActionResult(CustomResponse<CategoryDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpDelete("{categoryId}")]

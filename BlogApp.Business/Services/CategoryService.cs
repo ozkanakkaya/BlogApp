@@ -30,7 +30,7 @@ namespace BlogApp.Business.Services
             return CustomResponse<CategoryCreateDto>.Fail(400, "Bu isimde bir kategori adı zaten mevcut!");
         }
 
-        public async Task<CustomResponse<NoContent>> DeleteAsync(int categoryId)
+        public async Task<CustomResponse<CategoryDto>> DeleteAsync(int categoryId)
         {
             var category = await UnitOfWork.Categories.GetAsync(x => x.Id == categoryId);
             if (category != null)
@@ -41,12 +41,12 @@ namespace BlogApp.Business.Services
                 UnitOfWork.Categories.Update(category);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponse<CategoryDto>.Success(200, Mapper.Map<CategoryDto>(category));
             }
-            return CustomResponse<NoContent>.Fail(404, $"{categoryId} numaralı kategori bulunamadı!");
+            return CustomResponse<CategoryDto>.Fail(404, $"{categoryId} numaralı kategori bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> UndoDeleteAsync(int categoryId)//Admin-Arşiv-Users
+        public async Task<CustomResponse<CategoryDto>> UndoDeleteAsync(int categoryId)//Admin-Arşiv-Users
         {
             var result = await UnitOfWork.Categories.AnyAsync(x => x.Id == categoryId);
             if (result)
@@ -56,9 +56,9 @@ namespace BlogApp.Business.Services
                 category.IsActive = true;
                 UnitOfWork.Categories.Update(category);
                 await UnitOfWork.CommitAsync();
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponse<CategoryDto>.Success(200, Mapper.Map<CategoryDto>(category));
             }
-            return CustomResponse<NoContent>.Fail(404, "Bir kategori bulunamadı!");
+            return CustomResponse<CategoryDto>.Fail(404, "Bir kategori bulunamadı!");
         }
 
         public async Task<CustomResponse<NoContent>> HardDeleteAsync(int categoryId)//Admin-Arşiv-Users
@@ -170,7 +170,7 @@ namespace BlogApp.Business.Services
                     Categories = categories
                 });
             }
-            return CustomResponse<CategoryListDto>.Fail(404, "Silinmiş bir kullanıcı bulunamadı!");
+            return CustomResponse<CategoryListDto>.Fail(404, "Silinmiş bir kategori bulunamadı!");
         }
     }
 }

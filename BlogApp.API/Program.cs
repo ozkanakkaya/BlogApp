@@ -66,13 +66,6 @@ builder.Services.AddDbContext<AppDbContext>(x =>
     });
 });
 
-//builder.Services.AddScoped<AppDbContext>(provider =>
-//{
-//    var context = provider.GetService<AppDbContext>();
-//    context.Database.EnsureCreated(); // Veritabanýnýz yoksa oluþturulmasýný saðlar
-//    return context;
-//});
-
 //builder.Services.AddScoped(typeof());
 //builder.Services.AddValidatorsFromAssemblyContaining<AppUserRegisterDtoValidator>();//diðer kullaným
 builder.Services.AddScoped<IValidator<UserRegisterDto>, UserRegisterDtoValidator>();
@@ -85,6 +78,7 @@ builder.Services.AddScoped<IValidator<CategoryCreateDto>, CategoryCreateDtoValid
 builder.Services.AddScoped<IValidator<CategoryUpdateDto>, CategoryUpdateDtoValidator>();
 builder.Services.AddScoped<IValidator<CommentCreateDto>, CommentCreateDtoValidator>();
 builder.Services.AddScoped<IValidator<CommentUpdateDto>, CommentUpdateDtoValidator>();
+builder.Services.AddScoped<IValidator<TagUpdateDto>, TagUpdateDtoValidator>();
 
 builder.Services.AddScoped<CheckUserIdAttribute>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
