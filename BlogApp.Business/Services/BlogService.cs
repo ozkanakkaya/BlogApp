@@ -343,7 +343,7 @@ namespace BlogApp.Business.Services
             blog.ViewCount += 1;
             UnitOfWork.Blogs.Update(blog);
             await UnitOfWork.CommitAsync();
-            return CustomResponse<string>.Success(200, $"{blog.Title} adlı bloğun okunmasıyısı arttırıldı.");
+            return CustomResponse<string>.Success(200, $"{blog.Title} adlı bloğun okunmasayısı arttırıldı.");
         }
 
         public async Task<CustomResponse<BlogViewModel>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)

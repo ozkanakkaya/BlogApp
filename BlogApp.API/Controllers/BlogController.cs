@@ -150,7 +150,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
         }
 
-        [HttpPut("[action]")]
+        [HttpPut("[action]/{blogId}")]
         public async Task<IActionResult> UndoDelete(int blogId)
         {
             var result = await _blogService.UndoDeleteAsync(blogId);
@@ -161,7 +161,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
         }
 
-        [HttpPost("[action]")]
+        [HttpGet("[action]")]
         public async Task<IActionResult> Search(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
         {
             var searchResult = await _blogService.SearchAsync(keyword, currentPage, pageSize, isAscending);
@@ -257,7 +257,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{blogId}")]
         public async Task<IActionResult> IncreaseViewCount(int blogId)
         {
             var result = await _blogService.IncreaseViewCountAsync(blogId);
@@ -268,7 +268,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<string>.Success(result.StatusCode, result.Data));
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{categoryId}")]
         public async Task<IActionResult> GetAllByCategory(int categoryId)
         {
             var result = await _blogService.GetAllByCategoryAsync(categoryId);
@@ -293,7 +293,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllFilteredAsync(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser)
+        public async Task<IActionResult> GetAllFiltered(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser)
         {
             var result = await _blogService.GetAllBlogsFilteredAsync(categoryId, userId, isActive, isDeleted, currentPage, pageSize, orderBy, isAscending, includeCategory, includeTag, includeComments, includeUser);
             if (!result.Errors.Any())
@@ -303,7 +303,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{blogId}")]
         public async Task<IActionResult> GetByBlogId(int blogId)
         {
             var result = await _blogService.GetByBlogIdAsync(blogId);
@@ -327,7 +327,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponse<BlogListDto>.Success(result.StatusCode, result.Data));
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{tagId}")]
         public async Task<IActionResult> GetAllByTag(int tagId)
         {
             var result = await _blogService.GetAllByTagAsync(tagId);
