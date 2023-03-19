@@ -32,11 +32,11 @@ namespace BlogApp.API.Controllers
 
                 if (!resultAdd.Errors.Any())
                 {
-                    return CreateActionResult(CustomResponse<CommentDto>.Success(resultAdd.StatusCode, resultAdd.Data));
+                    return CreateActionResult(CustomResponseDto<CommentDto>.Success(resultAdd.StatusCode, resultAdd.Data));
                 }
                 else
                 {
-                    return CreateActionResult(CustomResponse<NoContent>.Fail(resultAdd.StatusCode, resultAdd.Errors));
+                    return CreateActionResult(CustomResponseDto<NoContent>.Fail(resultAdd.StatusCode, resultAdd.Errors));
                 }
             }
 
@@ -44,7 +44,7 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
 
         }
 
@@ -57,16 +57,16 @@ namespace BlogApp.API.Controllers
                 var resultUpdated = await _commentService.UpdateAsync(commentUpdateDto);
                 if (resultUpdated.Errors.Any())
                 {
-                    return CreateActionResult(CustomResponse<NoContent>.Fail(resultUpdated.StatusCode, resultUpdated.Errors));
+                    return CreateActionResult(CustomResponseDto<NoContent>.Fail(resultUpdated.StatusCode, resultUpdated.Errors));
                 }
-                return CreateActionResult(CustomResponse<CommentDto>.Success(resultUpdated.StatusCode, resultUpdated.Data));
+                return CreateActionResult(CustomResponseDto<CommentDto>.Success(resultUpdated.StatusCode, resultUpdated.Data));
             }
 
             result.Errors.ForEach(error => ModelState.AddModelError(error.PropertyName, error.ErrorMessage));
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpPut("[action]/{commentId}")]
@@ -75,9 +75,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.DeleteAsync(commentId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<CommentDto>.Success(result.StatusCode, result.Data));
+                return CreateActionResult(CustomResponseDto<CommentDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpDelete("{commentId}")]
@@ -86,9 +86,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.HardDeleteAsync(commentId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+                return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpGet("[action]")]
@@ -97,9 +97,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.CountTotalAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -108,9 +108,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.CountByNonDeletedAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpPut("{commentId}")]
@@ -119,9 +119,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.ApproveAsync(commentId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<CommentDto>.Success(result.StatusCode, result.Data));
+                return CreateActionResult(CustomResponseDto<CommentDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpPut("[action]")]
@@ -130,9 +130,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.UndoDeleteAsync(commentId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<CommentDto>.Success(result.StatusCode, result.Data));
+                return CreateActionResult(CustomResponseDto<CommentDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpGet("{commentId}")]
@@ -141,9 +141,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.GetCommentByIdAsync(commentId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<CommentDto>.Success(result.StatusCode, result.Data));
+                return CreateActionResult(CustomResponseDto<CommentDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpGet("[action]/{commentId}")]
@@ -152,9 +152,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.GetCommentUpdateDtoAsync(commentId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<CommentUpdateDto>.Success(result.StatusCode, result.Data));
+                return CreateActionResult(CustomResponseDto<CommentUpdateDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpGet("[action]")]
@@ -163,9 +163,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.GetAllCommentsAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CommentListDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<CommentListDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -174,9 +174,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.GetAllByDeletedAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CommentListDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<CommentListDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -185,9 +185,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.GetAllByNonDeletedAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CommentListDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<CommentListDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet]
@@ -196,9 +196,9 @@ namespace BlogApp.API.Controllers
             var result = await _commentService.GetAllByActiveAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CommentListDto>.Success(result.StatusCode,result.Data));
+            return CreateActionResult(CustomResponseDto<CommentListDto>.Success(result.StatusCode,result.Data));
         }
     }
 }

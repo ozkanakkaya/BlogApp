@@ -1,0 +1,133 @@
+﻿@using BlogApp.Core.Entities.Concrete
+@model BlogApp.WEB.Models.RightSideBarViewModel
+
+<aside class="col-lg-4 agileits-w3ls-right-blog-con text-left">
+    <div class="right-blog-info text-left">
+
+        <div class="tech-btm">
+            <form asp-controller="Blog" asp-action="Search" method="get">
+                <div class="input-group">
+                    <input class="form-control" type="search" placeholder="Arama..." name="keyword" required="">
+                    <span class="input-group-append">
+                        <button class="btn btn-secondary" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </span>
+                </div>
+            </form>
+        </div>
+
+        <div class="tech-btm">
+            <img src="~/images/banner1.jpg" class="card-img-top img-fluid" alt="">
+        </div>
+        <div class="tech-btm">
+            <h4>Haber bültenimize kaydolun</h4>
+            <p>Siz de bu kervanda yerinizi alın </p>
+            <form action="#" method="post">
+                <input type="email" placeholder="Email" required="">
+                <input type="submit" value="Subscribe">
+            </form>
+
+        </div>
+        <div class="tech-btm">
+            <h4>Kategoriler</h4>
+            <ul class="list-group single">
+
+                <a asp-controller="Home" asp-action="Index" class="list-group-item list-group-item-action" aria-current="true">Tümü</a>
+
+                @foreach (var category in Model.CategoryListDto.Categories)
+                {
+                    <a asp-controller="Home" asp-action="Index" asp-route-categoryId="@category.Id" class="list-group-item list-group-item-action">@category.Name</a>
+                }
+
+            </ul>
+        </div>
+        <div class="tech-btm">
+            <h4>En Çok Okunan Bloglar</h4>
+
+            <div class="blog-grids row mb-3">
+                
+                @foreach (var blog in Model.MostReadBlogs)
+                {
+                    <div class="col-md-5 blog-grid-left">
+                        <a asp-controller="Blog" asp-action="Detail" asp-route-blogId="@blog.Id">
+                            <img src="~/img/@blog.ImageUrl" class="card-img-top img-fluid" alt="">
+                        </a>
+                    </div>
+                    <div class="col-md-7 blog-grid-right">
+
+                        <h5>
+                            <a asp-controller="Blog" asp-action="Detail" asp-route-blogId="@blog.Id"> @blog.Title </a>
+                        </h5>
+                        <div class="sub-meta">
+                            <span>
+                                <i class="far fa-clock"></i> @blog.UpdatedDate.ToString("dd MMM, yyyy")
+                                
+                            </span>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+        <div class="tech-btm widget_social text-left">
+            <h4>Takipte Kalın</h4>
+            <ul>
+
+                <li>
+                    <a class="twitter" href="#">
+                        <i class="fab fa-twitter"></i>
+                        <span class="count">317K</span> Twitter Followers
+                    </a>
+                </li>
+                <li>
+                    <a class="facebook" href="#">
+                        <i class="fab fa-facebook-f"></i>
+                        <span class="count">218k</span> Twitter Followers
+                    </a>
+                </li>
+                <li>
+                    <a class="dribble" href="#">
+                        <i class="fab fa-dribbble"></i>
+
+                        <span class="count">215k</span> Dribble Followers
+                    </a>
+                </li>
+                <li>
+                    <a class="pin" href="#">
+                        <i class="fab fa-pinterest"></i>
+                        <span class="count">190k</span> Pinterest Followers
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="tech-btm">
+            <h4>Son Paylaşılanlar</h4>
+
+            @foreach (var blog in Model.LatestPosts)
+            {
+                <div class="blog-grids row mb-3 text-left">
+                    <div class="col-md-5 blog-grid-left">
+                        <a asp-controller="Blog" asp-action="Detail" asp-route-blogId="@blog.Id">
+                            <img src="~/img/@blog.ImageUrl" class="card-img-top img-fluid" alt="">
+                        </a>
+                    </div>
+                    <div class="col-md-7 blog-grid-right">
+
+                        <h5>
+                            <a asp-controller="Blog" asp-action="Detail" asp-route-blogId="@blog.Id"> @blog.Title </a>
+                        </h5>
+                        <div class="sub-meta">
+                            <span>
+                                <i class="far fa-clock"></i> @blog.UpdatedDate.ToString("dd MMM, yyyy")
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</aside>

@@ -6,9 +6,9 @@ namespace BlogApp.Core.Services
 {
     public interface IRoleService : IService<Role>
     {
-        Task<CustomResponse<RoleListDto>> GetAllRolesAsync();
-        Task<CustomResponse<RoleListDto>> GetAllByUserIdAsync(int userId);
-        Task<CustomResponse<UserRoleAssignDto>> GetUserRoleAssignDtoAsync(int userId);
-        Task<CustomResponse<UserRoleAssignDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto);
+        Task<CustomResponseDto<RoleListDto>> GetAllRolesAsync();
+        Task<CustomResponseDto<RoleListDto>> GetAllByUserIdAsync(int userId);
+        Task<CustomResponseDto<UserRoleAssignDto>> GetUserRoleAssignDtoAsync(int userId);
+        Task<CustomResponseDto<UserRoleAssignDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto);
     }
 }

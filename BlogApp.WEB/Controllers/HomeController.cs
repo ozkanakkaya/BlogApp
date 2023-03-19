@@ -1,25 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BlogApp.WEB.Services;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace BlogApp.WEB.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly BlogApiService _blogApiService;
 
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+		public HomeController(BlogApiService blogApiService)
+		{
+			_blogApiService = blogApiService;
+		}
 
-        public IActionResult Index()
+        [HttpGet]
+		public async Task<IActionResult> Index(int? categoryId, int currentPage = 1, int pageSize = 6, bool isAscending = false)
         {
-            return View();
-        }
+            var blogsResult = await (categoryId == null
+                ? _blogApiService.GetAllByPagingAsync(null, currentPage, pageSize, isAscending)
+                : _blogApiService.GetAllByPagingAsync(categoryId, currentPage, pageSize, isAscending));
 
-        public IActionResult Privacy()
-        {
-            return View();
+			return View(blogsResult);
         }
 
     }

@@ -6,17 +6,17 @@ namespace BlogApp.Core.Services
 {
     public interface ICategoryService : IService<Category>
     {
-        Task<CustomResponse<CategoryCreateDto>> AddAsync(CategoryCreateDto categoryCreateDto);
-        Task<CustomResponse<CategoryDto>> DeleteAsync(int categoryId);
-        Task<CustomResponse<CategoryDto>> UndoDeleteAsync(int categoryId);
-        Task<CustomResponse<NoContent>> HardDeleteAsync(int categoryId);
-        Task<CustomResponse<CategoryListDto>> GetAllByNonDeletedAsync();
-        Task<CustomResponse<CategoryListDto>> GetAllByActiveAsync();
-        Task<CustomResponse<CategoryListDto>> GetAllCategoriesAsync();
-        Task<CustomResponse<CategoryUpdateDto>> GetCategoryUpdateDtoAsync(int categoryId);
-        Task<CustomResponse<NoContent>> UpdateAsync(CategoryUpdateDto categoryUpdateDto);
-        Task<CustomResponse<int>> CountTotalAsync();
-        Task<CustomResponse<int>> CountByNonDeletedAsync();
-        Task<CustomResponse<CategoryListDto>> GetAllByDeletedAsync();
+        Task<CustomResponseDto<CategoryCreateDto>> AddAsync(CategoryCreateDto categoryCreateDto);
+        Task<CustomResponseDto<CategoryDto>> DeleteAsync(int categoryId);
+        Task<CustomResponseDto<CategoryDto>> UndoDeleteAsync(int categoryId);
+        Task<CustomResponseDto<NoContent>> HardDeleteAsync(int categoryId);
+        Task<CustomResponseDto<CategoryListDto>> GetAllByNonDeletedAsync();
+        Task<CustomResponseDto<CategoryListDto>> GetAllByActiveAsync();
+        Task<CustomResponseDto<CategoryListDto>> GetAllCategoriesAsync();
+        Task<CustomResponseDto<CategoryUpdateDto>> GetCategoryUpdateDtoAsync(int categoryId);
+        Task<CustomResponseDto<NoContent>> UpdateAsync(CategoryUpdateDto categoryUpdateDto);
+        Task<CustomResponseDto<int>> CountTotalAsync();
+        Task<CustomResponseDto<int>> CountByNonDeletedAsync();
+        Task<CustomResponseDto<CategoryListDto>> GetAllByDeletedAsync();
     }
 }

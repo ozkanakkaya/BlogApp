@@ -7,7 +7,7 @@ namespace BlogApp.API.Controllers
     [ApiController]
     public class CustomControllerBase : ControllerBase
     {
-        public IActionResult CreateActionResult<T>(CustomResponse<T> response)
+        public IActionResult CreateActionResult<T>(CustomResponseDto<T> response)
         {
             if (response.StatusCode == 204)
                 return new ObjectResult(null)

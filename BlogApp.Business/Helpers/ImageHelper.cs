@@ -20,7 +20,7 @@ namespace BlogApp.Business.Helpers
             _fileAccess = fileAccess;
         }
 
-        public async Task<CustomResponse<ImageUploadedDto>> UploadAsync(string name, IFormFile imageFile, ImageType imageType, string folderName = null)
+        public async Task<CustomResponseDto<ImageUploadedDto>> UploadAsync(string name, IFormFile imageFile, ImageType imageType, string folderName = null)
         {
             /* Eğer folderName değişkeni null gelir ise, o zaman resim tipine göre (PictureType) klasör adı ataması yapılır. */
             folderName ??= imageType == ImageType.User ? userImagesFolder : postImagesFolder;
@@ -31,7 +31,7 @@ namespace BlogApp.Business.Helpers
                 await _fileAccess.CreateDirectoryAsync($"{imgFolder}/{folderName}");
             }
 
-            if (imageFile == null || imageFile.Length < 0) return CustomResponse<ImageUploadedDto>.Fail(400, "imageFile boş");
+            if (imageFile == null || imageFile.Length < 0) return CustomResponseDto<ImageUploadedDto>.Fail(400, "imageFile boş");
             /* Resimin yüklenme sırasındaki ilk adı oldFileName adlı değişkene atanır. */
             string oldFileName = await _fileAccess.GetFileNameWithoutExtensionAsync(imageFile.FileName);
 
@@ -69,10 +69,10 @@ namespace BlogApp.Business.Helpers
                 Size = imageFile.Length
             };
 
-            return CustomResponse<ImageUploadedDto>.Success(200, imageUploadedDto);
+            return CustomResponseDto<ImageUploadedDto>.Success(200, imageUploadedDto);
         }
 
-        public async Task<CustomResponse<ImageDeletedDto>> DeleteAsync(string imageName)
+        public async Task<CustomResponseDto<ImageDeletedDto>> DeleteAsync(string imageName)
         {
             if (await _fileAccess.FileExistsAsync($"{imgFolder}/{imageName}"))
             {
@@ -85,11 +85,11 @@ namespace BlogApp.Business.Helpers
                     Size = fileInfo.Length
                 };
                 await _fileAccess.DeleteFileAsync($"{imgFolder}/{imageName}");
-                return CustomResponse<ImageDeletedDto>.Success(200, imageDeleteDto);
+                return CustomResponseDto<ImageDeletedDto>.Success(200, imageDeleteDto);
             }
             else
             {
-                return CustomResponse<ImageDeletedDto>.Fail(400, "Böyle bir resim bulunamadı!");
+                return CustomResponseDto<ImageDeletedDto>.Fail(400, "Böyle bir resim bulunamadı!");
             }
         }
     }

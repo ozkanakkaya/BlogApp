@@ -20,7 +20,7 @@ namespace BlogApp.Business.Services
         {
             _imageHelper = imageHelper;
         }
-        public async Task<CustomResponse<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogCreateDto)
+        public async Task<CustomResponseDto<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogCreateDto)
         {
             var tagSplit = blogCreateDto.Tags.Split(',');
 
@@ -78,10 +78,10 @@ namespace BlogApp.Business.Services
             await UnitOfWork.Blogs.AddAsync(blog);
             await UnitOfWork.CommitAsync();
 
-            return CustomResponse<BlogCreateDto>.Success(201, blogCreateDto);
+            return CustomResponseDto<BlogCreateDto>.Success(201, blogCreateDto);
         }
 
-        public async Task<CustomResponse<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto)
+        public async Task<CustomResponseDto<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto)
         {
             var oldBlog = await UnitOfWork.Blogs.GetBlogById(blogUpdateDto.Id);
             var blog = Mapper.Map<BlogUpdateDto, Blog>(blogUpdateDto, oldBlog);
@@ -160,10 +160,10 @@ namespace BlogApp.Business.Services
             if (isNewImageUploaded)
                 await _imageHelper.DeleteAsync(oldUserImage);
 
-            return CustomResponse<NoContent>.Success(204);
+            return CustomResponseDto<NoContent>.Success(204);
         }
 
-        public async Task<CustomResponse<NoContent>> DeleteAsync(int blogId)
+        public async Task<CustomResponseDto<NoContent>> DeleteAsync(int blogId)
         {
             var blog = await UnitOfWork.Blogs.Where(x => x.Id == blogId).FirstOrDefaultAsync();
             if (blog != null)
@@ -173,12 +173,12 @@ namespace BlogApp.Business.Services
                 //blog.UpdatedByUsername = (await _appUserRepository.GetByIdAsync(blog.AppUserId)).Username;
                 UnitOfWork.Blogs.Update(blog);
                 await UnitOfWork.CommitAsync();
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
-            return CustomResponse<NoContent>.Fail(404, $"{blogId} numaralı blog bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(404, $"{blogId} numaralı blog bulunamadı!");
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllByActiveAsync()
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByActiveAsync()
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
@@ -186,12 +186,12 @@ namespace BlogApp.Business.Services
             {
                 var blogListDto = blogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+                return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllByNonDeletedAsync()//Aktif ve Pasif bloglar
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByNonDeletedAsync()//Aktif ve Pasif bloglar
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(x => !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
@@ -199,12 +199,12 @@ namespace BlogApp.Business.Services
             {
                 var blogListDto = blogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+                return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
@@ -212,9 +212,9 @@ namespace BlogApp.Business.Services
             {
                 var blogListDto = blogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+                return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Silinmiş bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Silinmiş bir blog bulunamadı!");
         }
 
         public bool SetwiseEquivalentTo<T>(List<T> list, List<T> other) where T : IEquatable<T>
@@ -226,7 +226,7 @@ namespace BlogApp.Business.Services
             return true;
         }
 
-        public async Task<CustomResponse<PersonalBlogDto>> GetAllByUserIdAsync(int userId)//Kullanıcı Paneli-Bloglarım
+        public async Task<CustomResponseDto<PersonalBlogDto>> GetAllByUserIdAsync(int userId)//Kullanıcı Paneli-Bloglarım
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.UserId == userId && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
@@ -241,48 +241,48 @@ namespace BlogApp.Business.Services
                 personalBlogDto.TotalInactiveBlogCount = await UnitOfWork.Blogs.Where(x => !x.IsActive && x.UserId == userId).CountAsync();
                 blogs.ForEach(x => { personalBlogDto.TotalBlogsViewedCount += x.ViewCount; });
 
-                return CustomResponse<PersonalBlogDto>.Success(200, personalBlogDto);
+                return CustomResponseDto<PersonalBlogDto>.Success(200, personalBlogDto);
             }
-            return CustomResponse<PersonalBlogDto>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<PersonalBlogDto>.Fail(404, "Bir blog bulunamadı!");
         }
 
-        public async Task<CustomResponse<int>> CountTotalBlogsAsync()//Admin-Home
+        public async Task<CustomResponseDto<int>> CountTotalBlogsAsync()//Admin-Home
         {
             var blogsTotalCount = await UnitOfWork.Blogs.CountAsync();
 
-            return blogsTotalCount > -1 ? CustomResponse<int>.Success(200, blogsTotalCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
+            return blogsTotalCount > -1 ? CustomResponseDto<int>.Success(200, blogsTotalCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
         }
 
-        public async Task<CustomResponse<int>> CountActiveBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountActiveBlogsAsync()
         {
             var blogsTotalCount = await UnitOfWork.Blogs.CountAsync(x => x.IsActive);
 
-            return blogsTotalCount > -1 ? CustomResponse<int>.Success(200, blogsTotalCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
+            return blogsTotalCount > -1 ? CustomResponseDto<int>.Success(200, blogsTotalCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
 
         }
 
-        public async Task<CustomResponse<int>> CountInactiveBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountInactiveBlogsAsync()
         {
             var blogsTotalCount = await UnitOfWork.Blogs.CountAsync(x => !x.IsActive);
 
-            return blogsTotalCount > -1 ? CustomResponse<int>.Success(200, blogsTotalCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
+            return blogsTotalCount > -1 ? CustomResponseDto<int>.Success(200, blogsTotalCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsTotalCount}");
         }
 
-        public async Task<CustomResponse<int>> CountByDeletedBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountByDeletedBlogsAsync()
         {
             var blogsDeletedCount = await UnitOfWork.Blogs.CountAsync(x => x.IsDeleted);
 
-            return blogsDeletedCount > -1 ? CustomResponse<int>.Success(200, blogsDeletedCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsDeletedCount}");
+            return blogsDeletedCount > -1 ? CustomResponseDto<int>.Success(200, blogsDeletedCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsDeletedCount}");
         }
 
-        public async Task<CustomResponse<int>> CountByNonDeletedBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountByNonDeletedBlogsAsync()
         {
             var blogsNonDeletedCount = await UnitOfWork.Blogs.CountAsync(x => !x.IsDeleted);
 
-            return blogsNonDeletedCount > -1 ? CustomResponse<int>.Success(200, blogsNonDeletedCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsNonDeletedCount}");
+            return blogsNonDeletedCount > -1 ? CustomResponseDto<int>.Success(200, blogsNonDeletedCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {blogsNonDeletedCount}");
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllBlogsAsync()//Admin-Home-Bloglar
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllBlogsAsync()//Admin-Home-Bloglar
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(null, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
@@ -290,12 +290,12 @@ namespace BlogApp.Business.Services
             {
                 var blogListDto = blogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+                return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> HardDeleteAsync(int blogId)//Admin-Arşiv-Blog
+        public async Task<CustomResponseDto<NoContent>> HardDeleteAsync(int blogId)//Admin-Arşiv-Blog
         {
             var result = await UnitOfWork.Blogs.AnyAsync(x => x.Id == blogId);
             if (result)
@@ -310,12 +310,12 @@ namespace BlogApp.Business.Services
                 if (image != "postImages/defaultImage.png")
                     await _imageHelper.DeleteAsync(image);
 
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
-            return CustomResponse<NoContent>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(404, "Bir blog bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> UndoDeleteAsync(int blogId)//Admin-Arşiv-Blog
+        public async Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int blogId)//Admin-Arşiv-Blog
         {
             var result = await UnitOfWork.Blogs.AnyAsync(x => x.Id == blogId);
             if (result)
@@ -327,43 +327,43 @@ namespace BlogApp.Business.Services
                 //blog.UpdatedDate=
                 UnitOfWork.Blogs.Update(blog);
                 await UnitOfWork.CommitAsync();
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
-            return CustomResponse<NoContent>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(404, "Bir blog bulunamadı!");
         }
 
-        public async Task<CustomResponse<string>> IncreaseViewCountAsync(int blogId)//Anasayfa-Blog Detayda
+        public async Task<CustomResponseDto<string>> IncreaseViewCountAsync(int blogId)//Anasayfa-Blog Detayda
         {
             var blog = await UnitOfWork.Blogs.Where(x => x.Id == blogId).FirstOrDefaultAsync();
             if (blog == null)
             {
-                return CustomResponse<string>.Fail(404, "Bir blog bulunamadı!");
+                return CustomResponseDto<string>.Fail(404, "Bir blog bulunamadı!");
             }
 
             blog.ViewCount += 1;
             UnitOfWork.Blogs.Update(blog);
             await UnitOfWork.CommitAsync();
-            return CustomResponse<string>.Success(200, $"{blog.Title} adlı bloğun okunmasayısı arttırıldı.");
+            return CustomResponseDto<string>.Success(200, $"{blog.Title} adlı bloğun okunmasayısı arttırıldı.");
         }
 
-        public async Task<CustomResponse<BlogViewModel>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
+        public async Task<CustomResponseDto<BlogListResultDto>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
         {
             pageSize = pageSize > 20 ? 20 : pageSize;
 
-            if (string.IsNullOrWhiteSpace(keyword))
-            {
-                //var blogs = await UnitOfWork.Blogs.GetBlogsByDetailsAsync();
+            //if (string.IsNullOrWhiteSpace(keyword))
+            //{
+            //    //var blogs = await UnitOfWork.Blogs.GetBlogsByDetailsAsync();
 
-                //var sortedBlogs = isAscending
-                //    ? blogs.OrderBy(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
-                //    : blogs.OrderByDescending(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            //    //var sortedBlogs = isAscending
+            //    //    ? blogs.OrderBy(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
+            //    //    : blogs.OrderByDescending(x => x.CreatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
-                //var sortedBlogsListDto = sortedBlogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
+            //    //var sortedBlogsListDto = sortedBlogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                //return CustomResponse<List<BlogListDto>>.Success(200, sortedBlogsListDto);
-                return CustomResponse<BlogViewModel>.Fail(400, "Lütfen anahtar kelime giriniz!");
+            //    //return CustomResponse<List<BlogListDto>>.Success(200, sortedBlogsListDto);
+            //    return CustomResponse<BlogListResultDto>.Fail(400, "Lütfen anahtar kelime giriniz!");
 
-            }
+            //}
 
             var searchedBlogs = await UnitOfWork.Blogs.SearchAsync(new List<Expression<Func<Blog, bool>>>
             {
@@ -374,27 +374,24 @@ namespace BlogApp.Business.Services
             x => x.IsActive && !x.IsDeleted,
             x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
-            if (!searchedBlogs.Any())
-                return CustomResponse<BlogViewModel>.Fail(404, "Aradığınız anahtar kelime bulunamadı!");
-
             var searchedAndSortedBlogs = isAscending
                 ? searchedBlogs.OrderBy(x => x.UpdatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList()
                 : searchedBlogs.OrderByDescending(x => x.UpdatedDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
             var blogListDto = searchedAndSortedBlogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-            return CustomResponse<BlogViewModel>.Success(200, new BlogViewModel
+            return CustomResponseDto<BlogListResultDto>.Success(200, new BlogListResultDto
             {
                 BlogListDto = blogListDto,
                 CurrentPage = currentPage,
                 PageSize = pageSize,
-                TotalCount = blogListDto.Count,
+                TotalCount = searchedBlogs.Count,
                 IsAscending = isAscending,
                 Keyword = keyword
             });
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllByViewCountAsync(bool isAscending, int? takeSize)
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByViewCountAsync(bool isAscending, int? takeSize)
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
@@ -404,14 +401,14 @@ namespace BlogApp.Business.Services
             {
                 var blogListDto = sortedBlogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                return CustomResponse<List<BlogListDto>>.Success(200, takeSize < 1 ? blogListDto : blogListDto.Take(takeSize.Value).ToList());
+                return CustomResponseDto<List<BlogListDto>>.Success(200, takeSize < 1 ? blogListDto : blogListDto.Take(takeSize.Value).ToList());
 
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
 
         }
 
-        public async Task<CustomResponse<BlogViewModel>> GetAllByPagingAsync(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false)
+        public async Task<CustomResponseDto<BlogListResultDto>> GetAllByPagingAsync(int? categoryId, int currentPage = 1, int pageSize = 5, bool isAscending = false)
         {
             pageSize = pageSize > 20 ? 20 : pageSize;
             var blogs = categoryId == null
@@ -424,19 +421,19 @@ namespace BlogApp.Business.Services
 
             var blogListDto = sortedBlogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-            return CustomResponse<BlogViewModel>.Success(200, new BlogViewModel
+            return CustomResponseDto<BlogListResultDto>.Success(200, new BlogListResultDto
             {
                 BlogListDto = blogListDto,
                 CategoryId = categoryId.HasValue ? categoryId.Value : null,
                 CurrentPage = currentPage,
                 PageSize = pageSize,
-                TotalCount = blogListDto.Count,
+                TotalCount = blogs.Count,
                 IsAscending = isAscending
             });
 
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllByCategoryAsync(int categoryId)
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByCategoryAsync(int categoryId)
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.BlogCategories.Any(x => x.CategoryId == categoryId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
@@ -444,18 +441,18 @@ namespace BlogApp.Business.Services
             {
                 var blogListDto = blogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+                return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Bu kategoriye ait gösterilecek bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Bu kategoriye ait gösterilecek bir blog bulunamadı!");
 
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllByUserIdOnFilterAsync(int userId, FilterBy filterBy, OrderBy orderBy, bool isAscending, int takeSize, int categoryId, DateTime startAt, DateTime endAt, int minViewCount, int maxViewCount, int minCommentCount, int maxCommentCount)
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByUserIdOnFilterAsync(int userId, FilterBy filterBy, OrderBy orderBy, bool isAscending, int takeSize, int categoryId, DateTime startAt, DateTime endAt, int minViewCount, int maxViewCount, int minCommentCount, int maxCommentCount)
         {
             var anyUser = await UnitOfWork.Users.AnyAsync(x => x.Id == userId);
             if (!anyUser)
             {
-                return CustomResponse<List<BlogListDto>>.Fail(404, $"{userId} numarasına ait bir kullanıcı bulunamadı!");
+                return CustomResponseDto<List<BlogListDto>>.Fail(404, $"{userId} numarasına ait bir kullanıcı bulunamadı!");
             }
 
             var userBlogs = await UnitOfWork.Blogs.GetAllAsync(x => x.UserId == userId && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
@@ -560,17 +557,17 @@ namespace BlogApp.Business.Services
                         break;
                 }
                 if (!sortedBlogs.Any())
-                    return CustomResponse<List<BlogListDto>>.Fail(404, "Kullanıcının bu kriterlere ait gösterilecek bir bloğu bulunamadı!");
+                    return CustomResponseDto<List<BlogListDto>>.Fail(404, "Kullanıcının bu kriterlere ait gösterilecek bir bloğu bulunamadı!");
 
                 var blogListDto = sortedBlogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+                return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Kullanıcıya ait gösterilecek bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Kullanıcıya ait gösterilecek bir blog bulunamadı!");
 
         }
 
-        public async Task<CustomResponse<BlogViewModel>> GetAllBlogsFilteredAsync(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser)
+        public async Task<CustomResponseDto<BlogListResultDto>> GetAllBlogsFilteredAsync(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser)
         {
             List<Expression<Func<Blog, bool>>> predicates = new List<Expression<Func<Blog, bool>>>();
             List<Expression<Func<Blog, object>>> includes = new List<Expression<Func<Blog, object>>>();
@@ -579,7 +576,7 @@ namespace BlogApp.Business.Services
             {
                 if (!await UnitOfWork.Blogs.AnyAsync(x => x.BlogCategories.Any(x => x.CategoryId == categoryId.Value)))
                 {
-                    return CustomResponse<BlogViewModel>.Fail(404, $"{categoryId} numaralı kategoriye ait bir blog bulunamadı!");
+                    return CustomResponseDto<BlogListResultDto>.Fail(404, $"{categoryId} numaralı kategoriye ait bir blog bulunamadı!");
                 }
                 predicates.Add(x => x.BlogCategories.Any(x => x.CategoryId == categoryId.Value));
             }
@@ -588,7 +585,7 @@ namespace BlogApp.Business.Services
             {
                 if (!await UnitOfWork.Users.AnyAsync(x => x.Id == userId.Value))
                 {
-                    return CustomResponse<BlogViewModel>.Fail(404, "Böyle bir kullanıcı bulunamadı!");
+                    return CustomResponseDto<BlogListResultDto>.Fail(404, "Böyle bir kullanıcı bulunamadı!");
                 }
                 predicates.Add(x => x.UserId == userId.Value);
             }
@@ -622,7 +619,7 @@ namespace BlogApp.Business.Services
 
                 var blogListDto = sortedBlogs.Select(blog => Mapper.Map<BlogListDto>(blog)).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
-                return CustomResponse<BlogViewModel>.Success(200, new BlogViewModel
+                return CustomResponseDto<BlogListResultDto>.Success(200, new BlogListResultDto
                 {
                     BlogListDto = blogListDto,
                     CategoryId = categoryId.HasValue ? categoryId.Value : null,
@@ -632,11 +629,11 @@ namespace BlogApp.Business.Services
                     IsAscending = isAscending,
                 });
             }
-            return CustomResponse<BlogViewModel>.Fail(404, "Bu filtrelere uygun gösterilecek bir blog bulunamadı!");
+            return CustomResponseDto<BlogListResultDto>.Fail(404, "Bu filtrelere uygun gösterilecek bir blog bulunamadı!");
 
         }
 
-        public async Task<CustomResponse<BlogListDto>> GetByBlogIdAsync(int blogId)//blog detayda kul.
+        public async Task<CustomResponseDto<BlogListDto>> GetByBlogIdAsync(int blogId)//blog detayda kul.
         {
             var blog = await UnitOfWork.Blogs.GetAsync(x => x.Id == blogId, x => x.User, x => x.BlogCategories, x => x.BlogTags, x => x.Comments.Where(x => x.IsActive && !x.IsDeleted));
 
@@ -644,13 +641,13 @@ namespace BlogApp.Business.Services
             {
                 var blogDto = Mapper.Map<BlogListDto>(blog);
 
-                return CustomResponse<BlogListDto>.Success(200, blogDto);
+                return CustomResponseDto<BlogListDto>.Success(200, blogDto);
             }
-            return CustomResponse<BlogListDto>.Fail(404, "Gösterilecek bir blog bulunamadı!");
+            return CustomResponseDto<BlogListDto>.Fail(404, "Gösterilecek bir blog bulunamadı!");
 
         }
 
-        public async Task<CustomResponse<BlogListDto>> GetFilteredByBlogIdAsync(int blogId, bool includeCategory, bool includeTag, bool includeComment, bool includeUser)
+        public async Task<CustomResponseDto<BlogListDto>> GetFilteredByBlogIdAsync(int blogId, bool includeCategory, bool includeTag, bool includeComment, bool includeUser)
         {
             List<Expression<Func<Blog, bool>>> predicates = new List<Expression<Func<Blog, bool>>>();
             List<Expression<Func<Blog, object>>> includes = new List<Expression<Func<Blog, object>>>();
@@ -664,15 +661,15 @@ namespace BlogApp.Business.Services
             var blog = await UnitOfWork.Blogs.GetByListedAsync(predicates, includes);
 
             if (blog == null)
-                return CustomResponse<BlogListDto>.Fail(404, $"{blogId} numaralı bir blog bulunamadı!");
+                return CustomResponseDto<BlogListDto>.Fail(404, $"{blogId} numaralı bir blog bulunamadı!");
 
             var blogDto = Mapper.Map<BlogListDto>(blog);
 
-            return CustomResponse<BlogListDto>.Success(200, blogDto);
+            return CustomResponseDto<BlogListDto>.Success(200, blogDto);
 
         }
 
-        public async Task<CustomResponse<List<BlogListDto>>> GetAllByTagAsync(int tagId)
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByTagAsync(int tagId)
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.BlogTags.Any(x => x.TagId == tagId) && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
@@ -680,9 +677,9 @@ namespace BlogApp.Business.Services
             {
                 var blogListDto = blogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                return CustomResponse<List<BlogListDto>>.Success(200, blogListDto);
+                return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponse<List<BlogListDto>>.Fail(404, "Bu etikete ait gösterilecek bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Bu etikete ait gösterilecek bir blog bulunamadı!");
 
         }
     }

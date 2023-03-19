@@ -7,12 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Models\" />
+    <Folder Include="wwwroot\blogsite\css\" />
+    <Folder Include="wwwroot\blogsite\js\" />
+    <Folder Include="wwwroot\blogsite\webfonts\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlogApp.Business\BlogApp.Business.csproj" />
+    <PackageReference Include="FluentValidation" Version="11.5.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlogApp.Core\BlogApp.Core.csproj" />
   </ItemGroup>
 
 </Project>

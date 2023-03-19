@@ -7,7 +7,7 @@ namespace BlogApp.Core.Utilities.Abstract
 {
     public interface IImageHelper
     {
-        Task<CustomResponse<ImageUploadedDto>> UploadAsync(string name, IFormFile imageFile, ImageType imageType, string folderName = null);
-        Task<CustomResponse<ImageDeletedDto>> DeleteAsync(string imageName);
+        Task<CustomResponseDto<ImageUploadedDto>> UploadAsync(string name, IFormFile imageFile, ImageType imageType, string folderName = null);
+        Task<CustomResponseDto<ImageDeletedDto>> DeleteAsync(string imageName);
     }
 }

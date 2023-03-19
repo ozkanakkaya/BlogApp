@@ -33,7 +33,7 @@ namespace BlogApp.API.Middlewares
 
                     context.Response.StatusCode = statusCode;
 
-                    var response = CustomResponse<NoContent>.Fail(statusCode, exceptionFeature.Error.Message);
+                    var response = CustomResponseDto<NoContent>.Fail(statusCode, exceptionFeature.Error.Message);
 
                     await context.Response.WriteAsync(JsonSerializer.Serialize(response));
                 });

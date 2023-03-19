@@ -8,7 +8,7 @@ namespace BlogApp.Core.DTOs.Concrete
         public string Title { get; set; }
         public string Content { get; set; }
         public string Thumbnail { get; set; }
-        public int ViewsCount { get; set; } = 0;
+        public int ViewCount { get; set; } = 0;
         public int CommentCount { get; set; } = 0;
         public int LikeCount { get; set; } = 0;
         public DateTime CreatedDate { get; set; }

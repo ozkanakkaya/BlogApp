@@ -1,0 +1,140 @@
+﻿@using System.Text.RegularExpressions;
+@model BlogApp.WEB.Models.BlogSearchViewModel
+@{
+    ViewData["Title"] = "Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Regex regex = new Regex("<[^>]*>");
+}
+
+<!--left-->
+<div class="col-lg-8 left-blog-info-w3layouts-agileits text-left">
+
+    <div class="form-row">
+        <input type="hidden" id="keyword" value="@Model.Keyword" />
+        <input type="hidden" id="current-page" value="@Model.BlogListResultDto.CurrentPage" />
+        <div class="form-group col-md-6">
+            <select class="form-control" id="select-page-size">
+                <option selected="@(Model.BlogListResultDto.PageSize == 6 ? "selected" : null)" value="6">6</option>
+                <option selected="@(Model.BlogListResultDto.PageSize == 12 ? "selected" : null)" value="12">12</option>
+                <option selected="@(Model.BlogListResultDto.PageSize == 20 ? "selected" : null)" value="20">20</option>
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <select class="form-control" id="select-is-ascending">
+                <option selected="@(Model.BlogListResultDto.IsAscending == false ? "selected" : null)" value="false">En Yeni</option>
+                <option selected="@(Model.BlogListResultDto.IsAscending == true ? "selected" : null)" value="true">En Eski</option>
+            </select>
+        </div>
+
+    </div>
+
+
+    <div class="row mb-4">
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show col-lg-12 text-center" role="alert">
+                @TempData["Message"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        }
+
+        @foreach (var blog in Model.BlogListResultDto.BlogListDto)
+        {
+            <div class="col-md-6 card">
+                <div class="card-header ">
+                    <ul class="blog-icons my-1">
+                        <li>
+                            <p class="text-left">
+                                <i class="far fa-calendar-alt"></i> @blog.UpdatedDate.ToString("dd MMM, yyyy") | @blog.User.Username
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+
+                <img src="~/img/@blog.ImageUrl" class="card-img-top img-fluid" alt="@blog.Title">
+
+                <div class="card-body">
+                    <ul class="blog-icons my-1">
+                        <li>
+                            <a>
+                                <i class="far fa-comment"></i> @blog.CommentCount
+                            </a>
+                        </li>
+                        <li class="mx-3">
+                            <a>
+                                <i class="fa fa-eye"></i> @blog.ViewCount
+                            </a>
+                        </li>
+                    </ul>
+                    <div style="height: 200px; ">
+                        <h5 class="card-title ">
+                            <a>@blog.Title</a>
+                        </h5>
+                        <p class="card-text mb-3">
+                            @{
+                                blog.Content = regex.Replace(blog.Content, "");
+                            }
+                            @(blog.Content.Length > 100 ? @blog.Content.Substring(0, 100) : @blog.Content)..
+                        </p>
+                    </div>
+
+                    <a asp-controller="Blog" asp-action="Detail" asp-route-blogId="@blog.Id" class="btn btn-primary read-m mb-3">Devamını Oku &rarr; </a>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <!-- Pagination -->
+    <ul class="pagination justify-content-center mb-4">
+        @{
+            @if (Model.BlogListResultDto.ShowPrevious)
+            {
+
+                <li class="page-item">
+                    <a class="page-link" asp-route-currentPage="@(Model.BlogListResultDto.CurrentPage-1)" asp-route-isAscending="@Model.BlogListResultDto.IsAscending" asp-route-pageSize="@Model.BlogListResultDto.PageSize" asp-route-keyword="@Model.Keyword">Önceki</a>
+                </li>
+
+            }
+            @for (var i = 1; i <= Model.BlogListResultDto.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.BlogListResultDto.CurrentPage ? "active" : "")">
+                    @if (Model.BlogListResultDto.CategoryId != null)
+                    {
+                        <a class="page-link" asp-route-currentPage="@i" asp-route-isAscending="@Model.BlogListResultDto.IsAscending" asp-route-pageSize="@Model.BlogListResultDto.PageSize" asp-route-keyword="@Model.Keyword">@i</a>
+                    }
+                </li>
+            }
+            @if (Model.BlogListResultDto.ShowNext)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-currentPage="@(Model.BlogListResultDto.CurrentPage+1)" asp-route-isAscending="@Model.BlogListResultDto.IsAscending" asp-route-pageSize="@Model.BlogListResultDto.PageSize" asp-route-keyword="@Model.Keyword">Sonraki</a>
+                </li>
+            }
+        }
+    </ul>
+
+
+</div>
+<!--//left-->
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                const selectPageSize = $('#select-page-size');
+                const selectIsAscending = $('#select-is-ascending');
+                const categoryId = $('#category-id').val();
+                const currentPage = $('#current-page').val();
+                const categoryQuery = categoryId != null ? `&categoryId=${categoryId}` : null;
+                selectPageSize.on('change', function () {
+                    window.location = `/?pageSize=${selectPageSize.val()}&isAscending=${selectIsAscending.val()}${categoryQuery != null ? categoryQuery : null}&currentPage=${currentPage}`;
+                });
+                selectIsAscending.on('change', function () {
+                    window.location = `/?pageSize=${selectPageSize.val()}&isAscending=${selectIsAscending.val()}${categoryQuery != null ? categoryQuery : null}&currentPage=${currentPage}`;
+                });
+            });
+        });
+    </script>
+    }

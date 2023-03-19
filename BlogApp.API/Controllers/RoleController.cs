@@ -20,9 +20,9 @@ namespace BlogApp.API.Controllers
             var result = await _roleService.GetAllRolesAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<RoleListDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<RoleListDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]/{userId}")]
@@ -31,9 +31,9 @@ namespace BlogApp.API.Controllers
             var result = await _roleService.GetUserRoleAssignDtoAsync(userId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<UserRoleAssignDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<UserRoleAssignDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpPost("[action]")]
@@ -42,9 +42,9 @@ namespace BlogApp.API.Controllers
             var result = await _roleService.AssignAsync(userRoleAssignDto);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<UserRoleAssignDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<UserRoleAssignDto>.Success(result.StatusCode, result.Data));
         }
     }
 }

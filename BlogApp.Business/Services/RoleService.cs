@@ -15,35 +15,35 @@ namespace BlogApp.Business.Services
         public RoleService(IGenericRepository<Role> repository, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, unitOfWork, mapper)
         {
         }
-        public async Task<CustomResponse<RoleListDto>> GetAllRolesAsync()
+        public async Task<CustomResponseDto<RoleListDto>> GetAllRolesAsync()
         {
             var roles = await UnitOfWork.Roles.GetAllAsync(null);
 
             if (roles.Any())
             {
-                return CustomResponse<RoleListDto>.Success(200, new RoleListDto
+                return CustomResponseDto<RoleListDto>.Success(200, new RoleListDto
                 {
                     Roles = Mapper.Map<IList<RoleDto>>(roles)
                 });
             }
-            return CustomResponse<RoleListDto>.Fail(404, "Bir role bulunamadı!");
+            return CustomResponseDto<RoleListDto>.Fail(404, "Bir role bulunamadı!");
         }
 
-        public async Task<CustomResponse<RoleListDto>> GetAllByUserIdAsync(int userId)
+        public async Task<CustomResponseDto<RoleListDto>> GetAllByUserIdAsync(int userId)
         {
             var userRoles = await UnitOfWork.Roles.GetAllAsync(x => x.UserRoles.Any(x => x.UserId == userId));
 
             if (userRoles == null)
             {
-                return CustomResponse<RoleListDto>.Fail(404, $"Id: {userId} kullanıcısının rolleri bulunamadı!");
+                return CustomResponseDto<RoleListDto>.Fail(404, $"Id: {userId} kullanıcısının rolleri bulunamadı!");
             }
-            return CustomResponse<RoleListDto>.Success(200, new RoleListDto
+            return CustomResponseDto<RoleListDto>.Success(200, new RoleListDto
             {
                 Roles = Mapper.Map<IList<RoleDto>>(userRoles)
             });
         }
 
-        public async Task<CustomResponse<UserRoleAssignDto>> GetUserRoleAssignDtoAsync(int userId)
+        public async Task<CustomResponseDto<UserRoleAssignDto>> GetUserRoleAssignDtoAsync(int userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
             var roles = await UnitOfWork.Roles.GetAllAsync(null);
@@ -66,10 +66,10 @@ namespace BlogApp.Business.Services
                 };
                 userRoleAssignDto.RoleAssignments.Add(roleAssignDto);
             }
-            return CustomResponse<UserRoleAssignDto>.Success(200, userRoleAssignDto);
+            return CustomResponseDto<UserRoleAssignDto>.Success(200, userRoleAssignDto);
         }
 
-        public async Task<CustomResponse<UserRoleAssignDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto)
+        public async Task<CustomResponseDto<UserRoleAssignDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto)
         {
             var user = await UnitOfWork.Users.Where(x => x.Id == userRoleAssignDto.UserId).Include(x => x.UserRoles).SingleOrDefaultAsync();
 
@@ -108,7 +108,7 @@ namespace BlogApp.Business.Services
             }
             UnitOfWork.Users.Update(user);
             await UnitOfWork.CommitAsync();
-            return CustomResponse<UserRoleAssignDto>.Success(200, userRoleAssignDto);
+            return CustomResponseDto<UserRoleAssignDto>.Success(200, userRoleAssignDto);
 
         }
     }

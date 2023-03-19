@@ -34,9 +34,9 @@ namespace BlogApp.API.Controllers
 
                 if (user.Errors.Any())//aynı kullanıcı adı kayıtlıysa girer
                 {
-                    return CreateActionResult(CustomResponse<UserRegisterDto>.Fail(user.StatusCode, user.Errors));
+                    return CreateActionResult(CustomResponseDto<UserRegisterDto>.Fail(user.StatusCode, user.Errors));
                 }
-                return CreateActionResult(CustomResponse<UserRegisterDto>.Success(user.StatusCode, user.Data));
+                return CreateActionResult(CustomResponseDto<UserRegisterDto>.Success(user.StatusCode, user.Data));
             }
 
             foreach (var error in result.Errors)
@@ -45,7 +45,7 @@ namespace BlogApp.API.Controllers
             }
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpPost("[action]")]
@@ -58,7 +58,7 @@ namespace BlogApp.API.Controllers
                 var token = TokenGenerator.GenerateToken(result.Data, roleResult.Data);
                 return Created("", token);
             }
-            return CreateActionResult(CustomResponse<CheckUserResponseDto>.Fail(result.StatusCode, result.Errors));
+            return CreateActionResult(CustomResponseDto<CheckUserResponseDto>.Fail(result.StatusCode, result.Errors));
         }
     }
 }

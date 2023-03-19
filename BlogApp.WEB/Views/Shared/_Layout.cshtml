@@ -1,49 +1,121 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BlogApp.WEB</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/BlogApp.WEB.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BlogApp.WEB</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+﻿@{
+    Layout = null;
+}
 
-    <footer class="border-top footer text-muted">
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <title>Blog Kervanı</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Blog Kervanı, en güncel ve özgün blog yazılarına ev sahipliği yapan bir platformdur. Tüm ilgi alanlarına yönelik yazıların yer aldığı Blog Kervanı'nda keşfedeceğiniz birçok ilginç konu bulacaksınız. Ücretsiz üyelik ile her gün yeni bir şeyler öğrenin ve deneyimleyin." />
+
+    <script>
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+    </script>
+    <link href="~/css/bootstrap.css" rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="~/css/single.css">
+    <link href="~/css/style.css" rel='stylesheet' type='text/css' />
+    <link href="~/css/fontawesome-all.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/fontawesome-all.min.css">
+    <link href="//fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800"
+          rel="stylesheet">
+</head>
+
+<body>
+    <!--Header-->
+
+    <header>
+
+        @await Html.PartialAsync("_HeaderPartial")
+
+        @await Html.PartialAsync("_MainMenuPartial")
+
+    </header>
+    <!--//header-->
+    <!--/banner-->
+    @*    <div class="banner-inner">
+    </div>
+    <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+    <a href="index.html">Home</a>
+    </li>
+    <li class="breadcrumb-item active">Blog2</li>
+    </ol>*@
+    <!--//banner-->
+    <!--/main-->
+    <section class="main-content-w3layouts-agileits">
         <div class="container">
-            &copy; 2022 - BlogApp.WEB - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <h3 class="tittle">Blog Paylaşımları</h3>
+            <div class="row inner-sec">
+
+                @RenderBody()
+
+                @await Component.InvokeAsync("RightSideBar")
+            </div>
+        </div>
+    </section>
+    <!--//main-->
+    <!--footer-->
+    @*@await Html.PartialAsync("_FooterPartial")*@
+    <footer>
+        <div class="w3layouts-agile-copyrightbottom text-center">
+            <p>
+                © @DateTime.Now.Year Blog Kervanı. Tüm Hakları Saklıdır.
+            </p>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <!---->
+    <!-- js -->
+    <script src="~/js/jquery-2.2.3.min.js"></script>
+    <!-- //js -->
+    <!--/ start-smoth-scrolling -->
+    <script src="~/js/move-top.js"></script>
+    <script src="~/js/easing.js"></script>
+    <script>
+        jQuery(document).ready(function ($) {
+            $(".scroll").click(function (event) {
+                event.preventDefault();
+                $('html,body').animate({
+                    scrollTop: $(this.hash).offset().top
+                }, 900);
+            });
+        });
+    </script>
+    <!--// end-smoth-scrolling -->
+
+    <script>
+        $(document).ready(function () {
+            /*
+                                    var defaults = {
+                                            containerID: 'toTop', // fading element id
+                                        containerHoverID: 'toTopHover', // fading element hover id
+                                        scrollSpeed: 1200,
+                                        easingType: 'linear'
+                                        };
+                                    */
+
+            $().UItoTop({
+                easingType: 'easeOutQuart'
+            });
+
+        });
+    </script>
+    <a href="#home" class="scroll" id="toTop" style="display: block;">
+        <span id="toTopHover" style="opacity: 1;"> </span>
+    </a>
+
+    <!-- //Custom-JavaScript-File-Links -->
+    <script src="~/js/jquery-2.2.3.min.js"></script>
+    <script src="~/js/bootstrap.js"></script>
+    @await RenderSectionAsync("Scripts",false)
 </body>
+
 </html>

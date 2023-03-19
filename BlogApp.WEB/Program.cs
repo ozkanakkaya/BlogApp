@@ -1,4 +1,7 @@
+using BlogApp.WEB.Configurations;
 using BlogApp.WEB.Services;
+using Microsoft.Extensions.DependencyInjection;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,13 @@ builder.Services.AddHttpClient<BlogApiService>(opt =>
 {
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
 });
+
+builder.Services.AddHttpClient<CategoryApiService>(opt =>
+{
+	opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
+});
+
+builder.Services.Configure<BlogRightSideBarWidgetOptions>(builder.Configuration.GetSection("BlogRightSideBarWidgetOptions"));
 
 var app = builder.Build();
 

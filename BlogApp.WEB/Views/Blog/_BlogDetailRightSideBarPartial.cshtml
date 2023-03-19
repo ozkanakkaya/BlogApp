@@ -1,0 +1,57 @@
+﻿@model BlogApp.WEB.Models.BlogDetailRightSideBarViewModel
+
+<div class="card my-4">
+    <img src="~/img/@Model.User.ImageUrl" class="card-img-top text-center image-blog mt-1 mb-1" alt="@Model.User.Username" />
+    <h5 class="card-header align-content-center" style="font-family:Tahoma; text-align:center;">@Model.User.Username</h5>
+    <div class="card-body">
+        <p class="card-text text-center">@Model.User.About</p>
+        @if (Model.User.GitHubLink != null || Model.User.WebsiteLink != null)
+        {
+            <div class="card-footer text-center">
+                <p>Sosyal Medya Linkleri</p>
+
+                @if (Model.User.GitHubLink != null)
+                {
+                    <a href="#" target="_blank"><span class="fab fa-github-square"></span></a>
+                }
+
+                @if (Model.User.WebsiteLink != null)
+                {
+                    <a href="#" target="_blank"><span class="fas fa-home"></span></a>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="tech-btm">
+        <h4>@Model.Header</h4>
+
+        <div class="blog-grids row mb-3">
+
+            @foreach (var blog in Model.BlogListDto)
+            {
+                if (blog.Id != (int)ViewData["Id"])
+                {
+                    <div class="col-md-5 blog-grid-left">
+                        <a asp-controller="Blog" asp-action="Detail" asp-route-blogId="@blog.Id">
+                            <img src="~/img/@blog.ImageUrl" class="card-img-top img-fluid" alt="">
+                        </a>
+                    </div>
+                    <div class="col-md-7 blog-grid-right">
+
+                        <h5>
+                            <a asp-controller="Blog" asp-action="Detail" asp-route-blogId="@blog.Id"> @blog.Title </a>
+                        </h5>
+                        <div class="sub-meta">
+                            <span>
+                                <i class="far fa-clock"></i> @blog.UpdatedDate.ToString("dd MMM, yyyy")
+                                <i class="fa fa-eye"></i> @blog.ViewCount
+                            </span>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+

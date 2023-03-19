@@ -35,7 +35,7 @@ namespace BlogApp.API.Controllers
 
                 var addResult = await _blogService.AddBlogWithTagsAndCategoriesAsync(blogCreateDto);
                 //if (!addResult.Errors.Any())
-                return CreateActionResult(CustomResponse<BlogCreateDto>.Success(201, addResult.Data));
+                return CreateActionResult(CustomResponseDto<BlogCreateDto>.Success(201, addResult.Data));
                 //return CreateActionResult(CustomResponse<BlogCreateDto>.Fail(addResult.StatusCode, addResult.Errors));
             }
 
@@ -46,7 +46,7 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpPut]
@@ -59,7 +59,7 @@ namespace BlogApp.API.Controllers
                 var resultUpdate = await _blogService.UpdateBlogAsync(blogUpdateDto);
                 if (resultUpdate.StatusCode == 204)
                 {
-                    return CreateActionResult(CustomResponse<NoContent>.Success(204));
+                    return CreateActionResult(CustomResponseDto<NoContent>.Success(204));
                 }
             }
 
@@ -70,7 +70,7 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpPut("[action]/{blogId}")]
@@ -79,9 +79,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.DeleteAsync(blogId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+                return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpGet]//api/blogs
@@ -90,9 +90,9 @@ namespace BlogApp.API.Controllers
             var blogs = await _blogService.GetAllByActiveAsync();
             if (blogs.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, blogs.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(200, blogs.Data));
         }
 
         [HttpGet("[action]")]
@@ -101,9 +101,9 @@ namespace BlogApp.API.Controllers
             var blogs = await _blogService.GetAllByNonDeletedAsync();
             if (blogs.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, blogs.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, blogs.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(200, blogs.Data));
         }
 
         [HttpGet("[action]")]
@@ -112,9 +112,9 @@ namespace BlogApp.API.Controllers
             var deletedBlogs = await _blogService.GetAllByDeletedAsync();
             if (deletedBlogs.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, deletedBlogs.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, deletedBlogs.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, deletedBlogs.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(200, deletedBlogs.Data));
         }
 
         [HttpGet("[action]/{userId}")]
@@ -123,9 +123,9 @@ namespace BlogApp.API.Controllers
             var blogs = await _blogService.GetAllByUserIdAsync(userId);
             if (blogs.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, blogs.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, blogs.Errors));
             }
-            return CreateActionResult(CustomResponse<PersonalBlogDto>.Success(200, blogs.Data));
+            return CreateActionResult(CustomResponseDto<PersonalBlogDto>.Success(200, blogs.Data));
         }
 
         [HttpGet("[action]")]
@@ -134,9 +134,9 @@ namespace BlogApp.API.Controllers
             var deletedBlogs = await _blogService.GetAllBlogsAsync();
             if (deletedBlogs.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, deletedBlogs.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, deletedBlogs.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(200, deletedBlogs.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(200, deletedBlogs.Data));
         }
 
         [HttpDelete("{blogId}")]
@@ -145,9 +145,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.HardDeleteAsync(blogId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+            return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
         }
 
         [HttpPut("[action]/{blogId}")]
@@ -156,9 +156,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.UndoDeleteAsync(blogId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+            return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
         }
 
         [HttpGet("[action]")]
@@ -168,10 +168,10 @@ namespace BlogApp.API.Controllers
 
             if (searchResult.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(searchResult.StatusCode, searchResult.Errors));
+                return CreateActionResult(CustomResponseDto<BlogListResultDto>.Fail(searchResult.StatusCode, searchResult.Errors));
             }
 
-            return CreateActionResult(CustomResponse<BlogViewModel>.Success(200, searchResult.Data));
+            return CreateActionResult(CustomResponseDto<BlogListResultDto>.Success(searchResult.StatusCode, searchResult.Data));
         }
 
         [HttpGet("[action]")]
@@ -181,9 +181,9 @@ namespace BlogApp.API.Controllers
 
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(result.StatusCode, result.Data));
 
         }
 
@@ -196,10 +196,10 @@ namespace BlogApp.API.Controllers
                 );
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
 
-            return CreateActionResult(CustomResponse<BlogViewModel>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<BlogListResultDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -208,9 +208,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.CountTotalBlogsAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -219,9 +219,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.CountActiveBlogsAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -230,9 +230,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.CountInactiveBlogsAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -241,9 +241,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.CountByDeletedBlogsAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -252,9 +252,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.CountByNonDeletedBlogsAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(400, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]/{blogId}")]
@@ -263,9 +263,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.IncreaseViewCountAsync(blogId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<string>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<string>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]/{categoryId}")]
@@ -275,9 +275,9 @@ namespace BlogApp.API.Controllers
 
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -287,9 +287,9 @@ namespace BlogApp.API.Controllers
 
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -298,9 +298,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.GetAllBlogsFilteredAsync(categoryId, userId, isActive, isDeleted, currentPage, pageSize, orderBy, isAscending, includeCategory, includeTag, includeComments, includeUser);
             if (!result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<BlogViewModel>.Success(200, result.Data));
+                return CreateActionResult(CustomResponseDto<BlogListResultDto>.Success(200, result.Data));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpGet("[action]/{blogId}")]
@@ -310,9 +310,9 @@ namespace BlogApp.API.Controllers
 
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<BlogListDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<BlogListDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -322,9 +322,9 @@ namespace BlogApp.API.Controllers
 
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<BlogListDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<BlogListDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]/{tagId}")]
@@ -334,9 +334,9 @@ namespace BlogApp.API.Controllers
 
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<List<BlogListDto>>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(result.StatusCode, result.Data));
         }
     }
 }

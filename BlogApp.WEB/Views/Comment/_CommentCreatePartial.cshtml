@@ -1,0 +1,14 @@
+﻿@model BlogApp.Core.DTOs.Concrete.CommentCreateDto
+
+<div class="comment-top">
+    <h4>Yorum Yap</h4>
+    <div class="comment-bottom">
+        <form asp-controller="Comment" asp-action="Add" method="post" itemid="form-comment-add">
+            <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+            <div asp-validation-summary="All" class="text-danger" id="validation-summary" aria-hidden="true" style="display: none;"></div>
+            <input asp-for="BlogId" type="hidden" />
+            <textarea class="form-control" rows="3" placeholder="Yorum..." required="" asp-for="Content"></textarea>
+            <button type="submit" class="btn btn-primary submit">Gönder</button>
+        </form>
+    </div>
+</div>

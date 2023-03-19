@@ -6,17 +6,17 @@ namespace BlogApp.Core.Services
 {
     public interface ITagService : IService<Tag>
     {
-        Task<CustomResponse<TagDto>> DeleteAsync(int tagId);
-        Task<CustomResponse<TagDto>> UndoDeleteAsync(int tagId);
-        Task<CustomResponse<NoContent>> HardDeleteAsync(int tagId);
-        Task<CustomResponse<TagListDto>> GetAllByNonDeletedAsync();
-        Task<CustomResponse<TagListDto>> GetAllByActiveAsync();
-        Task<CustomResponse<TagListDto>> GetAllTagsAsync();
-        Task<CustomResponse<TagUpdateDto>> GetTagUpdateDtoAsync(int tagId);
-        Task<CustomResponse<NoContent>> UpdateAsync(TagUpdateDto tagUpdateDto);
-        Task<CustomResponse<int>> CountTotalAsync();
-        Task<CustomResponse<int>> CountByNonDeletedAsync();
-        Task<CustomResponse<TagListDto>> GetAllByDeletedAsync();
+        Task<CustomResponseDto<TagDto>> DeleteAsync(int tagId);
+        Task<CustomResponseDto<TagDto>> UndoDeleteAsync(int tagId);
+        Task<CustomResponseDto<NoContent>> HardDeleteAsync(int tagId);
+        Task<CustomResponseDto<TagListDto>> GetAllByNonDeletedAsync();
+        Task<CustomResponseDto<TagListDto>> GetAllByActiveAsync();
+        Task<CustomResponseDto<TagListDto>> GetAllTagsAsync();
+        Task<CustomResponseDto<TagUpdateDto>> GetTagUpdateDtoAsync(int tagId);
+        Task<CustomResponseDto<NoContent>> UpdateAsync(TagUpdateDto tagUpdateDto);
+        Task<CustomResponseDto<int>> CountTotalAsync();
+        Task<CustomResponseDto<int>> CountByNonDeletedAsync();
+        Task<CustomResponseDto<TagListDto>> GetAllByDeletedAsync();
 
     }
 }

@@ -2,9 +2,9 @@
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class BlogViewModel : BaseDto, IDto
+    public class BlogListResultDto : BaseDto, IDto
     {
-        public List<BlogListDto> BlogListDto { get; set; }
+        public IList<BlogListDto> BlogListDto { get; set; }
         public string Keyword { get; set; }
         public int? CategoryId { get; set; }
     }

@@ -26,7 +26,7 @@ namespace BlogApp.Business.Services
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<CustomResponse<CheckUserResponseDto>> CheckUserAsync(UserLoginDto loginDto)
+        public async Task<CustomResponseDto<CheckUserResponseDto>> CheckUserAsync(UserLoginDto loginDto)
         {
             var result = _loginValidator.Validate(loginDto);
             if (result.IsValid)
@@ -40,16 +40,16 @@ namespace BlogApp.Business.Services
                     if (resultPassword == PasswordVerificationResult.Success)
                     {
                         var userDto = Mapper.Map<CheckUserResponseDto>(user);
-                        return CustomResponse<CheckUserResponseDto>.Success(200, userDto);
+                        return CustomResponseDto<CheckUserResponseDto>.Success(200, userDto);
                     }
-                    return CustomResponse<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola hatalıdır.");
+                    return CustomResponseDto<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola hatalıdır.");
                 }
-                return CustomResponse<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola hatalıdır.");
+                return CustomResponseDto<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola hatalıdır.");
             }
-            return CustomResponse<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola boş geçilemez.");
+            return CustomResponseDto<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola boş geçilemez.");
         }
 
-        public async Task<CustomResponse<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId)
+        public async Task<CustomResponseDto<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId)
         {
             var hasUser = await UnitOfWork.Users.AnyAsync(x => x.Username == dto.Username);
 
@@ -71,12 +71,12 @@ namespace BlogApp.Business.Services
                 await UnitOfWork.Users.AddAsync(user);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponse<UserRegisterDto>.Success(201, dto);
+                return CustomResponseDto<UserRegisterDto>.Success(201, dto);
             }
-            return CustomResponse<UserRegisterDto>.Fail(400, $"'{dto.Username}' kullanıcı adı zaten kayıtlı!");
+            return CustomResponseDto<UserRegisterDto>.Fail(400, $"'{dto.Username}' kullanıcı adı zaten kayıtlı!");
         }
 
-        public async Task<CustomResponse<List<UserListDto>>> GetAllByActiveAsync()
+        public async Task<CustomResponseDto<List<UserListDto>>> GetAllByActiveAsync()
         {
             var users = await UnitOfWork.Users.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.UserRoles);
 
@@ -84,12 +84,12 @@ namespace BlogApp.Business.Services
             {
                 var usersDto = users.Select(user => Mapper.Map<UserListDto>(user)).ToList();
 
-                return CustomResponse<List<UserListDto>>.Success(200, usersDto);
+                return CustomResponseDto<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponse<List<UserListDto>>.Fail(404, "Herhangi bir kullanıcı bulunamadı!");
+            return CustomResponseDto<List<UserListDto>>.Fail(404, "Herhangi bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<UserListDto>> GetUserByIdAsync(int userId)
+        public async Task<CustomResponseDto<UserListDto>> GetUserByIdAsync(int userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId && x.IsActive && !x.IsDeleted, x => x.UserRoles);
 
@@ -97,12 +97,12 @@ namespace BlogApp.Business.Services
             {
                 var userDto = Mapper.Map<UserListDto>(user);
 
-                return CustomResponse<UserListDto>.Success(200, userDto);
+                return CustomResponseDto<UserListDto>.Success(200, userDto);
             }
-            return CustomResponse<UserListDto>.Fail(404, "Gösterilecek bir kullanıcı bulunamadı!");
+            return CustomResponseDto<UserListDto>.Fail(404, "Gösterilecek bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> DeleteAsync(int userId)
+        public async Task<CustomResponseDto<NoContent>> DeleteAsync(int userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
             if (user != null)
@@ -112,12 +112,12 @@ namespace BlogApp.Business.Services
 
                 UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
-            return CustomResponse<NoContent>.Fail(404, $"{userId} numaralı kullanıcı bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(404, $"{userId} numaralı kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> UndoDeleteAsync(int userId)//Admin-Arşiv-Users
+        public async Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int userId)//Admin-Arşiv-Users
         {
             var result = await UnitOfWork.Users.AnyAsync(x => x.Id == userId);
             if (result)
@@ -127,12 +127,12 @@ namespace BlogApp.Business.Services
                 user.IsActive = true;
                 UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
-            return CustomResponse<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> HardDeleteAsync(int userId)//Admin-Arşiv-Users
+        public async Task<CustomResponseDto<NoContent>> HardDeleteAsync(int userId)//Admin-Arşiv-Users
         {
             var result = await UnitOfWork.Users.AnyAsync(x => x.Id == userId);
             if (result)
@@ -147,12 +147,12 @@ namespace BlogApp.Business.Services
                 if (imageUrl != "userImages/defaultUser.png")
                     await _imageHelper.DeleteAsync(imageUrl);
 
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
-            return CustomResponse<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<List<UserListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
+        public async Task<CustomResponseDto<List<UserListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
         {
             var users = await UnitOfWork.Users.GetAllAsync(x => x.IsDeleted, x => x.UserRoles);
 
@@ -160,12 +160,12 @@ namespace BlogApp.Business.Services
             {
                 var usersDto = users.Select(user => Mapper.Map<UserListDto>(user)).ToList();
 
-                return CustomResponse<List<UserListDto>>.Success(200, usersDto);
+                return CustomResponseDto<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponse<List<UserListDto>>.Fail(404, "Silinmiş bir kullanıcı bulunamadı!");
+            return CustomResponseDto<List<UserListDto>>.Fail(404, "Silinmiş bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<List<UserListDto>>> GetAllByInactiveAsync()//Admin-Arşiv
+        public async Task<CustomResponseDto<List<UserListDto>>> GetAllByInactiveAsync()//Admin-Arşiv
         {
             var users = await UnitOfWork.Users.GetAllAsync(x => !x.IsActive & !x.IsDeleted, x => x.UserRoles);
 
@@ -173,12 +173,12 @@ namespace BlogApp.Business.Services
             {
                 var usersDto = users.Select(user => Mapper.Map<UserListDto>(user)).ToList();
 
-                return CustomResponse<List<UserListDto>>.Success(200, usersDto);
+                return CustomResponseDto<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponse<List<UserListDto>>.Fail(404, "Aktif olmayan bir kullanıcı bulunamadı!");
+            return CustomResponseDto<List<UserListDto>>.Fail(404, "Aktif olmayan bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> UpdateUserAsync(UserUpdateDto appUserUpdateDto)
+        public async Task<CustomResponseDto<NoContent>> UpdateUserAsync(UserUpdateDto appUserUpdateDto)
         {
             bool isNewImageUploaded = false;
 
@@ -207,10 +207,10 @@ namespace BlogApp.Business.Services
                 await _imageHelper.DeleteAsync(oldUserImage);
             }
 
-            return CustomResponse<NoContent>.Success(204);
+            return CustomResponseDto<NoContent>.Success(204);
         }
 
-        public async Task<CustomResponse<NoContent>> PasswordChangeAsync(UserPasswordChangeDto userPasswordChangeDto, string userId)
+        public async Task<CustomResponseDto<NoContent>> PasswordChangeAsync(UserPasswordChangeDto userPasswordChangeDto, string userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == int.Parse(userId));
 
@@ -223,26 +223,26 @@ namespace BlogApp.Business.Services
                 UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
             else
             {
-                return CustomResponse<NoContent>.Fail(400, "Mevcut şifrenizi kontrol ediniz!");
+                return CustomResponseDto<NoContent>.Fail(400, "Mevcut şifrenizi kontrol ediniz!");
             }
         }
 
-        public async Task<CustomResponse<NoContent>> ActivateUserAsync(int userId)
+        public async Task<CustomResponseDto<NoContent>> ActivateUserAsync(int userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
             if (user.IsActive)
-                return CustomResponse<NoContent>.Fail(400, "Kullanıcı zaten aktif!");
+                return CustomResponseDto<NoContent>.Fail(400, "Kullanıcı zaten aktif!");
             user.IsActive = true;
             UnitOfWork.Users.Update(user);
             await UnitOfWork.CommitAsync();
-            return CustomResponse<NoContent>.Success(204);
+            return CustomResponseDto<NoContent>.Success(204);
         }
 
-        public async Task<CustomResponse<NoContent>> DeleteUserImageAsync(int userId)
+        public async Task<CustomResponseDto<NoContent>> DeleteUserImageAsync(int userId)
         {
             var user = UnitOfWork.Users.Where(x => x.Id == userId).SingleOrDefault();
 
@@ -253,24 +253,24 @@ namespace BlogApp.Business.Services
                 await UnitOfWork.CommitAsync();
                 await _imageHelper.DeleteAsync(user.ImageUrl);
 
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
 
-            return CustomResponse<NoContent>.Fail(400, "Silinecek bir profil fotoğrafı bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(400, "Silinecek bir profil fotoğrafı bulunamadı!");
         }
 
-        public async Task<CustomResponse<int>> CountTotalAsync()
+        public async Task<CustomResponseDto<int>> CountTotalAsync()
         {
             var categoriesCount = await UnitOfWork.Users.CountAsync();
 
-            return categoriesCount > -1 ? CustomResponse<int>.Success(200, categoriesCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {categoriesCount}");
+            return categoriesCount > -1 ? CustomResponseDto<int>.Success(200, categoriesCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {categoriesCount}");
         }
 
-        public async Task<CustomResponse<int>> CountByNonDeletedAsync()
+        public async Task<CustomResponseDto<int>> CountByNonDeletedAsync()
         {
             var categoriesCount = await UnitOfWork.Users.CountAsync(x => !x.IsDeleted);
 
-            return categoriesCount > -1 ? CustomResponse<int>.Success(200, categoriesCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {categoriesCount}");
+            return categoriesCount > -1 ? CustomResponseDto<int>.Success(200, categoriesCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {categoriesCount}");
         }
     }
 }

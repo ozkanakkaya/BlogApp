@@ -6,20 +6,20 @@ namespace BlogApp.Core.Services
 {
     public interface IUserService : IService<User>
     {
-        Task<CustomResponse<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId);
-        Task<CustomResponse<CheckUserResponseDto>> CheckUserAsync(UserLoginDto dto);
-        Task<CustomResponse<List<UserListDto>>> GetAllByActiveAsync();
-        Task<CustomResponse<UserListDto>> GetUserByIdAsync(int userId);
-        Task<CustomResponse<NoContent>> DeleteAsync(int userId);
-        Task<CustomResponse<NoContent>> UndoDeleteAsync(int userId);
-        Task<CustomResponse<NoContent>> HardDeleteAsync(int userId);
-        Task<CustomResponse<List<UserListDto>>> GetAllByDeletedAsync();
-        Task<CustomResponse<List<UserListDto>>> GetAllByInactiveAsync();
-        Task<CustomResponse<NoContent>> UpdateUserAsync(UserUpdateDto appUserUpdateDto);
-        Task<CustomResponse<NoContent>> PasswordChangeAsync(UserPasswordChangeDto appUserPasswordChangeDto, string userId);
-        Task<CustomResponse<NoContent>> ActivateUserAsync(int userId);
-        Task<CustomResponse<NoContent>> DeleteUserImageAsync(int userId);
-        Task<CustomResponse<int>> CountTotalAsync();
-        Task<CustomResponse<int>> CountByNonDeletedAsync();
+        Task<CustomResponseDto<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId);
+        Task<CustomResponseDto<CheckUserResponseDto>> CheckUserAsync(UserLoginDto dto);
+        Task<CustomResponseDto<List<UserListDto>>> GetAllByActiveAsync();
+        Task<CustomResponseDto<UserListDto>> GetUserByIdAsync(int userId);
+        Task<CustomResponseDto<NoContent>> DeleteAsync(int userId);
+        Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int userId);
+        Task<CustomResponseDto<NoContent>> HardDeleteAsync(int userId);
+        Task<CustomResponseDto<List<UserListDto>>> GetAllByDeletedAsync();
+        Task<CustomResponseDto<List<UserListDto>>> GetAllByInactiveAsync();
+        Task<CustomResponseDto<NoContent>> UpdateUserAsync(UserUpdateDto appUserUpdateDto);
+        Task<CustomResponseDto<NoContent>> PasswordChangeAsync(UserPasswordChangeDto appUserPasswordChangeDto, string userId);
+        Task<CustomResponseDto<NoContent>> ActivateUserAsync(int userId);
+        Task<CustomResponseDto<NoContent>> DeleteUserImageAsync(int userId);
+        Task<CustomResponseDto<int>> CountTotalAsync();
+        Task<CustomResponseDto<int>> CountByNonDeletedAsync();
     }
 }

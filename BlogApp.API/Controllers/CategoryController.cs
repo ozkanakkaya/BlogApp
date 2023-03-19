@@ -30,11 +30,11 @@ namespace BlogApp.API.Controllers
 
                 if (!resultAdd.Errors.Any())
                 {
-                    return CreateActionResult(CustomResponse<CategoryCreateDto>.Success(resultAdd.StatusCode, resultAdd.Data));
+                    return CreateActionResult(CustomResponseDto<CategoryCreateDto>.Success(resultAdd.StatusCode, resultAdd.Data));
                 }
                 else
                 {
-                    return CreateActionResult(CustomResponse<CategoryCreateDto>.Fail(resultAdd.StatusCode, resultAdd.Errors));
+                    return CreateActionResult(CustomResponseDto<CategoryCreateDto>.Fail(resultAdd.StatusCode, resultAdd.Errors));
                 }
             }
 
@@ -42,40 +42,40 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
-        [HttpPut("[action]")]
+        [HttpPut("[action]/{categoryId}")]
         public async Task<IActionResult> Delete(int categoryId)
         {
             var result = await _categoryService.DeleteAsync(categoryId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<CategoryDto>.Success(result.StatusCode, result.Data));
+                return CreateActionResult(CustomResponseDto<CategoryDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
-        [HttpPut("[action]")]
+        [HttpPut("[action]/{categoryId}")]
         public async Task<IActionResult> UndoDelete(int categoryId)
         {
             var result = await _categoryService.UndoDeleteAsync(categoryId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CategoryDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<CategoryDto>.Success(result.StatusCode, result.Data));
         }
 
-        [HttpDelete("{categoryId}")]
+        [HttpDelete("[action]/{categoryId}")]
         public async Task<IActionResult> HardDelete(int categoryId)
         {
             var result = await _categoryService.HardDeleteAsync(categoryId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+            return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
         }
 
         [HttpGet("[action]")]
@@ -84,9 +84,9 @@ namespace BlogApp.API.Controllers
             var result = await _categoryService.GetAllByNonDeletedAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CategoryListDto>.Success(200, result.Data));
+            return CreateActionResult(CustomResponseDto<CategoryListDto>.Success(200, result.Data));
         }
 
         [HttpGet]
@@ -95,9 +95,9 @@ namespace BlogApp.API.Controllers
             var result = await _categoryService.GetAllByActiveAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CategoryListDto>.Success(200, result.Data));
+            return CreateActionResult(CustomResponseDto<CategoryListDto>.Success(200, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -106,20 +106,20 @@ namespace BlogApp.API.Controllers
             var result = await _categoryService.GetAllCategoriesAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CategoryListDto>.Success(200, result.Data));
+            return CreateActionResult(CustomResponseDto<CategoryListDto>.Success(200, result.Data));
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]/{categoryId}")]
         public async Task<IActionResult> GetCategoryUpdateDto(int categoryId)
         {
             var result = await _categoryService.GetCategoryUpdateDtoAsync(categoryId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<CategoryUpdateDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<CategoryUpdateDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpPut]
@@ -131,16 +131,16 @@ namespace BlogApp.API.Controllers
                 var resultUpdated = await _categoryService.UpdateAsync(categoryUpdateDto);
                 if (resultUpdated.Errors.Any())
                 {
-                    return CreateActionResult(CustomResponse<NoContent>.Fail(resultUpdated.StatusCode, resultUpdated.Errors));
+                    return CreateActionResult(CustomResponseDto<NoContent>.Fail(resultUpdated.StatusCode, resultUpdated.Errors));
                 }
-                return CreateActionResult(CustomResponse<NoContent>.Success(resultUpdated.StatusCode));
+                return CreateActionResult(CustomResponseDto<NoContent>.Success(resultUpdated.StatusCode));
             }
 
             result.Errors.ForEach(error => ModelState.AddModelError(error.PropertyName, error.ErrorMessage));
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpGet("[action]")]
@@ -149,9 +149,9 @@ namespace BlogApp.API.Controllers
             var result = await _categoryService.CountTotalAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -160,9 +160,9 @@ namespace BlogApp.API.Controllers
             var result = await _categoryService.CountByNonDeletedAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -171,9 +171,9 @@ namespace BlogApp.API.Controllers
             var deletedUsers = await _categoryService.GetAllByDeletedAsync();
             if (deletedUsers.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(deletedUsers.StatusCode, deletedUsers.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(deletedUsers.StatusCode, deletedUsers.Errors));
             }
-            return CreateActionResult(CustomResponse<CategoryListDto>.Success(deletedUsers.StatusCode, deletedUsers.Data));
+            return CreateActionResult(CustomResponseDto<CategoryListDto>.Success(deletedUsers.StatusCode, deletedUsers.Data));
         }
     }
 }

@@ -15,7 +15,7 @@ namespace BlogApp.Business.Services
         {
         }
 
-        public async Task<CustomResponse<TagDto>> DeleteAsync(int tagId)
+        public async Task<CustomResponseDto<TagDto>> DeleteAsync(int tagId)
         {
             var tag = await UnitOfWork.Tags.GetAsync(x => x.Id == tagId);
             if (tag != null)
@@ -26,12 +26,12 @@ namespace BlogApp.Business.Services
                 UnitOfWork.Tags.Update(tag);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponse<TagDto>.Success(200, Mapper.Map<TagDto>(tag));
+                return CustomResponseDto<TagDto>.Success(200, Mapper.Map<TagDto>(tag));
             }
-            return CustomResponse<TagDto>.Fail(404, $"{tagId} numaralı etiket bulunamadı!");
+            return CustomResponseDto<TagDto>.Fail(404, $"{tagId} numaralı etiket bulunamadı!");
         }
 
-        public async Task<CustomResponse<TagDto>> UndoDeleteAsync(int tagId)//Admin-Arşiv-Users
+        public async Task<CustomResponseDto<TagDto>> UndoDeleteAsync(int tagId)//Admin-Arşiv-Users
         {
             var result = await UnitOfWork.Tags.AnyAsync(x => x.Id == tagId);
             if (result)
@@ -41,12 +41,12 @@ namespace BlogApp.Business.Services
                 tag.IsActive = true;
                 UnitOfWork.Tags.Update(tag);
                 await UnitOfWork.CommitAsync();
-                return CustomResponse<TagDto>.Success(200, Mapper.Map<TagDto>(tag));
+                return CustomResponseDto<TagDto>.Success(200, Mapper.Map<TagDto>(tag));
             }
-            return CustomResponse<TagDto>.Fail(404, "Bir etiket bulunamadı!");
+            return CustomResponseDto<TagDto>.Fail(404, "Bir etiket bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> HardDeleteAsync(int tagId)
+        public async Task<CustomResponseDto<NoContent>> HardDeleteAsync(int tagId)
         {
             var result = await UnitOfWork.Tags.AnyAsync(x => x.Id == tagId);
             if (result)
@@ -56,66 +56,66 @@ namespace BlogApp.Business.Services
                 UnitOfWork.Tags.RemoveRange(tag);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponse<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(204);
             }
-            return CustomResponse<NoContent>.Fail(404, "Bir etiket bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(404, "Bir etiket bulunamadı!");
         }
 
-        public async Task<CustomResponse<TagListDto>> GetAllByNonDeletedAsync()//Aktif ve pasif tüm tagler
+        public async Task<CustomResponseDto<TagListDto>> GetAllByNonDeletedAsync()//Aktif ve pasif tüm tagler
         {
             var tags = await UnitOfWork.Tags.GetAllAsync(x => !x.IsDeleted);
 
             if (tags.Any())
             {
-                return CustomResponse<TagListDto>.Success(200, new TagListDto
+                return CustomResponseDto<TagListDto>.Success(200, new TagListDto
                 {
                     Tags = tags
                 });
             }
-            return CustomResponse<TagListDto>.Fail(404, "Bir etiket bulunamadı!");
+            return CustomResponseDto<TagListDto>.Fail(404, "Bir etiket bulunamadı!");
         }
 
-        public async Task<CustomResponse<TagListDto>> GetAllByActiveAsync()
+        public async Task<CustomResponseDto<TagListDto>> GetAllByActiveAsync()
         {
             var tags = await UnitOfWork.Tags.GetAllAsync(x => x.IsActive && !x.IsDeleted);
 
             if (tags.Any())
             {
-                return CustomResponse<TagListDto>.Success(200, new TagListDto
+                return CustomResponseDto<TagListDto>.Success(200, new TagListDto
                 {
                     Tags = tags
                 });
             }
-            return CustomResponse<TagListDto>.Fail(404, "Bir etiket bulunamadı!");
+            return CustomResponseDto<TagListDto>.Fail(404, "Bir etiket bulunamadı!");
         }
 
-        public async Task<CustomResponse<TagListDto>> GetAllTagsAsync()
+        public async Task<CustomResponseDto<TagListDto>> GetAllTagsAsync()
         {
             var tags = await UnitOfWork.Tags.GetAllAsync(null);
 
             if (tags.Any())
             {
-                return CustomResponse<TagListDto>.Success(200, new TagListDto
+                return CustomResponseDto<TagListDto>.Success(200, new TagListDto
                 {
                     Tags = tags
                 });
             }
-            return CustomResponse<TagListDto>.Fail(404, "Bir etiket bulunamadı!");
+            return CustomResponseDto<TagListDto>.Fail(404, "Bir etiket bulunamadı!");
         }
 
-        public async Task<CustomResponse<TagUpdateDto>> GetTagUpdateDtoAsync(int tagId)
+        public async Task<CustomResponseDto<TagUpdateDto>> GetTagUpdateDtoAsync(int tagId)
         {
             var result = await UnitOfWork.Tags.AnyAsync(x => x.Id == tagId);
             if (result)
             {
                 var tag = await UnitOfWork.Tags.GetAsync(x => x.Id == tagId);
 
-                return CustomResponse<TagUpdateDto>.Success(200, Mapper.Map<TagUpdateDto>(tag));
+                return CustomResponseDto<TagUpdateDto>.Success(200, Mapper.Map<TagUpdateDto>(tag));
             }
-            return CustomResponse<TagUpdateDto>.Fail(404, "Bir etiket bulunamadı!");
+            return CustomResponseDto<TagUpdateDto>.Fail(404, "Bir etiket bulunamadı!");
         }
 
-        public async Task<CustomResponse<NoContent>> UpdateAsync(TagUpdateDto tagUpdateDto)
+        public async Task<CustomResponseDto<NoContent>> UpdateAsync(TagUpdateDto tagUpdateDto)
         {
             var oldTag = await UnitOfWork.Tags.Where(x => x.Id == tagUpdateDto.Id).SingleOrDefaultAsync();
             var updatedTag = Mapper.Map<TagUpdateDto, Tag>(tagUpdateDto, oldTag);
@@ -123,24 +123,24 @@ namespace BlogApp.Business.Services
             UnitOfWork.Tags.Update(updatedTag);
             await UnitOfWork.CommitAsync();
 
-            return CustomResponse<NoContent>.Success(204);
+            return CustomResponseDto<NoContent>.Success(204);
         }
 
-        public async Task<CustomResponse<int>> CountTotalAsync()
+        public async Task<CustomResponseDto<int>> CountTotalAsync()
         {
             var tagsCount = await UnitOfWork.Tags.CountAsync();
 
-            return tagsCount > -1 ? CustomResponse<int>.Success(200, tagsCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {tagsCount}");
+            return tagsCount > -1 ? CustomResponseDto<int>.Success(200, tagsCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {tagsCount}");
         }
 
-        public async Task<CustomResponse<int>> CountByNonDeletedAsync()
+        public async Task<CustomResponseDto<int>> CountByNonDeletedAsync()
         {
             var tagsCount = await UnitOfWork.Tags.CountAsync(x => !x.IsDeleted);
 
-            return tagsCount > -1 ? CustomResponse<int>.Success(200, tagsCount) : CustomResponse<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {tagsCount}");
+            return tagsCount > -1 ? CustomResponseDto<int>.Success(200, tagsCount) : CustomResponseDto<int>.Fail(400, $"Hata ile karşılaşıldı! Dönen sayı: {tagsCount}");
         }
 
-        public async Task<CustomResponse<TagListDto>> GetAllByDeletedAsync()//Admin-Arşiv
+        public async Task<CustomResponseDto<TagListDto>> GetAllByDeletedAsync()//Admin-Arşiv
         {
             var tags = await UnitOfWork.Tags.GetAllAsync(x => x.IsDeleted);
 
@@ -148,12 +148,12 @@ namespace BlogApp.Business.Services
             {
                 var tagsDto = tags.Select(tag => Mapper.Map<TagListDto>(tag)).ToList();
 
-                return CustomResponse<TagListDto>.Success(200, new TagListDto
+                return CustomResponseDto<TagListDto>.Success(200, new TagListDto
                 {
                     Tags = tags
                 });
             }
-            return CustomResponse<TagListDto>.Fail(404, "Silinmiş bir etiket bulunamadı!");
+            return CustomResponseDto<TagListDto>.Fail(404, "Silinmiş bir etiket bulunamadı!");
         }
     }
 }

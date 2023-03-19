@@ -1,0 +1,136 @@
+﻿@using BlogApp.Core.DTOs.Concrete;
+@model BlogApp.WEB.Models.BlogDetailViewModel
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+<!--left-->
+<div class="col-lg-8 left-blog-info-w3layouts-agileits text-left">
+    <div class="blog-grid-top">
+        <div class="b-grid-top">
+
+            <div class="blog_info_left_grid">
+
+                <div class="card-text ">
+                    <ul class="blog-icons my-1">
+                        <li>
+                            <a class="text-left" style="font-family:Tahoma;">
+                                @*<a href="@Url.Action("ActionName", "ControllerName", new { id = Model.BlogListDto.CreatedByUserId })"></a>*@
+                                <i class="far fa-calendar-alt"></i> @Model.BlogListDto.CreatedByUsername tarafından @Model.BlogListDto.CreatedDate.ToString("dd MMM, yyyy") tarihinde paylaşılmıştır.
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <a>
+                    <img src="~/img/@Model.BlogListDto.ImageUrl" class="img-fluid" alt="@Model.BlogListDto.Title">
+                </a>
+            </div>
+
+            <hr />
+            <div class="text-center">
+                <div class="d-inline-block mr-5">
+                    <a href="#" class="text-left">
+                        <i class="far fa-thumbs-up"></i> @Model.BlogListDto.LikeCount
+                    </a>
+                </div>
+                <div class="d-inline-block mr-5">
+                    <span>
+                        <i class="far fa-comment"></i> @Model.BlogListDto.CommentCount
+                    </span>
+                </div>
+                <div class="d-inline-block">
+                    <span>
+                        <i class="fa fa-eye"></i> @Model.BlogListDto.ViewCount
+                    </span>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+        <h3>
+            <a>@Model.BlogListDto.Title </a>
+        </h3>
+        <p>
+            @Html.Raw(Model.BlogListDto.Content)
+        </p>
+
+        <div>
+            <h6 class="d-inline-block mr-3">Kategoriler :</h6>
+            @foreach (var category in Model.BlogListDto.Categories)
+            {
+                <span class="badge badge-success mr-2">
+                    @category.Name
+                </span>
+            }
+        </div>
+        <br />
+        <div>
+            <h6 class="d-inline-block mr-3">Etiketler :</h6>
+            @foreach (var tag in Model.BlogListDto.Tags)
+            {
+                <span class="badge badge-info mr-2">
+                    @tag.Name
+                </span>
+            }
+        </div>
+
+    </div>
+
+
+    @await Html.PartialAsync("~/Views/Comment/_CommentCreatePartial.cshtml", new CommentCreateDto { BlogId = Model.BlogListDto.Id })
+
+
+
+    <div class="comment-top">
+
+        @if (Model.BlogListDto.Comments.Count > 0)
+        {
+
+            <div class="card-header no-border">
+                <h3 class="text-center" style="font-family:Tahoma;">Yorumlar</h3>
+            </div>
+            <br />
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-header no-border">
+                    <h3 class="text-center" style="font-family:Tahoma;">İlk yorumu siz yapın.</h3>
+                </div>
+            </div>
+            <br />
+        }
+
+        @foreach (var comment in Model.BlogListDto.Comments)
+        {
+            <div class="media">
+                <img src="~/img/@comment.ImageUrl" alt="" class="img-fluid image-blog" />
+                <div class="media-body">
+
+                    <h5 class="mt-0">
+                        @comment.CreatedByUsername <span style="font-size: small;">(@comment.Firstname @comment.Lastname)</span>
+                    </h5>
+
+                    <p>@comment.Content </p>
+                </div>
+            </div>
+        }
+
+    </div>
+
+
+</div>
+
+<!--//left-->
+<!--right-->
+<aside class="col-lg-4 agileits-w3ls-right-blog-con text-right">
+    <div class="right-blog-info text-left">
+
+        @await Html.PartialAsync("_BlogDetailRightSideBarPartial", Model.BlogDetailRightSideBarViewModel)
+
+    </div>
+
+</aside>
+<!--//right-->

@@ -6,19 +6,19 @@ namespace BlogApp.Core.Services
 {
     public interface ICommentService : IService<Comment>
     {
-        Task<CustomResponse<CommentDto>> AddAsync(CommentCreateDto commentCreateDto, string userId);
-        Task<CustomResponse<CommentDto>> UpdateAsync(CommentUpdateDto commentUpdateDto);
-        Task<CustomResponse<CommentDto>> DeleteAsync(int commentId);
-        Task<CustomResponse<NoContent>> HardDeleteAsync(int commentId);
-        Task<CustomResponse<int>> CountTotalAsync();
-        Task<CustomResponse<int>> CountByNonDeletedAsync();
-        Task<CustomResponse<CommentDto>> ApproveAsync(int commentId);
-        Task<CustomResponse<CommentDto>> UndoDeleteAsync(int categoryId);
-        Task<CustomResponse<CommentDto>> GetCommentByIdAsync(int categoryId);
-        Task<CustomResponse<CommentUpdateDto>> GetCommentUpdateDtoAsync(int commentId);
-        Task<CustomResponse<CommentListDto>> GetAllCommentsAsync();
-        Task<CustomResponse<CommentListDto>> GetAllByDeletedAsync();
-        Task<CustomResponse<CommentListDto>> GetAllByNonDeletedAsync();
-        Task<CustomResponse<CommentListDto>> GetAllByActiveAsync();
+        Task<CustomResponseDto<CommentDto>> AddAsync(CommentCreateDto commentCreateDto, string userId);
+        Task<CustomResponseDto<CommentDto>> UpdateAsync(CommentUpdateDto commentUpdateDto);
+        Task<CustomResponseDto<CommentDto>> DeleteAsync(int commentId);
+        Task<CustomResponseDto<NoContent>> HardDeleteAsync(int commentId);
+        Task<CustomResponseDto<int>> CountTotalAsync();
+        Task<CustomResponseDto<int>> CountByNonDeletedAsync();
+        Task<CustomResponseDto<CommentDto>> ApproveAsync(int commentId);
+        Task<CustomResponseDto<CommentDto>> UndoDeleteAsync(int categoryId);
+        Task<CustomResponseDto<CommentDto>> GetCommentByIdAsync(int categoryId);
+        Task<CustomResponseDto<CommentUpdateDto>> GetCommentUpdateDtoAsync(int commentId);
+        Task<CustomResponseDto<CommentListDto>> GetAllCommentsAsync();
+        Task<CustomResponseDto<CommentListDto>> GetAllByDeletedAsync();
+        Task<CustomResponseDto<CommentListDto>> GetAllByNonDeletedAsync();
+        Task<CustomResponseDto<CommentListDto>> GetAllByActiveAsync();
     }
 }

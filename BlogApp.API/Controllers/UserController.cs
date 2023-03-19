@@ -31,9 +31,9 @@ namespace BlogApp.API.Controllers
 
             if (users.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, users.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, users.Errors));
             }
-            return CreateActionResult(CustomResponse<List<UserListDto>>.Success(200, users.Data));
+            return CreateActionResult(CustomResponseDto<List<UserListDto>>.Success(200, users.Data));
         }
 
         [HttpGet("{userId}")]//api/blogs/1
@@ -43,9 +43,9 @@ namespace BlogApp.API.Controllers
 
             if (users.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, users.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, users.Errors));
             }
-            return CreateActionResult(CustomResponse<UserListDto>.Success(200, users.Data));
+            return CreateActionResult(CustomResponseDto<UserListDto>.Success(200, users.Data));
         }
 
         [HttpPut("[action]/{userId}")]
@@ -54,9 +54,9 @@ namespace BlogApp.API.Controllers
             var result = await _userService.DeleteAsync(userId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+                return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
         }
 
         [HttpPut("[action]/{userId}")]
@@ -65,9 +65,9 @@ namespace BlogApp.API.Controllers
             var result = await _userService.UndoDeleteAsync(userId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode));
+            return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
         }
 
         [HttpDelete("{userId}")]
@@ -76,9 +76,9 @@ namespace BlogApp.API.Controllers
             var user = await _userService.HardDeleteAsync(userId);
             if (user.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, user.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, user.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(user.StatusCode));
+            return CreateActionResult(CustomResponseDto<NoContent>.Success(user.StatusCode));
         }
 
         [HttpGet("[action]")]
@@ -87,9 +87,9 @@ namespace BlogApp.API.Controllers
             var deletedUsers = await _userService.GetAllByDeletedAsync();
             if (deletedUsers.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(deletedUsers.StatusCode, deletedUsers.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(deletedUsers.StatusCode, deletedUsers.Errors));
             }
-            return CreateActionResult(CustomResponse<List<UserListDto>>.Success(deletedUsers.StatusCode, deletedUsers.Data));
+            return CreateActionResult(CustomResponseDto<List<UserListDto>>.Success(deletedUsers.StatusCode, deletedUsers.Data));
         }
 
         [HttpGet("[action]")]
@@ -99,9 +99,9 @@ namespace BlogApp.API.Controllers
 
             if (users.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(404, users.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, users.Errors));
             }
-            return CreateActionResult(CustomResponse<List<UserListDto>>.Success(200, users.Data));
+            return CreateActionResult(CustomResponseDto<List<UserListDto>>.Success(200, users.Data));
         }
 
         [HttpPut]
@@ -115,7 +115,7 @@ namespace BlogApp.API.Controllers
 
                 if (resultUpdate.StatusCode == 204)
                 {
-                    return CreateActionResult(CustomResponse<NoContent>.Success(204));
+                    return CreateActionResult(CustomResponseDto<NoContent>.Success(204));
                 }
             }
 
@@ -126,7 +126,7 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpPost("[action]")]
@@ -142,15 +142,15 @@ namespace BlogApp.API.Controllers
                 var resultUpdate = await _userService.PasswordChangeAsync(appUserPasswordChangeDto, userId);
 
                 return !resultUpdate.Errors.Any()
-                    ? CreateActionResult(CustomResponse<NoContent>.Success(204))
-                    : CreateActionResult(CustomResponse<NoContent>.Fail(400, resultUpdate.Errors));
+                    ? CreateActionResult(CustomResponseDto<NoContent>.Success(204))
+                    : CreateActionResult(CustomResponseDto<NoContent>.Fail(400, resultUpdate.Errors));
             }
 
             result.Errors.ToList().ForEach(error => ModelState.AddModelError(error.PropertyName, error.ErrorMessage));
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponse<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpGet("[action]/{userId}")]
@@ -159,9 +159,9 @@ namespace BlogApp.API.Controllers
             var activateUser = await _userService.ActivateUserAsync(userId);
             if (activateUser.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(activateUser.StatusCode, activateUser.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(activateUser.StatusCode, activateUser.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(activateUser.StatusCode, activateUser.Data));
+            return CreateActionResult(CustomResponseDto<NoContent>.Success(activateUser.StatusCode, activateUser.Data));
         }
 
         [HttpPut("[action]/{userId}")]
@@ -170,9 +170,9 @@ namespace BlogApp.API.Controllers
             var result = await _userService.DeleteUserImageAsync(userId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<NoContent>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -181,9 +181,9 @@ namespace BlogApp.API.Controllers
             var result = await _userService.CountTotalAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -192,9 +192,9 @@ namespace BlogApp.API.Controllers
             var result = await _userService.CountByNonDeletedAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponse<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponse<int>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
     }
 }
