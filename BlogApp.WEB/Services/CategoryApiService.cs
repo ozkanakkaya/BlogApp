@@ -148,7 +148,7 @@ namespace BlogApp.WEB.Services
 			}
 		}
 
-		public async Task<int> CountByNonDeletedBlogsAsync()
+		public async Task<int> CountByNonDeletedAsync()
 		{
 			var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("category/countbynondeleted");
 

@@ -80,14 +80,14 @@
 
 
     @await Html.PartialAsync("~/Views/Comment/_CommentCreatePartial.cshtml", new CommentCreateDto { BlogId = Model.BlogListDto.Id })
+@*    <partial name="~/Views/Comment/_CommentCreatePartial.cshtml" model="new CommentCreateDto{BlogId=Model.BlogListDto.Id}"></partial>*@
 
 
 
-    <div class="comment-top">
+    <div id="comments" class="comment-top">
 
         @if (Model.BlogListDto.Comments.Count > 0)
         {
-
             <div class="card-header no-border">
                 <h3 class="text-center" style="font-family:Tahoma;">Yorumlar</h3>
             </div>
@@ -134,3 +134,7 @@
 
 </aside>
 <!--//right-->
+
+@section Scripts{
+    <script src="~/js/blogDetail.js" type="text/ecmascript"></script>
+}

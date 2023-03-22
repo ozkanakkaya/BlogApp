@@ -56,7 +56,18 @@ namespace BlogApp.API.Controllers
             {
                 var roleResult = await _roleService.GetAllByUserIdAsync(result.Data.Id);
                 var token = TokenGenerator.GenerateToken(result.Data, roleResult.Data);
-                return Created("", token);
+				var cookieOptions = new CookieOptions
+				{
+					HttpOnly = true,
+					Secure = true,
+					SameSite = SameSiteMode.Strict,
+					Expires = DateTime.UtcNow.AddDays(1),
+				};
+
+				Response.Cookies.Append("access_token", token.Token, cookieOptions);
+
+                //return Created("", token);
+                return Ok(token);
             }
             return CreateActionResult(CustomResponseDto<CheckUserResponseDto>.Fail(result.StatusCode, result.Errors));
         }

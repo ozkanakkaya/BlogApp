@@ -21,7 +21,7 @@ namespace BlogApp.API.Controllers
 
         [HttpPost]
         [CheckUserId]
-        public async Task<IActionResult> Add([FromForm] CommentCreateDto commentCreateDto)
+        public async Task<IActionResult> Add(CommentCreateDto commentCreateDto)
         {
             var result = _commentCreateDtoValidator.Validate(commentCreateDto);
             if (result.IsValid)
@@ -57,7 +57,7 @@ namespace BlogApp.API.Controllers
                 var resultUpdated = await _commentService.UpdateAsync(commentUpdateDto);
                 if (resultUpdated.Errors.Any())
                 {
-                    return CreateActionResult(CustomResponseDto<NoContent>.Fail(resultUpdated.StatusCode, resultUpdated.Errors));
+                    return CreateActionResult(CustomResponseDto<CommentDto>.Fail(resultUpdated.StatusCode, resultUpdated.Errors));
                 }
                 return CreateActionResult(CustomResponseDto<CommentDto>.Success(resultUpdated.StatusCode, resultUpdated.Data));
             }
@@ -77,7 +77,7 @@ namespace BlogApp.API.Controllers
             if (!result.Errors.Any())
                 return CreateActionResult(CustomResponseDto<CommentDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<CommentDto>.Fail(404, result.Errors));
         }
 
         [HttpDelete("{commentId}")]

@@ -18,7 +18,14 @@ builder.Services.AddHttpClient<CategoryApiService>(opt =>
 	opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
 });
 
+builder.Services.AddHttpClient<CommentApiService>(opt =>
+{
+    opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
+});
+
 builder.Services.Configure<BlogRightSideBarWidgetOptions>(builder.Configuration.GetSection("BlogRightSideBarWidgetOptions"));
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -34,6 +41,19 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+//var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
+
+////API'ye yapýlan her istekte, cookie içindeki token'a eriþmek için bu middleware kullanýldý.
+//app.Use(async (context, next) =>
+//{
+//	var accessToken = httpContextAccessor.HttpContext.Request.Cookies["access_token"];
+//	if (!string.IsNullOrEmpty(accessToken))
+//	{
+//		context.Request.Headers.Add("Authorization", "Bearer" + accessToken);
+//	}
+//	await next();
+//});
 
 app.UseAuthorization();
 
