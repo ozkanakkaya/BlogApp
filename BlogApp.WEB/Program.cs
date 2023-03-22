@@ -24,6 +24,7 @@ builder.Services.AddHttpClient<CommentApiService>(opt =>
 });
 
 builder.Services.Configure<BlogRightSideBarWidgetOptions>(builder.Configuration.GetSection("BlogRightSideBarWidgetOptions"));
+builder.Services.Configure<AboutUsPageInfo>(builder.Configuration.GetSection("AboutUsPageInfo"));
 
 builder.Services.AddHttpContextAccessor();
 
