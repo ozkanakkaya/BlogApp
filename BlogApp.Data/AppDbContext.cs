@@ -46,7 +46,7 @@ namespace BlogApp.Data
                             {
                                 entityReference.CreatedDate = DateTime.Now;
                                 entityReference.UpdatedDate = entityReference.CreatedDate;
-                                if(username != null) entityReference.CreatedByUsername = username;
+                                if (username != null) entityReference.CreatedByUsername = username;
                                 break;
                             }
                         case EntityState.Modified:

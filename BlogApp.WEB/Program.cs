@@ -1,12 +1,16 @@
+using BlogApp.Business.Services;
+using BlogApp.Core.DTOs.Concrete;
+using BlogApp.Core.Entities.Concrete;
+using BlogApp.Core.Services;
 using BlogApp.WEB.Configurations;
 using BlogApp.WEB.Services;
-using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
+using BlogApp.WEB.Validations;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddNToastNotifyToastr();
 
 builder.Services.AddHttpClient<BlogApiService>(opt =>
 {
@@ -15,7 +19,7 @@ builder.Services.AddHttpClient<BlogApiService>(opt =>
 
 builder.Services.AddHttpClient<CategoryApiService>(opt =>
 {
-	opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
+    opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
 });
 
 builder.Services.AddHttpClient<CommentApiService>(opt =>
@@ -25,6 +29,11 @@ builder.Services.AddHttpClient<CommentApiService>(opt =>
 
 builder.Services.Configure<BlogRightSideBarWidgetOptions>(builder.Configuration.GetSection("BlogRightSideBarWidgetOptions"));
 builder.Services.Configure<AboutUsPageInfo>(builder.Configuration.GetSection("AboutUsPageInfo"));
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+
+builder.Services.AddScoped<IValidator<EmailSendDto>, EmailSendDtoValidator>();
+
+builder.Services.AddScoped<IMailService, MailService>();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -42,6 +51,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseNToastNotify();
 
 //var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 

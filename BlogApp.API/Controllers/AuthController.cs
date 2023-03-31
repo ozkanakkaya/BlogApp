@@ -56,15 +56,15 @@ namespace BlogApp.API.Controllers
             {
                 var roleResult = await _roleService.GetAllByUserIdAsync(result.Data.Id);
                 var token = TokenGenerator.GenerateToken(result.Data, roleResult.Data);
-				var cookieOptions = new CookieOptions
-				{
-					HttpOnly = true,
-					Secure = true,
-					SameSite = SameSiteMode.Strict,
-					Expires = DateTime.UtcNow.AddDays(1),
-				};
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(1),
+                };
 
-				Response.Cookies.Append("access_token", token.Token, cookieOptions);
+                Response.Cookies.Append("access_token", token.Token, cookieOptions);
 
                 //return Created("", token);
                 return Ok(token);

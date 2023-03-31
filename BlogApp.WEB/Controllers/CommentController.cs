@@ -22,7 +22,7 @@ namespace BlogApp.WEB.Controllers
         {
             if (ModelState.IsValid)
             {
-				var result = await _commentApiService.AddAsync(commentCreateDto);
+                var result = await _commentApiService.AddAsync(commentCreateDto);
                 if (!result.Errors.Any())
                 {
                     var commentCreateAjaxViewModel = JsonSerializer.Serialize(new CommentCreateAjaxViewModel

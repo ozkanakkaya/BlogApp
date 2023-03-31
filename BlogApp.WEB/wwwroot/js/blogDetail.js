@@ -33,7 +33,7 @@ $(document).ready(function () {//sayfa yüklendiðinde çalýþýr
                         $('#comments').append(newSingleCommentObject);
                         newSingleCommentObject.fadeIn(3000);
                         toastr.success(
-                            `Sayýn ${commentCreateAjaxModel.CommentDto.CreatedByUsername} yorumunuz baþarýyla eklenmiþtir. Yorumunuz onaylandýktan sonra herkese görünür olacaktýr.`);
+                            `Sayin ${commentCreateAjaxModel.CommentDto.CreatedByUsername} yorumunuz basariyla eklenmistir. Yorumunuz onaylandiktan sonra herkese gorunur olacaktir.`);
                         $('#btnSave').prop('disabled', true);
                         setTimeout(function () {
                             $('#btnSave').prop('disabled', false);

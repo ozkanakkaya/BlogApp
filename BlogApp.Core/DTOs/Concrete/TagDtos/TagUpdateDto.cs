@@ -2,7 +2,7 @@
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class TagUpdateDto :IDto
+    public class TagUpdateDto : IDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

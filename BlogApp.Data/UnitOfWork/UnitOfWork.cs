@@ -1,5 +1,4 @@
 ﻿using BlogApp.Core.Repositories;
-using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
 using BlogApp.Data.Repositories;
 

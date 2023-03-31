@@ -1,9 +1,7 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Response;
 using Microsoft.AspNetCore.Mvc;
-using NuGet.Common;
 using System.Net.Http.Headers;
-using System.Net.Http;
 namespace BlogApp.WEB.Services
 {
     public class CommentApiService
@@ -12,12 +10,12 @@ namespace BlogApp.WEB.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public CommentApiService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
-		{
-			_httpClient = httpClient;
+        {
+            _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
         }
 
-		public async Task<CustomResponseDto<CommentDto>> AddAsync(CommentCreateDto newComment)
+        public async Task<CustomResponseDto<CommentDto>> AddAsync(CommentCreateDto newComment)
         {
             var accessToken = _httpContextAccessor.HttpContext.Request.Cookies["access_token"];
 

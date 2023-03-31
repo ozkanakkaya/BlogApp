@@ -198,7 +198,7 @@ namespace BlogApp.API.Controllers
             {
                 return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponseDto<CommentListDto>.Success(result.StatusCode,result.Data));
+            return CreateActionResult(CustomResponseDto<CommentListDto>.Success(result.StatusCode, result.Data));
         }
     }
 }

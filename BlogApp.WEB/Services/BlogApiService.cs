@@ -17,7 +17,7 @@ namespace BlogApp.WEB.Services
         public async Task<BlogCreateDto> AddAsync([FromForm] BlogCreateDto newBlog)
         {
             var response = await _httpClient.PostAsJsonAsync("blog", newBlog);
-            
+
             var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<BlogCreateDto>>();
 
             if (responseBody.Errors.Any())
@@ -289,43 +289,43 @@ namespace BlogApp.WEB.Services
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<BlogListDto>>>($"blog/GetAllByUserIdOnFilter?userId={userId}&filterBy={filterBy}&orderBy={orderBy}&isAscending={isAscending}&takeSize={takeSize}&categoryId={categoryId}&startAt={startAt.ToString("yyyy-MM-ddTHH:mm:ss")}&endAt={endAt.ToString("yyyy-MM-ddTHH:mm:ss")}&minViewCount={minViewCount}&maxViewCount={maxViewCount}&minCommentCount={minCommentCount}&maxCommentCount={maxCommentCount}");
 
-			if (response.Errors.Any())
-			{
-				return CustomResponseDto<List<BlogListDto>>.Fail(response.StatusCode, response.Errors);
-			}
-			else
-			{
-				return CustomResponseDto<List<BlogListDto>>.Success(response.StatusCode, response.Data);
-			}
-		}
+            if (response.Errors.Any())
+            {
+                return CustomResponseDto<List<BlogListDto>>.Fail(response.StatusCode, response.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<List<BlogListDto>>.Success(response.StatusCode, response.Data);
+            }
+        }
 
         public async Task<CustomResponseDto<BlogListResultDto>> GetAllFilteredAsync(int? categoryId, int? userId, bool? isActive, bool? isDeleted, int currentPage, int pageSize, OrderByGeneral orderBy, bool isAscending, bool includeCategory, bool includeTag, bool includeComments, bool includeUser)
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<BlogListResultDto>>($"blog/getallfiltered?categoryId={categoryId}&userId={userId}&isActive={isActive}&isDeleted={isDeleted}&currentPage={currentPage}&pageSize={pageSize}&orderBy={orderBy}&isAscending={isAscending}&includeCategory={includeCategory}&includeTag={includeTag}&includeComments={includeComments}&includeUser={includeUser}");
 
-			if (response.Errors.Any())
-			{
-				return CustomResponseDto<BlogListResultDto>.Fail(response.StatusCode, response.Errors);
-			}
-			else
-			{
-				return CustomResponseDto<BlogListResultDto>.Success(response.StatusCode, response.Data);
-			}
-		}
+            if (response.Errors.Any())
+            {
+                return CustomResponseDto<BlogListResultDto>.Fail(response.StatusCode, response.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<BlogListResultDto>.Success(response.StatusCode, response.Data);
+            }
+        }
 
         public async Task<CustomResponseDto<BlogListDto>> GetByBlogIdAsync(int blogId)
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<BlogListDto>>($"blog/getbyblogid/{blogId}");
 
-			if (response.Errors.Any())
-			{
-				return CustomResponseDto<BlogListDto>.Fail(response.StatusCode, response.Errors);
-			}
-			else
-			{
-				return CustomResponseDto<BlogListDto>.Success(response.StatusCode, response.Data);
-			}
-		}
+            if (response.Errors.Any())
+            {
+                return CustomResponseDto<BlogListDto>.Fail(response.StatusCode, response.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<BlogListDto>.Success(response.StatusCode, response.Data);
+            }
+        }
 
         public async Task<BlogListDto> GetFilteredByBlogIdAsync(int blogId, bool includeCategory, bool includeTag, bool includeComment, bool includeUser)
         {

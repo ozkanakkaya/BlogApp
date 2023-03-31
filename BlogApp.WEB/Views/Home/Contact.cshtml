@@ -1,4 +1,5 @@
-﻿@{
+﻿@model BlogApp.Core.DTOs.Concrete.EmailSendDto
+@{
     ViewData["Title"] = "Contact";
     Layout = "~/Views/Shared/_ContactLayout.cshtml";
 }
@@ -21,7 +22,6 @@
                         <h6>Adres</h6>
                         <p>
                             İstanbul, Türkiye
-
                         </p>
                     </div>
                 </div>
@@ -35,9 +35,7 @@
                     <div class="col-md-8 address-right text-left">
                         <h6>E-Posta</h6>
                         <p>
-                            Email :
-                            <a href="info@blogkaravani.com"> info@blogkaravani.com</a>
-
+                            <a href="info@blogkaravani.com"> info@blogkervani.com</a>
                         </p>
                     </div>
 
@@ -61,33 +59,85 @@
 </div>
 <div class="container">
     <div class="contact_grid_right">
-        <form asp-controller="Home" asp-action="Contact" method="post">
+        <form id="contactForm" asp-controller="Home" asp-action="Contact" method="post">
+            <div data-valmsg-summary="ModelOnly" class="text-danger"></div>
             <div class="row contact_left_grid">
                 <div class="col-md-6 con-left">
                     <div class="form-group">
                         <label for="validationCustom01 my-2">İsim</label>
-                        <input class="form-control" type="text" name="Username" placeholder="" required="">
+                        <input class="form-control" type="text" asp-for="Name" placeholder="" required="">
+                        <span asp-validation-for="Name" class="text-danger" id="Name"></span>
                     </div>
                     <div class="form-group">
                         <label for="exampleFormControlInput1">E-Posta</label>
-                        <input class="form-control" type="email" name="Email" placeholder="" required="">
+                        <input class="form-control" type="email" asp-for="Email" placeholder="" required="">
+                        <span asp-validation-for="Email" class="text-danger" id="Email"></span>
                     </div>
                     <div class="form-group">
                         <label for="validationCustom03 my-2">Konu</label>
-                        <input class="form-control" type="text" name="Subject" placeholder="" required="">
+                        <input class="form-control" type="text" asp-for="Subject" placeholder="" required="">
+                        <span asp-validation-for="Subject" class="text-danger" id="Subject"></span>
                     </div>
                 </div>
                 <div class="col-md-6 con-right">
                     <div class="form-group">
                         <label for="textarea">Mesaj</label>
-                        <textarea id="textarea" placeholder=""></textarea>
+                        <textarea id="textarea" asp-for="Message"></textarea>
+                        <span asp-validation-for="Message" class="text-danger" id="Message"></span>
                     </div>
-                    <input class="form-control" type="submit" value="Gönder">
-
+                    <input class="form-control" id="btnContact" type="submit" value="Gönder">
                 </div>
             </div>
         </form>
     </div>
 </div>
 
+@section Scripts {
+    <script type="text/javascript">
 
+        $(document).ready(function () {
+            $("#btnContact").click(function () {
+                var form = $("#contactForm");
+                $('span').empty();//eski hata mesajlarını temizler
+
+                $.ajax({
+                    type: "POST",
+                    url: form.attr("action"),
+                    data: form.serialize(),
+                    beforeSend: function () {
+                        toastr.info("Lütfen bekleyiniz, mesajınız gönderiliyor...", "", {
+                            timeOut: 0,
+                            extendedTimeOut: 0
+                        });
+                    },
+                    success: function (data) {
+
+                        if (data.success) {
+                            toastr.clear();
+                            toastr.success("Mesajınız başarıyla gönderildi.");
+                            form.trigger("reset");
+                        } else {
+                            toastr.clear();
+                            toastr.warning("Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.");
+
+                            var errors = data.errors;
+                            $.each(errors, function (key, value) {
+                                var errorSpan = $('[id="' + key + '"]'); // hata mesajlarının gösterileceği span'ın id'si
+                                errorSpan.html(value.join("<br>")); // hata mesajlarını span içine ekle
+                            });
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        toastr.clear();
+                        toastr.error("Mesaj gönderimi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.");
+                    },
+                    complete: function () {
+                        // İşlem tamamlandığında yapılacak işlemler
+                    }
+                });
+
+                return false;
+            });
+        });
+    </script>
+}

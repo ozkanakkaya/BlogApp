@@ -1,7 +1,6 @@
 ﻿using BlogApp.Core.Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Data;
 
 namespace BlogApp.Data.Configurations
 {

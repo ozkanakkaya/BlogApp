@@ -2,7 +2,7 @@
 
 namespace BlogApp.Core.DTOs.Concrete
 {
-    public class CommentCreateDto :IDto
+    public class CommentCreateDto : IDto
     {
         public string Content { get; set; }
         public int BlogId { get; set; }

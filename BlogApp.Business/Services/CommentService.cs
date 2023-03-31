@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using BlogApp.Core.DTOs.Abstract;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Repositories;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using BlogApp.Core.UnitOfWork;
-using System.Reflection.Metadata;
 
 namespace BlogApp.Business.Services
 {
@@ -233,7 +231,7 @@ namespace BlogApp.Business.Services
             {
                 return CustomResponseDto<CommentListDto>.Success(200, new CommentListDto
                 {
-                    Comments= Mapper.Map<IList<CommentDto>>(comments)
+                    Comments = Mapper.Map<IList<CommentDto>>(comments)
                 });
             }
             return CustomResponseDto<CommentListDto>.Fail(404, "Bir yorum bulunamadı!");
