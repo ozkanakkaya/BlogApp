@@ -134,31 +134,31 @@ namespace BlogApp.WEB.Services
             return responseBody.Data;
         }
 
-        public async Task<int> CountTotalAsync()
+        public async Task<CustomResponseDto<int>> CountTotalAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("blog/counttotal");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Toplam kategori sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<int> CountByNonDeletedAsync()
+        public async Task<CustomResponseDto<int>> CountByNonDeletedAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("category/countbynondeleted");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Silinmemiş kategori sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 

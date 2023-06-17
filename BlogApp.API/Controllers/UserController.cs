@@ -36,7 +36,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponseDto<List<UserListDto>>.Success(200, users.Data));
         }
 
-        [HttpGet("{userId}")]//api/blogs/1
+        [HttpGet("{userId}")]//api/user/1
         public async Task<IActionResult> GetUserById(int userId)
         {
             var users = await _userService.GetUserByIdAsync(userId);
@@ -129,17 +129,17 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
-        [HttpPost("[action]")]
+        [HttpPut("[action]")]
         [CheckUserId]
-        public async Task<IActionResult> PasswordChange([FromForm] UserPasswordChangeDto appUserPasswordChangeDto)
+        public async Task<IActionResult> PasswordChange([FromForm] UserPasswordChangeDto userPasswordChangeDto)
         {
-            var result = _userPasswordChangeDtoValidator.Validate(appUserPasswordChangeDto);
+            var result = _userPasswordChangeDtoValidator.Validate(userPasswordChangeDto);
 
             if (result.IsValid)
             {
                 var userId = HttpContext.Items["userId"] as string;
 
-                var resultUpdate = await _userService.PasswordChangeAsync(appUserPasswordChangeDto, userId);
+                var resultUpdate = await _userService.PasswordChangeAsync(userPasswordChangeDto, userId);
 
                 return !resultUpdate.Errors.Any()
                     ? CreateActionResult(CustomResponseDto<NoContent>.Success(204))
@@ -181,7 +181,7 @@ namespace BlogApp.API.Controllers
             var result = await _userService.CountTotalAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<int>.Fail(result.StatusCode, result.Errors));
             }
             return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }
@@ -192,7 +192,7 @@ namespace BlogApp.API.Controllers
             var result = await _userService.CountByNonDeletedAsync();
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<int>.Fail(result.StatusCode, result.Errors));
             }
             return CreateActionResult(CustomResponseDto<int>.Success(result.StatusCode, result.Data));
         }

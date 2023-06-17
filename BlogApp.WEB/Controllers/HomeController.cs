@@ -23,6 +23,9 @@ namespace BlogApp.WEB.Controllers
             _emailDtoValidator = emailDtoValidator;
         }
 
+        //[Route("index")]
+        //[Route("anasayfa")]
+        //[Route("")]
         [HttpGet]
         public async Task<IActionResult> Index(int? categoryId, int currentPage = 1, int pageSize = 6, bool isAscending = false)
         {

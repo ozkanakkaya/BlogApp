@@ -42,7 +42,6 @@ namespace BlogApp.Business.Services
                         var userDto = Mapper.Map<CheckUserResponseDto>(user);
                         return CustomResponseDto<CheckUserResponseDto>.Success(200, userDto);
                     }
-                    return CustomResponseDto<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola hatalıdır.");
                 }
                 return CustomResponseDto<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola hatalıdır.");
             }

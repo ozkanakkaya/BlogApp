@@ -1,4 +1,4 @@
-﻿namespace BlogApp.API.Jwt
+﻿namespace BlogApp.Core.Response
 {
     public class TokenResponse
     {

@@ -1,4 +1,5 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
+using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Response;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
@@ -17,7 +18,8 @@ namespace BlogApp.WEB.Services
 
         public async Task<CustomResponseDto<CommentDto>> AddAsync(CommentCreateDto newComment)
         {
-            var accessToken = _httpContextAccessor.HttpContext.Request.Cookies["access_token"];
+            var httpContext = _httpContextAccessor.HttpContext;
+            var accessToken = httpContext.User.Claims.SingleOrDefault(x => x.Type == "accessToken")?.Value;
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
@@ -67,31 +69,31 @@ namespace BlogApp.WEB.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<int> CountTotalAsync()
+        public async Task<CustomResponseDto<int>> CountTotalAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("comment/counttotal");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Toplam yorum sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<int> CountByNonDeletedAsync()
+        public async Task<CustomResponseDto<int>> CountByNonDeletedAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("comment/countbynondeleted");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Silinmemiş yorum sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 

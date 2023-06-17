@@ -7,12 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Admin\Data\" />
     <Folder Include="wwwroot\blogsite\css\" />
     <Folder Include="wwwroot\blogsite\js\" />
     <Folder Include="wwwroot\blogsite\webfonts\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.13" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
     <PackageReference Include="toastr" Version="2.1.1" />

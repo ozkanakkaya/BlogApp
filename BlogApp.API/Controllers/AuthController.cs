@@ -49,27 +49,19 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login([FromForm] UserLoginDto loginDto)
+        public async Task<IActionResult> Login(UserLoginDto loginDto)
         {
             var result = await _userService.CheckUserAsync(loginDto);
             if (!result.Errors.Any())
             {
                 var roleResult = await _roleService.GetAllByUserIdAsync(result.Data.Id);
                 var token = TokenGenerator.GenerateToken(result.Data, roleResult.Data);
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddDays(1),
-                };
 
-                Response.Cookies.Append("access_token", token.Token, cookieOptions);
+                return CreateActionResult(CustomResponseDto<TokenResponse>.Success(result.StatusCode, token));
 
                 //return Created("", token);
-                return Ok(token);
             }
-            return CreateActionResult(CustomResponseDto<CheckUserResponseDto>.Fail(result.StatusCode, result.Errors));
+            return CreateActionResult(CustomResponseDto<string>.Fail(result.StatusCode, result.Errors));
         }
     }
 }

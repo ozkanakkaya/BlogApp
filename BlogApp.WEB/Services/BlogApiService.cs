@@ -136,7 +136,7 @@ namespace BlogApp.WEB.Services
             var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Silmeyi geri alma işlemini sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
+                throw new Exception($"Silmeyi geri alma işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
 
             return response.IsSuccessStatusCode;
         }
@@ -187,73 +187,73 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<int> CountTotalBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountTotalBlogsAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("blog/counttotalblogs");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Toplam blog sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<int> CountActiveBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountActiveBlogsAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("blog/countactiveblogs");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Aktif blog sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<int> CountInactiveBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountInactiveBlogsAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("blog/countinactiveblogs");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Pasif blog sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<int> CountByDeletedBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountByDeletedBlogsAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("blog/countbydeletedblogs");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Silinmiş blog sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<int> CountByNonDeletedBlogsAsync()
+        public async Task<CustomResponseDto<int>> CountByNonDeletedBlogsAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<int>>("blog/countbynondeletedblogs");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Silinmemiş blog sayısı getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<int>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<int>.Success(response.StatusCode, response.Data);
             }
         }
 
