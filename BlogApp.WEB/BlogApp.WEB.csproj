@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,10 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\blogsite\**" />
+    <Content Remove="wwwroot\blogsite\**" />
+    <EmbeddedResource Remove="wwwroot\blogsite\**" />
+    <EntityDeploy Remove="wwwroot\blogsite\**" />
+    <None Remove="wwwroot\blogsite\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="wwwroot\blogsite\css\" />
-    <Folder Include="wwwroot\blogsite\js\" />
-    <Folder Include="wwwroot\blogsite\webfonts\" />
   </ItemGroup>
 
   <ItemGroup>

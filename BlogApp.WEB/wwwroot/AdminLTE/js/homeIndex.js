@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
     //DataTable
-    $('#articlesTable').DataTable({
+    $('#blogsTable').DataTable({
         language: {
             "sDecimal": ",",
             "sEmptyTable": "Tabloda herhangi bir veri mevcut değil",
@@ -38,27 +38,27 @@
     //DataTable
 
     //Chart.js
-    $.get('/Admin/Article/GetAllByViewCount/?isAscending=false&takeSize=10',
+    $.get('/Admin/Blog/GetAllByViewCount/?isAscending=false&takeSize=10',
         function (data) {
-            const articleResult = jQuery.parseJSON(data);
+            const blogResult = jQuery.parseJSON(data);
 
             let viewCountContext = $('#viewCountChart');//Kanvas'ı seçtik. (Yani grafik html etiketini burada seçtik.)
             let viewCountChart = new Chart(viewCountContext,
                 {
                     type: 'bar',
                     data: {
-                        labels: articleResult.$values.map(article => article.Title),//Foreach döngüsü,
+                        labels: blogResult.$values.map(blog => blog.Title),//Foreach döngüsü,
                         datasets: [
                             {
                                 label: 'Okunma Sayısı',
-                                data: articleResult.$values.map(article => article.ViewCount),
+                                data: blogResult.$values.map(blog => blog.ViewCount),
                                 backgroundColor: '#fb3640', /* ['#00ADB5', '#EEEEEE', '#EAFFD0', '#C3BEF0', '#A0E4CB']*/
                                 hoverBorderWith: 4,
                                 hoverBorderColor: 'black'
                             },
                             {
                                 label: 'Yorum Sayısı',
-                                data: articleResult.$values.map(article => article.CommentCount),
+                                data: blogResult.$values.map(blog => blog.CommentCount),
                                 backgroundColor: '#fdca40',
                                 hoverBorderWith: 4,
                                 hoverBorderColor: 'black'
