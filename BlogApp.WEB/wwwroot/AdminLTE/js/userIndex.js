@@ -33,18 +33,18 @@
                             const userListDto = jQuery.parseJSON(data);
                             dataTable.clear();
                             console.log(userListDto);
-                            if (userListDto.ResultStatus === 0) {
-                                $.each(userListDto.Users.$values,
+                            if (!userListDto.error) {
+                                $.each(userListDto.$values,
                                     function (index, user) {
                                         const newTableRow = dataTable.row.add([
                                             user.Id,
-                                            user.UserName,
+                                            user.Username,
                                             user.Email,
-                                            user.FirstName,
-                                            user.LastName,
+                                            user.Firstname,
+                                            user.Lastname,
                                             user.PhoneNumber,
                                             user.About.length > 75 ? user.About.substring(0, 75) : user.About,
-                                            `<img src="/img/${user.Picture}" alt="${user.UserName}" class="my-image-table" />`,
+                                            `<img src="/img/${user.ImageUrl}" alt="${user.Username}" class="my-image-table" />`,
                                             `
                                 <button class="btn btn-info btn-sm btn-detail" data-id="${user.Id}"><span class="fas fa-newspaper"></span></button>
                                 <button class="btn btn-warning btn-sm btn-assign" data-id="${user.Id}"><span class="fas fa-user-shield"></span></button>
@@ -59,7 +59,7 @@
                                 $('.spinner-border').hide();
                                 $('#usersTable').fadeIn(1400);
                             } else {
-                                toastr.error(`${userListDto.Message}`, 'İşlem Başarısız!');
+                                toastr.error(`${userListDto.error}`, 'İşlem Başarısız!');
                             }
                         },
                         error: function (err) {

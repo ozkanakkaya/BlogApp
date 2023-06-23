@@ -75,6 +75,19 @@ namespace BlogApp.Business.Services
             return CustomResponseDto<UserRegisterDto>.Fail(400, $"'{dto.Username}' kullanıcı adı zaten kayıtlı!");
         }
 
+        public async Task<CustomResponseDto<List<UserListDto>>> GetAllUsersAsync()
+        {
+            var users = await UnitOfWork.Users.GetAllAsync(null, x => x.UserRoles);
+
+            if (users.Any())
+            {
+                var usersDto = users.Select(user => Mapper.Map<UserListDto>(user)).ToList();
+
+                return CustomResponseDto<List<UserListDto>>.Success(200, usersDto);
+            }
+            return CustomResponseDto<List<UserListDto>>.Fail(404, "Herhangi bir kullanıcı bulunamadı!");
+        }
+
         public async Task<CustomResponseDto<List<UserListDto>>> GetAllByActiveAsync()
         {
             var users = await UnitOfWork.Users.GetAllAsync(x => x.IsActive && !x.IsDeleted, x => x.UserRoles);

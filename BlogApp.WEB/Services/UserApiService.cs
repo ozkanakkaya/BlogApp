@@ -13,6 +13,32 @@ namespace BlogApp.WEB.Services
             _httpClient = httpClient;
         }
 
+        public async Task<CustomResponseDto<UserRegisterDto>> RegisterAsync(UserRegisterDto registerDto)
+        {
+            var response = await _httpClient.PostAsJsonAsync("user", registerDto);
+
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<UserRegisterDto>>();
+
+            if (responseBody.Errors.Any())
+                return CustomResponseDto<UserRegisterDto>.Fail(responseBody.StatusCode, responseBody.Errors);
+
+            return CustomResponseDto<UserRegisterDto>.Success(responseBody.StatusCode, responseBody.Data);
+        }
+
+        public async Task<CustomResponseDto<List<UserListDto>>> GetAllUsersAsync()
+        {
+            var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<UserListDto>>>("user/getallusers");
+
+            if (response.Errors.Any())
+            {
+                return CustomResponseDto<List<UserListDto>>.Fail(response.StatusCode, response.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<List<UserListDto>>.Success(response.StatusCode, response.Data);
+            }
+        }
+
         public async Task<CustomResponseDto<List<UserListDto>>> GetAllByActiveAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<UserListDto>>>("user");
@@ -49,7 +75,7 @@ namespace BlogApp.WEB.Services
 
             if (responseBody.Errors.Any())
             {
-                return CustomResponseDto<NoContent>.Fail(responseBody.StatusCode, responseBody.Errors);
+                return CustomResponseDto<NoContent>.Fail(responseBody.StatusCode, responseBody.Errors.FirstOrDefault());
             }
             else
             {

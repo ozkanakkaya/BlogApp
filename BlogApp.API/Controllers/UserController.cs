@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BlogApp.API.Filter;
 using BlogApp.Core.DTOs.Concrete;
+using BlogApp.Core.Enums;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using FluentValidation;
@@ -13,15 +14,42 @@ namespace BlogApp.API.Controllers
         private readonly IUserService _userService;
         private readonly IValidator<UserUpdateDto> _userUpdateDtoValidator;
         private readonly IValidator<UserPasswordChangeDto> _userPasswordChangeDtoValidator;
+        private readonly IValidator<UserRegisterDto> _validator;
         private readonly IMapper _mapper;
 
 
-        public UserController(IUserService userService, IValidator<UserUpdateDto> userUpdateDtoValidator, IValidator<UserPasswordChangeDto> userPasswordChangeDtoValidator, IMapper mapper)
+        public UserController(IUserService userService, IValidator<UserUpdateDto> userUpdateDtoValidator, IValidator<UserPasswordChangeDto> userPasswordChangeDtoValidator, IMapper mapper, IValidator<UserRegisterDto> validator)
         {
             _userService = userService;
             _userUpdateDtoValidator = userUpdateDtoValidator;
             _userPasswordChangeDtoValidator = userPasswordChangeDtoValidator;
             _mapper = mapper;
+            _validator = validator;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register([FromForm] UserRegisterDto registerDto)
+        {
+            var result = _validator.Validate(registerDto);
+
+            if (result.IsValid)
+            {
+                var user = await _userService.RegisterWithRoleAsync(registerDto, (int)RoleType.Member);
+
+                if (user.Errors.Any())//aynı kullanıcı adı kayıtlıysa girer
+                {
+                    return CreateActionResult(CustomResponseDto<UserRegisterDto>.Fail(user.StatusCode, user.Errors));
+                }
+                return CreateActionResult(CustomResponseDto<UserRegisterDto>.Success(user.StatusCode, user.Data));
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+            var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
+
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpGet]
@@ -32,6 +60,18 @@ namespace BlogApp.API.Controllers
             if (users.Errors.Any())
             {
                 return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, users.Errors));
+            }
+            return CreateActionResult(CustomResponseDto<List<UserListDto>>.Success(200, users.Data));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userService.GetAllUsersAsync();
+
+            if (users.Errors.Any())
+            {
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(200, users.Errors));
             }
             return CreateActionResult(CustomResponseDto<List<UserListDto>>.Success(200, users.Data));
         }

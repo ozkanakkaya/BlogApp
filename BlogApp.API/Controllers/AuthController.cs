@@ -11,41 +11,13 @@ namespace BlogApp.API.Controllers
 {
     public class AuthController : CustomControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
-        private readonly IValidator<UserRegisterDto> _validator;
-        public AuthController(IMapper mapper, IUserService userService, IValidator<UserRegisterDto> validator, IRoleService roleService)
+
+        public AuthController(IUserService userService, IRoleService roleService)
         {
-            _mapper = mapper;
             _userService = userService;
-            _validator = validator;
             _roleService = roleService;
-        }
-
-        [HttpPost("[action]")]
-        public async Task<IActionResult> Register([FromForm] UserRegisterDto registerDto)
-        {
-            var result = _validator.Validate(registerDto);
-
-            if (result.IsValid)
-            {
-                var user = await _userService.RegisterWithRoleAsync(registerDto, (int)RoleType.Member);
-
-                if (user.Errors.Any())//aynı kullanıcı adı kayıtlıysa girer
-                {
-                    return CreateActionResult(CustomResponseDto<UserRegisterDto>.Fail(user.StatusCode, user.Errors));
-                }
-                return CreateActionResult(CustomResponseDto<UserRegisterDto>.Success(user.StatusCode, user.Data));
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
-            var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
-
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
         [HttpPost("[action]")]

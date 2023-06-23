@@ -9,6 +9,7 @@ namespace BlogApp.Core.Services
         Task<CustomResponseDto<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId);
         Task<CustomResponseDto<CheckUserResponseDto>> CheckUserAsync(UserLoginDto dto);
         Task<CustomResponseDto<List<UserListDto>>> GetAllByActiveAsync();
+        Task<CustomResponseDto<List<UserListDto>>> GetAllUsersAsync();
         Task<CustomResponseDto<UserListDto>> GetUserByIdAsync(int userId);
         Task<CustomResponseDto<NoContent>> DeleteAsync(int userId);
         Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int userId);
