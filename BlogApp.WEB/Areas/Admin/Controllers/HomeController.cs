@@ -30,7 +30,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             var blogsCountResult = await _blogApiService.CountByNonDeletedBlogsAsync();
             var categoriesCountResult = await _categoryApiService.CountByNonDeletedAsync();
             var commentsCountResult = await _commentApiService.CountByNonDeletedAsync();
-            var usersCountResult = await _userApiService.CountTotalAsync();
+            var usersCountResult = await _userApiService.CountByNonDeletedAsync();
             var blogsResult = await _blogApiService.GetAllAsync();
 
             if (!blogsCountResult.Errors.Any() && !categoriesCountResult.Errors.Any() && !commentsCountResult.Errors.Any() && !usersCountResult.Errors.Any() && !blogsCountResult.Errors.Any())

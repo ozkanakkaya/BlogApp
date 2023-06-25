@@ -115,7 +115,7 @@ namespace BlogApp.Business.Services
             return CustomResponseDto<UserListDto>.Fail(404, "Gösterilecek bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<NoContent>> DeleteAsync(int userId)
+        public async Task<CustomResponseDto<UserDto>> DeleteAsync(int userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
             if (user != null)
@@ -125,9 +125,9 @@ namespace BlogApp.Business.Services
 
                 UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<UserDto>.Success(200,Mapper.Map<UserDto>(user));
             }
-            return CustomResponseDto<NoContent>.Fail(404, $"{userId} numaralı kullanıcı bulunamadı!");
+            return CustomResponseDto<UserDto>.Fail(404, $"{userId} numaralı kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int userId)//Admin-Arşiv-Users

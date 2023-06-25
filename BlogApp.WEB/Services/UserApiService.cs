@@ -68,19 +68,19 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<CustomResponseDto<NoContent>> DeleteAsync(int userId)
+        public async Task<CustomResponseDto<UserDto>> DeleteAsync(int userId)
         {
-            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<NoContent>>($"user/delete/{userId}", null);
+            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<UserDto>>($"user/delete/{userId}", null);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<UserDto>>();
 
             if (responseBody.Errors.Any())
             {
-                return CustomResponseDto<NoContent>.Fail(responseBody.StatusCode, responseBody.Errors.FirstOrDefault());
+                return CustomResponseDto<UserDto>.Fail(responseBody.StatusCode, responseBody.Errors);
             }
             else
             {
-                return CustomResponseDto<NoContent>.Success(responseBody.StatusCode);
+                return CustomResponseDto<UserDto>.Success(responseBody.StatusCode,responseBody.Data);
             }
         }
 

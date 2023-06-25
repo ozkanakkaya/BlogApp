@@ -94,9 +94,9 @@ namespace BlogApp.API.Controllers
             var result = await _userService.DeleteAsync(userId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
+                return CreateActionResult(CustomResponseDto<UserDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<UserDto>.Fail(result.StatusCode, result.Errors));
         }
 
         [HttpPut("[action]/{userId}")]

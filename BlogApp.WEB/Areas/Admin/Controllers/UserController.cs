@@ -1,6 +1,4 @@
-﻿using BlogApp.Core.DTOs.Abstract;
-using BlogApp.Core.DTOs.Concrete;
-using BlogApp.Core.Entities.Concrete;
+﻿using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums;
 using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Utilities.Abstract;
@@ -9,8 +7,6 @@ using BlogApp.WEB.Services;
 using BlogApp.WEB.Utilities.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Data;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -31,7 +27,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         [Authorize(Roles = "SuperAdmin,User.Read")]
         public async Task<IActionResult> Index()
         {
-            var users = await _userApiService.GetAllUsersAsync();
+            var users = await _userApiService.GetAllByActiveAsync();
 
             if (!users.Errors.Any())
                 return View(users.Data);
@@ -125,9 +121,38 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             }
         }
 
+        [Authorize(Roles = "SuperAdmin,User.Delete")]
+        [HttpPost]
+        public async Task<JsonResult> Delete(int userId)
+        {
+            var result = await _userApiService.DeleteAsync(userId);
 
+            if (!result.Errors.Any())
+            {
+                var deletedUserModel = JsonSerializer.Serialize(new UserViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Message = $"'{result.Data.Username}' adlı kullanıcı başarıyla silindi. \nTamamen silmek için veya geri almak için : \nÇöp Kutusu/Kullanıcılar menüsüne gidiniz.",
+                    UserDto = result.Data
+                });
+                return Json(deletedUserModel);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
 
-
+                var deletedUserErrorModel = JsonSerializer.Serialize(new UserViewModel
+                {
+                    ResultStatus = ResultStatus.Error,
+                    Message = $"{errorMessages}\n",
+                });
+                return Json(deletedUserErrorModel);
+            }
+        }
 
 
 

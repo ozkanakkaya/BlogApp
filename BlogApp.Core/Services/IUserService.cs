@@ -11,7 +11,7 @@ namespace BlogApp.Core.Services
         Task<CustomResponseDto<List<UserListDto>>> GetAllByActiveAsync();
         Task<CustomResponseDto<List<UserListDto>>> GetAllUsersAsync();
         Task<CustomResponseDto<UserListDto>> GetUserByIdAsync(int userId);
-        Task<CustomResponseDto<NoContent>> DeleteAsync(int userId);
+        Task<CustomResponseDto<UserDto>> DeleteAsync(int userId);
         Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int userId);
         Task<CustomResponseDto<NoContent>> HardDeleteAsync(int userId);
         Task<CustomResponseDto<List<UserListDto>>> GetAllByDeletedAsync();

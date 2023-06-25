@@ -206,11 +206,12 @@
                         data: { userId: id },
                         url: '/Admin/User/Delete/',
                         success: function (data) {
-                            const userDto = jQuery.parseJSON(data);
-                            if (userDto.ResultStatus === 0) {
+                            const deletedUserModel = jQuery.parseJSON(data);
+                            if (deletedUserModel.ResultStatus === 200) {
                                 Swal.fire(
                                     'Silindi!',
-                                    `${userDto.User.UserName} adlı kullanıcı başarıyla silinmiştir.`,
+                                    `${deletedUserModel.Message}`,
+/*                                    `${deletedUserModel.UserDto.Username} adlı kullanıcı başarıyla silinmiştir.`,*/
                                     'success'
                                 );
 
@@ -219,7 +220,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Başarısız İşlem!',
-                                    text: `${userDto.Message}`,
+                                    text: `${deletedUserModel.Message}`,
                                 });
                             }
                         },
