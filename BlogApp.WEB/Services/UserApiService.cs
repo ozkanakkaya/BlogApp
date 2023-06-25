@@ -1,6 +1,7 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 
 namespace BlogApp.WEB.Services
 {
@@ -13,16 +14,16 @@ namespace BlogApp.WEB.Services
             _httpClient = httpClient;
         }
 
-        public async Task<CustomResponseDto<UserRegisterDto>> RegisterAsync(UserRegisterDto registerDto)
+        public async Task<CustomResponseDto<UserDto>> RegisterAsync(UserRegisterDto registerDto)
         {
             var response = await _httpClient.PostAsJsonAsync("user", registerDto);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<UserRegisterDto>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<UserDto>>();
 
             if (responseBody.Errors.Any())
-                return CustomResponseDto<UserRegisterDto>.Fail(responseBody.StatusCode, responseBody.Errors);
+                return CustomResponseDto<UserDto>.Fail(responseBody.StatusCode, responseBody.Errors);
 
-            return CustomResponseDto<UserRegisterDto>.Success(responseBody.StatusCode, responseBody.Data);
+            return CustomResponseDto<UserDto>.Success(responseBody.StatusCode, responseBody.Data);
         }
 
         public async Task<CustomResponseDto<List<UserListDto>>> GetAllUsersAsync()

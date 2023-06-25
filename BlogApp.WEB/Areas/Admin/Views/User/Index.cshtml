@@ -30,8 +30,6 @@
                             <th>E-Posta Adresi</th>
                             <th>Adı</th>
                             <th>Soyadı</th>
-                            <th>Telefon Numarası</th>
-                            <th>Hakkında</th>
                             <th>Resim</th>
                             <th>İşlemler</th>
                         </tr>
@@ -43,8 +41,6 @@
                             <th>E-Posta Adresi</th>
                             <th>Adı</th>
                             <th>Soyadı</th>
-                            <th>Telefon Numarası</th>
-                            <th>Hakkında</th>
                             <th>Resim</th>
                             <th>İşlemler</th>
                         </tr>
@@ -58,8 +54,6 @@
                                 <td>@user.Email</td>
                                 <td>@user.Firstname</td>
                                 <td>@user.Lastname</td>
-                                <td>@user.PhoneNumber</td>
-                                <td>@(user.About.Length > 75 ? user.About.Substring(0, 75) : user.About)</td>
                                 <td><img src="~/img/@user.ImageUrl" alt="@user.Username" class="my-image-table" /></td>
                                 <td style="width:150px;">
                                     <button class="btn btn-info btn-sm btn-detail" data-id="@user.Id"><span class="fas fa-newspaper"></span></button>

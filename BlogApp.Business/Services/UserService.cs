@@ -48,17 +48,18 @@ namespace BlogApp.Business.Services
             return CustomResponseDto<CheckUserResponseDto>.Fail(400, "Kullanıcı adı veya parola boş geçilemez.");
         }
 
-        public async Task<CustomResponseDto<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId)
+        public async Task<CustomResponseDto<UserDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId)
         {
             var hasUser = await UnitOfWork.Users.AnyAsync(x => x.Username == dto.Username);
 
             if (!hasUser)
             {
-                var uploadedImageDtoResult = await _imageHelper.UploadAsync(dto.Username, dto.ImageFile, ImageType.User);
+                //var uploadedImageDtoResult = await _imageHelper.UploadAsync(dto.Username, dto.ImageFile, ImageType.User);
 
                 var user = Mapper.Map<User>(dto);
                 user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
-                user.ImageUrl = uploadedImageDtoResult.StatusCode == 200 ? uploadedImageDtoResult.Data.FullName : "userImages/defaultUser.png";
+                user.ImageUrl = dto.ImageUrl;
+                //user.ImageUrl = uploadedImageDtoResult.StatusCode == 200 ? uploadedImageDtoResult.Data.FullName : "userImages/defaultUser.png";
 
                 user.UserRoles = new List<UserRole>();
                 user.UserRoles.Add(new UserRole
@@ -70,9 +71,9 @@ namespace BlogApp.Business.Services
                 await UnitOfWork.Users.AddAsync(user);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponseDto<UserRegisterDto>.Success(201, dto);
+                return CustomResponseDto<UserDto>.Success(201, Mapper.Map<UserDto>(user));
             }
-            return CustomResponseDto<UserRegisterDto>.Fail(400, $"'{dto.Username}' kullanıcı adı zaten kayıtlı!");
+            return CustomResponseDto<UserDto>.Fail(400, $"'{dto.Username}' kullanıcı adı zaten kayıtlı!");
         }
 
         public async Task<CustomResponseDto<List<UserListDto>>> GetAllUsersAsync()

@@ -1,0 +1,89 @@
+﻿@model BlogApp.Core.DTOs.Concrete.UserRegisterDto
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><span class="fas fa-plus"></span> Kullanıcı Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="İptal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Add" id="form-user-add">
+                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+                    <div asp-validation-summary="All" class="text-danger" id="validation-summary" aria-hidden="true" style="display: none;"></div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Kullanıcı Adı</label>
+                            <input class="form-control" asp-for="Username" placeholder="Lütfen kullanıcı adı giriniz." />
+                            <span class="text-danger" asp-validation-for="Username"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>E-Posta</label>
+                            <input type="email" class="form-control" asp-for="Email" placeholder="Lütfen e-posta adresi giriniz." />
+                            <span class="text-danger" asp-validation-for="Email"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Parola</label>
+                            <input type="password" class="form-control" asp-for="Password" placeholder="Lütfen şifre giriniz." />
+                            <span class="text-danger" asp-validation-for="Password"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Parola Tekrarı</label>
+                            <input type="password" class="form-control" asp-for="ConfirmPassword" placeholder="Lütfen şifre tekrarı giriniz." />
+                            <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Ad</label>
+                            <input type="text" class="form-control" asp-for="Firstname" placeholder="Lütfen ad giriniz." />
+                            <span class="text-danger" asp-validation-for="Firstname"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Soyad</label>
+                            <input type="text" class="form-control" asp-for="Lastname" placeholder="Lütfen soyad giriniz." />
+                            <span class="text-danger" asp-validation-for="Lastname"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Telefon Numarası</label>
+                            <input type="text" class="form-control" asp-for="PhoneNumber" placeholder="Lütfen telefon numarası giriniz." />
+                            <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Cinsiyet</label>
+                            <select class="form-control" asp-for="GenderId">
+                                <option value="1">Erkek</option>
+                                <option value="2">Kız</option>
+                                <option value="3" selected>Belirtilmedi</option>
+                            </select>
+                            <span class="text-danger" asp-validation-for="GenderId"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label>Hakkında</label>
+                            <textarea class="form-control" asp-for="About" placeholder="Lütfen hakkında bilgisi giriniz." rows="4"></textarea>
+                            <span class="text-danger" asp-validation-for="About"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>GitHub Profil</label>
+                            <input type="text" class="form-control" asp-for="GitHubLink" placeholder="Lütfen github profil link'i giriniz." />
+                            <span class="text-danger" asp-validation-for="GitHubLink"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Website</label>
+                            <input type="text" class="form-control" asp-for="WebsiteLink" placeholder="Lütfen website link'i giriniz." />
+                            <span class="text-danger" asp-validation-for="WebsiteLink"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Profil Fotoğrafı</label>
+                            <input type="file" accept="image/*" class="form-control-file" asp-for="ImageFile" />
+                            <span class="text-danger" asp-validation-for="ImageFile"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-block" data-dismiss="modal"><span class="fas fa-times"></span> İptal</button>
+                <button type="button" class="btn btn-primary btn-block" id="btnSave"><span class="fas fa-save"></span> Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>

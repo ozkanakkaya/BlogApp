@@ -28,7 +28,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromForm] UserRegisterDto registerDto)
+        public async Task<IActionResult> Register(UserRegisterDto registerDto)
         {
             var result = _validator.Validate(registerDto);
 
@@ -38,9 +38,9 @@ namespace BlogApp.API.Controllers
 
                 if (user.Errors.Any())//aynı kullanıcı adı kayıtlıysa girer
                 {
-                    return CreateActionResult(CustomResponseDto<UserRegisterDto>.Fail(user.StatusCode, user.Errors));
+                    return CreateActionResult(CustomResponseDto<UserDto>.Fail(user.StatusCode, user.Errors));
                 }
-                return CreateActionResult(CustomResponseDto<UserRegisterDto>.Success(user.StatusCode, user.Data));
+                return CreateActionResult(CustomResponseDto<UserDto>.Success(user.StatusCode, user.Data));
             }
 
             foreach (var error in result.Errors)

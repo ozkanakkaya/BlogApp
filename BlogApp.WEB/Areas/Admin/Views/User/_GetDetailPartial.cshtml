@@ -10,9 +10,31 @@
             </div>
             <div class="modal-body">
                 <div class="form-row">
+
                     <div class="form-group col-md-12">
                         <label>Hakkında</label>
                         <textarea class="form-control" asp-for="About" rows="6" disabled="disabled"></textarea>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Cinsiyet</label>
+                        <input type="text" class="form-control" asp-for="GenderId" disabled="disabled">
+                        @if (Model.GenderId == 1)
+                        {
+                            <script>document.querySelector('input[name="GenderId"]').value = "Erkek";</script>
+                        }
+                        else if (Model.GenderId == 2)
+                        {
+                            <script>document.querySelector('input[name="GenderId"]').value = "Kız";</script>
+                        }
+                        else if (Model.GenderId == 3)
+                        {
+                            <script>document.querySelector('input[name="GenderId"]').value = "Belirtilmedi";</script>
+                        }
+                        </>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Telefon Numarası</label>
+                        <input type="text" class="form-control" asp-for="PhoneNumber" disabled="disabled" />
                     </div>
                     <div class="form-group col-md-6">
                         <label>GitHub</label>

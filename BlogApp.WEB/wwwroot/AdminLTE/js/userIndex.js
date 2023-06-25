@@ -42,8 +42,6 @@
                                             user.Email,
                                             user.Firstname,
                                             user.Lastname,
-                                            user.PhoneNumber,
-                                            user.About.length > 75 ? user.About.substring(0, 75) : user.About,
                                             `<img src="/img/${user.ImageUrl}" alt="${user.Username}" class="my-image-table" />`,
                                             `
                                 <button class="btn btn-info btn-sm btn-detail" data-id="${user.Id}"><span class="fas fa-newspaper"></span></button>
@@ -146,32 +144,30 @@
                         if (isValid) {
                             placeHolderDiv.find('.modal').modal('hide');
                             const newTableRow = dataTable.row.add([
-                                userAddAjaxModel.UserDto.User.Id,
-                                userAddAjaxModel.UserDto.User.UserName,
-                                userAddAjaxModel.UserDto.User.Email,
-                                userAddAjaxModel.UserDto.User.FirstName,
-                                userAddAjaxModel.UserDto.User.LastName,
-                                userAddAjaxModel.UserDto.User.PhoneNumber,
-                                userAddAjaxModel.UserDto.User.About.length > 75 ? userAddAjaxModel.UserDto.User.About.substring(0, 75) : userAddAjaxModel.UserDto.User.About,
-                                `<img src="/img/${userAddAjaxModel.UserDto.User.Picture}" alt="${userAddAjaxModel.UserDto.User.UserName}" class="my-image-table" />`,
+                                userAddAjaxModel.UserViewModel.UserDto.Id,
+                                userAddAjaxModel.UserViewModel.UserDto.Username,
+                                userAddAjaxModel.UserViewModel.UserDto.Email,
+                                userAddAjaxModel.UserViewModel.UserDto.Firstname,
+                                userAddAjaxModel.UserViewModel.UserDto.Lastname,
+                                `<img src="/img/${userAddAjaxModel.UserViewModel.UserDto.ImageUrl}" alt="${userAddAjaxModel.UserViewModel.UserDto.Username}" class="my-image-table" />`,
                                 `
-                                <button class="btn btn-info btn-sm btn-detail" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-newspaper"></span></button>
-                                <button class="btn btn-warning btn-sm btn-assign" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-user-shield"></span></button>
-                                <button class="btn btn-primary btn-sm btn-update" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-edit"></span></button>
-                                <button class="btn btn-danger btn-sm btn-delete" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-minus-circle"></span></button>
+                                <button class="btn btn-info btn-sm btn-detail" data-id="${userAddAjaxModel.UserViewModel.UserDto.Id}"><span class="fas fa-newspaper"></span></button>
+                                <button class="btn btn-warning btn-sm btn-assign" data-id="${userAddAjaxModel.UserViewModel.UserDto.Id}"><span class="fas fa-user-shield"></span></button>
+                                <button class="btn btn-primary btn-sm btn-update" data-id="${userAddAjaxModel.UserViewModel.UserDto.Id}"><span class="fas fa-edit"></span></button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="${userAddAjaxModel.UserViewModel.UserDto.Id}"><span class="fas fa-minus-circle"></span></button>
                             `
                             ]).node();
                             const jqueryTableRow = $(newTableRow);
-                            jqueryTableRow.attr('name', `${userAddAjaxModel.UserDto.User.Id}`);
+                            jqueryTableRow.attr('name', `${userAddAjaxModel.UserViewModel.UserDto.Id}`);
                             dataTable.row(newTableRow).draw();
-                            toastr.success(`${userAddAjaxModel.UserDto.Message}`, 'Başarılı İşlem!');
+                            toastr.success(`${userAddAjaxModel.UserViewModel.Message}`, 'Başarılı İşlem!');
                         } else {
                             let summaryText = "";
                             $('#validation-summary > ul > li').each(function () {
                                 let text = $(this).text();
-                                summaryText = `*${text}\n`;
+                                summaryText += `*${text}<br/>`;
                             });
-                            toastr.warning(summaryText);
+                            toastr.error(summaryText);
                         }
                     },
                     error: function (err) {

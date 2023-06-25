@@ -6,7 +6,7 @@ namespace BlogApp.Core.Services
 {
     public interface IUserService : IService<User>
     {
-        Task<CustomResponseDto<UserRegisterDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId);
+        Task<CustomResponseDto<UserDto>> RegisterWithRoleAsync(UserRegisterDto dto, int roleId);
         Task<CustomResponseDto<CheckUserResponseDto>> CheckUserAsync(UserLoginDto dto);
         Task<CustomResponseDto<List<UserListDto>>> GetAllByActiveAsync();
         Task<CustomResponseDto<List<UserListDto>>> GetAllUsersAsync();

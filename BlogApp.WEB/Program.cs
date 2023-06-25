@@ -1,7 +1,9 @@
+using BlogApp.Business.Helpers;
 using BlogApp.Business.Services;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Services;
+using BlogApp.Core.Utilities.Abstract;
 using BlogApp.WEB.Configurations;
 using BlogApp.WEB.Services;
 using BlogApp.WEB.Validations;
@@ -12,6 +14,7 @@ using Microsoft.CodeAnalysis.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using static System.Net.WebRequestMethods;
+using FileAccess = BlogApp.Business.Helpers.FileAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +55,8 @@ builder.Services.AddScoped<IValidator<EmailSendDto>, EmailSendDtoValidator>();
 builder.Services.AddScoped<IMailService, MailService>();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<IImageHelper, ImageHelper>();
+builder.Services.AddScoped<IFileAccess, FileAccess>();
 
 builder.Services.AddHttpContextAccessor();
 
