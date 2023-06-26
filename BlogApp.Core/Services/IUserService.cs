@@ -16,7 +16,7 @@ namespace BlogApp.Core.Services
         Task<CustomResponseDto<NoContent>> HardDeleteAsync(int userId);
         Task<CustomResponseDto<List<UserListDto>>> GetAllByDeletedAsync();
         Task<CustomResponseDto<List<UserListDto>>> GetAllByInactiveAsync();
-        Task<CustomResponseDto<NoContent>> UpdateUserAsync(UserUpdateDto appUserUpdateDto);
+        Task<CustomResponseDto<UserDto>> UpdateUserAsync(UserUpdateDto appUserUpdateDto);
         Task<CustomResponseDto<NoContent>> PasswordChangeAsync(UserPasswordChangeDto appUserPasswordChangeDto, string userId);
         Task<CustomResponseDto<NoContent>> ActivateUserAsync(int userId);
         Task<CustomResponseDto<NoContent>> DeleteUserImageAsync(int userId);

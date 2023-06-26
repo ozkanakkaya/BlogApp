@@ -1,4 +1,5 @@
-﻿using BlogApp.Core.DTOs.Concrete;
+﻿using AutoMapper;
+using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums;
 using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Utilities.Abstract;
@@ -17,11 +18,13 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
     {
         private readonly UserApiService _userApiService;
         private readonly IImageHelper _imageHelper;
+        private readonly IMapper _mapper;
 
-        public UserController(UserApiService userApiService, IImageHelper imageHelper)
+        public UserController(UserApiService userApiService, IImageHelper imageHelper, IMapper mapper)
         {
             _userApiService = userApiService;
             _imageHelper = imageHelper;
+            _mapper = mapper;
         }
 
         [Authorize(Roles = "SuperAdmin,User.Read")]
@@ -154,8 +157,81 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             }
         }
 
+        [Authorize(Roles = "SuperAdmin,User.Update")]
+        public async Task<IActionResult> Update(int userId)
+        {
+            var user = await _userApiService.GetUserByIdAsync(userId);
 
+            return PartialView("_UserUpdatePartial", _mapper.Map<UserUpdateDto>(user.Data));
+        }
 
+        [Authorize(Roles = "SuperAdmin,User.Update")]
+        [HttpPost]
+        public async Task<JsonResult> Update(UserUpdateDto userUpdateDto)
+        {
+            if (ModelState.IsValid)
+            {
+                bool isNewImageUploaded = false;
+
+                var oldUserImage = userUpdateDto.ImageUrl;
+
+                if (userUpdateDto.ImageFile != null)
+                {
+                    var uploadedImageDtoResult = await _imageHelper.UploadAsync(userUpdateDto.Username, userUpdateDto.ImageFile, ImageType.User);
+
+                    if (uploadedImageDtoResult.StatusCode == 200)
+                        userUpdateDto.ImageUrl = uploadedImageDtoResult.Data.FullName;
+
+                    if (oldUserImage != "userImages/defaultUser.png")
+                        isNewImageUploaded = true;
+                }
+
+                var result = await _userApiService.UpdateAsync(userUpdateDto);
+
+                if (isNewImageUploaded)
+                {
+                    await _imageHelper.DeleteAsync(oldUserImage);
+                }
+
+                if (!result.Errors.Any())
+                {
+                    var userUpdateAjaxModel = JsonSerializer.Serialize(new UserUpdateAjaxViewModel
+                    {
+                        UserViewModel = new UserViewModel
+                        {
+                            ResultStatus = ResultStatus.Success,
+                            Message = $"'{result.Data.Username}' adlı kullanıcı bilgileri başarılı bir şekilde güncellenmiştir.",
+                            UserDto = result.Data
+                        },
+                        UserUpdatePartial = await this.RenderViewToStringAsync("_UserUpdatePartial", userUpdateDto)
+                    });
+                    return Json(userUpdateAjaxModel);
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+
+                    var userUpdateAjaxErrorModel = JsonSerializer.Serialize(new UserUpdateAjaxViewModel
+                    {
+                        UserUpdateDto = userUpdateDto,
+                        UserUpdatePartial = await this.RenderViewToStringAsync("_UserUpdatePartial", userUpdateDto)
+                    });
+                    return Json(userUpdateAjaxErrorModel);
+                }
+            }
+            else
+            {
+                var userUpdateAjaxModelStateErrorModel = JsonSerializer.Serialize(new UserUpdateAjaxViewModel
+                {
+                    UserUpdateDto = userUpdateDto,
+                    UserUpdatePartial = await this.RenderViewToStringAsync("_UserUpdatePartial", userUpdateDto)
+                });
+                return Json(userUpdateAjaxModelStateErrorModel);
+            }
+        }
 
 
 

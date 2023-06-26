@@ -191,36 +191,36 @@ namespace BlogApp.Business.Services
             return CustomResponseDto<List<UserListDto>>.Fail(404, "Aktif olmayan bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<NoContent>> UpdateUserAsync(UserUpdateDto appUserUpdateDto)
+        public async Task<CustomResponseDto<UserDto>> UpdateUserAsync(UserUpdateDto userUpdateDto)
         {
-            bool isNewImageUploaded = false;
+            //bool isNewImageUploaded = false;
 
-            var oldUser = UnitOfWork.Users.Where(x => x.Id == appUserUpdateDto.Id).SingleOrDefault();
+            var oldUser = UnitOfWork.Users.Where(x => x.Id == userUpdateDto.Id).SingleOrDefault();
 
-            var oldUserImage = oldUser.ImageUrl;
+            //var oldUserImage = oldUser.ImageUrl;
 
-            if (appUserUpdateDto.ImageFile != null)
-            {
-                var uploadedImageDtoResult = await _imageHelper.UploadAsync(oldUser.Username, appUserUpdateDto.ImageFile, ImageType.User);
-                if (uploadedImageDtoResult.StatusCode == 200)
-                    appUserUpdateDto.ImageUrl = uploadedImageDtoResult.Data.FullName;
+            //if (/*userUpdateDto.ImageFile != null && */oldUserImage!=userUpdateDto.ImageUrl)
+            //{
+            //    //var uploadedImageDtoResult = await _imageHelper.UploadAsync(oldUser.Username, UserUpdateDto.ImageFile, ImageType.User);
+            //    //if (uploadedImageDtoResult.StatusCode == 200)
+            //    //    UserUpdateDto.ImageUrl = uploadedImageDtoResult.Data.FullName;
 
-                if (oldUserImage != "userImages/defaultUser.png")
-                    isNewImageUploaded = true;
-            }
+            //    //if (oldUserImage != "userImages/defaultUser.png")
+            //    //    isNewImageUploaded = true;
+            //}
 
-            var updateUser = Mapper.Map<UserUpdateDto, User>(appUserUpdateDto, oldUser);
+            var updateUser = Mapper.Map<UserUpdateDto, User>(userUpdateDto, oldUser);
 
             UnitOfWork.Users.Update(updateUser);
 
             await UnitOfWork.CommitAsync();
 
-            if (isNewImageUploaded)
-            {
-                await _imageHelper.DeleteAsync(oldUserImage);
-            }
+            //if (isNewImageUploaded)
+            //{
+            //    await _imageHelper.DeleteAsync(oldUserImage);
+            //}
 
-            return CustomResponseDto<NoContent>.Success(204);
+            return CustomResponseDto<UserDto>.Success(200, Mapper.Map<UserDto>(updateUser));
         }
 
         public async Task<CustomResponseDto<NoContent>> PasswordChangeAsync(UserPasswordChangeDto userPasswordChangeDto, string userId)

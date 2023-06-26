@@ -273,35 +273,33 @@
                         placeHolderDiv.find('.modal-body').replaceWith(newFormBody);
                         const isValid = newFormBody.find('[name="IsValid"]').val() === 'True';
                         if (isValid) {
-                            const id = userUpdateAjaxModel.UserDto.User.Id;
+                            const id = userUpdateAjaxModel.UserViewModel.UserDto.Id;
                             const tableRow = $(`[name="${id}"]`);
                             placeHolderDiv.find('.modal').modal('hide');
                             dataTable.row(tableRow).data([
-                                userUpdateAjaxModel.UserDto.User.Id,
-                                userUpdateAjaxModel.UserDto.User.UserName,
-                                userUpdateAjaxModel.UserDto.User.Email,
-                                userUpdateAjaxModel.UserDto.User.FirstName,
-                                userUpdateAjaxModel.UserDto.User.LastName,
-                                userUpdateAjaxModel.UserDto.User.PhoneNumber,
-                                userUpdateAjaxModel.UserDto.User.About.length > 75 ? userUpdateAjaxModel.UserDto.User.About.substring(0, 75) : userUpdateAjaxModel.UserDto.User.About,
-                                `<img src="/img/${userUpdateAjaxModel.UserDto.User.Picture}" alt="${userUpdateAjaxModel.UserDto.User.UserName}" class="my-image-table" />`,
+                                userUpdateAjaxModel.UserViewModel.UserDto.Id,
+                                userUpdateAjaxModel.UserViewModel.UserDto.Username,
+                                userUpdateAjaxModel.UserViewModel.UserDto.Email,
+                                userUpdateAjaxModel.UserViewModel.UserDto.Firstname,
+                                userUpdateAjaxModel.UserViewModel.UserDto.Lastname,
+                                `<img src="/img/${userUpdateAjaxModel.UserViewModel.UserDto.ImageUrl}" alt="${userUpdateAjaxModel.UserViewModel.UserDto.Username}" class="my-image-table" />`,
                                 `
-                                <button class="btn btn-info btn-sm btn-detail" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-newspaper"></span></button>
-                                <button class="btn btn-warning btn-sm btn-assign" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-user-shield"></span></button>
-                                <button class="btn btn-primary btn-sm btn-update" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-edit"></span></button>
-                                <button class="btn btn-danger btn-sm btn-delete" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-minus-circle"></span></button>
+                                <button class="btn btn-info btn-sm btn-detail" data-id="${userUpdateAjaxModel.UserViewModel.UserDto.Id}"><span class="fas fa-newspaper"></span></button>
+                                <button class="btn btn-warning btn-sm btn-assign" data-id="${userUpdateAjaxModel.UserViewModel.UserDto.Id}"><span class="fas fa-user-shield"></span></button>
+                                <button class="btn btn-primary btn-sm btn-update" data-id="${userUpdateAjaxModel.UserViewModel.UserDto.Id}"><span class="fas fa-edit"></span></button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="${userUpdateAjaxModel.UserViewModel.UserDto.Id}"><span class="fas fa-minus-circle"></span></button>
                             `
                             ]);
                             tableRow.attr("name", `${id}`);
                             dataTable.row(tableRow).invalidate();
-                            toastr.success(`${userUpdateAjaxModel.UserDto.Message}`, "Başarılı İşlem!");
+                            toastr.success(`${userUpdateAjaxModel.UserViewModel.Message}`, "Başarılı İşlem!");
                         } else {
                             let summaryText = "";
                             $('#validation-summary > ul > li').each(function () {
                                 let text = $(this).text();
-                                summaryText = `*${text}\n`;
+                                summaryText += `*${text}<br/>`;
                             });
-                            toastr.warning(summaryText);
+                            toastr.error(summaryText);
                         }
                     },
                     error: function (error) {
@@ -379,7 +377,7 @@
                             let summaryText = "";
                             $('#validation-summary > ul > li').each(function () {
                                 let text = $(this).text();
-                                summaryText = `*${text}\n`;
+                                summaryText += `*${text}<br/>`;
                             });
                             toastr.warning(summaryText);
                         }

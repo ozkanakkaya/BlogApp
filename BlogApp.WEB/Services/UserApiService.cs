@@ -144,19 +144,19 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<CustomResponseDto<NoContent>> UpdateAsync([FromForm] UserUpdateDto newUser)
+        public async Task<CustomResponseDto<UserDto>> UpdateAsync([FromForm] UserUpdateDto newUser)
         {
             var response = await _httpClient.PutAsJsonAsync("user", newUser);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<UserDto>>();
 
             if (responseBody.Errors.Any())
             {
-                return CustomResponseDto<NoContent>.Fail(responseBody.StatusCode, responseBody.Errors);
+                return CustomResponseDto<UserDto>.Fail(responseBody.StatusCode, responseBody.Errors);
             }
             else
             {
-                return CustomResponseDto<NoContent>.Success(responseBody.StatusCode);
+                return CustomResponseDto<UserDto>.Success(responseBody.StatusCode, responseBody.Data);
             }
         }
 

@@ -18,6 +18,7 @@ namespace BlogApp.Business.Mapping
             CreateMap<User, UserPasswordChangeDto>()
                 .ForPath(dest => dest.NewPassword, opt => opt.MapFrom(src => src.PasswordHash))
                 .ReverseMap();
+            CreateMap<UserListDto, UserUpdateDto>().ReverseMap();
         }
     }
 }

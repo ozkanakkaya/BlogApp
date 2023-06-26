@@ -1,4 +1,6 @@
+using AutoMapper;
 using BlogApp.Business.Helpers;
+using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
 using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
@@ -45,6 +47,18 @@ builder.Services.AddHttpClient<AuthApiService>(opt =>
 {
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
 });
+
+//**Mappleme
+var profiles = ProfileHelper.GetProfiles();
+profiles.Add(new UserProfile());
+
+var configuration = new MapperConfiguration(opt =>
+{
+    opt.AddProfiles(profiles);
+});
+var mapper = configuration.CreateMapper();
+builder.Services.AddSingleton(mapper);
+//**Mappleme
 
 builder.Services.Configure<BlogRightSideBarWidgetOptions>(builder.Configuration.GetSection("BlogRightSideBarWidgetOptions"));
 builder.Services.Configure<AboutUsPageInfo>(builder.Configuration.GetSection("AboutUsPageInfo"));

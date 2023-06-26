@@ -145,7 +145,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromForm] UserUpdateDto appUserUpdateDto)
+        public async Task<IActionResult> UpdateUser(UserUpdateDto appUserUpdateDto)
         {
             var result = _userUpdateDtoValidator.Validate(appUserUpdateDto);
 
@@ -153,9 +153,9 @@ namespace BlogApp.API.Controllers
             {
                 var resultUpdate = await _userService.UpdateUserAsync(appUserUpdateDto);
 
-                if (resultUpdate.StatusCode == 204)
+                if (!resultUpdate.Errors.Any())
                 {
-                    return CreateActionResult(CustomResponseDto<NoContent>.Success(204));
+                    return CreateActionResult(CustomResponseDto<UserDto>.Success(resultUpdate.StatusCode,resultUpdate.Data));
                 }
             }
 
@@ -166,7 +166,7 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<UserDto>.Fail(400, errors));
         }
 
         [HttpPut("[action]")]
