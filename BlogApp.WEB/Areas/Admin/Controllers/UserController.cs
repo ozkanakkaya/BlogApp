@@ -8,6 +8,8 @@ using BlogApp.WEB.Services;
 using BlogApp.WEB.Utilities.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NToastNotify;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -19,12 +21,14 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         private readonly UserApiService _userApiService;
         private readonly IImageHelper _imageHelper;
         private readonly IMapper _mapper;
+        private readonly IToastNotification _toastNotification;
 
-        public UserController(UserApiService userApiService, IImageHelper imageHelper, IMapper mapper)
+        public UserController(UserApiService userApiService, IImageHelper imageHelper, IMapper mapper, IToastNotification toastNotification)
         {
             _userApiService = userApiService;
             _imageHelper = imageHelper;
             _mapper = mapper;
+            _toastNotification = toastNotification;
         }
 
         [Authorize(Roles = "SuperAdmin,User.Read")]
@@ -188,19 +192,19 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
 
                 var result = await _userApiService.UpdateAsync(userUpdateDto);
 
-                if (isNewImageUploaded)
-                {
-                    await _imageHelper.DeleteAsync(oldUserImage);
-                }
-
                 if (!result.Errors.Any())
                 {
+                    if (isNewImageUploaded)
+                    {
+                        await _imageHelper.DeleteAsync(oldUserImage);
+                    }
+
                     var userUpdateAjaxModel = JsonSerializer.Serialize(new UserUpdateAjaxViewModel
                     {
                         UserViewModel = new UserViewModel
                         {
                             ResultStatus = ResultStatus.Success,
-                            Message = $"'{result.Data.Username}' adlı kullanıcı bilgileri başarılı bir şekilde güncellenmiştir.",
+                            Message = $"'{result.Data.Username}' adlı kullanıcının bilgileri başarılı bir şekilde güncellenmiştir.",
                             UserDto = result.Data
                         },
                         UserUpdatePartial = await this.RenderViewToStringAsync("_UserUpdatePartial", userUpdateDto)
@@ -233,11 +237,67 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             }
         }
 
+        [Authorize]
+        public async Task<IActionResult> ProfileUpdate()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            var user = await _userApiService.GetUserByIdAsync(int.Parse(userId));
 
+            return View(_mapper.Map<UserUpdateDto>(user.Data));
+        }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ProfileUpdate(UserUpdateDto userUpdateDto)
+        {
+            if (ModelState.IsValid)
+            {
+                bool isNewImageUploaded = false;
 
+                var oldUserImage = userUpdateDto.ImageUrl;
 
+                if (userUpdateDto.ImageFile != null)
+                {
+                    var uploadedImageDtoResult = await _imageHelper.UploadAsync(userUpdateDto.Username, userUpdateDto.ImageFile, ImageType.User);
+
+                    if (uploadedImageDtoResult.StatusCode == 200)
+                        userUpdateDto.ImageUrl = uploadedImageDtoResult.Data.FullName;
+
+                    if (oldUserImage != "userImages/defaultUser.png")
+                        isNewImageUploaded = true;
+                }
+
+                var result = await _userApiService.UpdateAsync(userUpdateDto);
+
+                if (!result.Errors.Any())
+                {
+                    if (isNewImageUploaded)
+                    {
+                        await _imageHelper.DeleteAsync(oldUserImage);
+                    }
+
+                    _toastNotification.AddSuccessToastMessage("Bilgileriniz başarılı bir şekilde güncellenmiştir.", new ToastrOptions
+                    {
+                        Title = "İşlem Başarılı"
+                    });
+                    return View(userUpdateDto);
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+
+                    return View(userUpdateDto);
+                }
+            }
+            else
+            {
+                return View(userUpdateDto);
+            }
+        }
 
 
 

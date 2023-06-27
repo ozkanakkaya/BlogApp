@@ -1,16 +1,16 @@
 ﻿@model BlogApp.Core.DTOs.Concrete.UserUpdateDto
-<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><span class="fas fa-edit"></span> Kullanıcı Düzenle</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="İptal">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Profile Düzenle";
+}
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="card mt-1 mb-1">
+            <div class="card-header">
+                <h5 class="text-center"><span class="fas fa-edit"></span> Profil Düzenle</h5>
             </div>
-            <div class="modal-body">
-                <form asp-action="Update" id="form-user-update">
-                    <input name="IsValid" type="hidden" value="@ViewData.ModelState.IsValid.ToString()" />
+            <div class="card-body">
+                <form asp-controller="User" asp-action="ProfileUpdate" id="form-user-update" enctype="multipart/form-data" method="post">
                     <div asp-validation-summary="All" class="text-danger" id="validation-summary" aria-hidden="true" style="display: none;"></div>
                     <input asp-for="Id" type="hidden" />
                     <div class="form-row">
@@ -71,15 +71,15 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label>Profil Fotoğrafı Yükle</label>
-                            <input type="file" accept="image/*" class="form-control-file" asp-for="ImageFile"/>
+                            <input type="file" accept="image/*" class="form-control-file" asp-for="ImageFile" />
                             <span class="text-danger" asp-validation-for="ImageFile"></span>
+                        </div>
+                        <div class="form-group col-md-12 text-center">
+                            <a class="btn btn-danger btn-lg" asp-area="Admin" asp-controller="Home" asp-action="Index"><span class="fas fa-times"></span> İptal</a>
+                            <button type="submit" class="btn btn-primary btn-lg ml-2"><span class="fas fa-save"></span> Kaydet</button>
                         </div>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger btn-block" data-dismiss="modal"><span class="fas fa-times"></span> İptal</button>
-                <button type="button" class="btn btn-primary btn-block" id="btnUpdate"><span class="fas fa-save"></span> Kaydet</button>
             </div>
         </div>
     </div>
