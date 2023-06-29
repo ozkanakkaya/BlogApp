@@ -1,5 +1,6 @@
 using AutoMapper;
 using BlogApp.Business.Helpers;
+using BlogApp.Business.Jwt;
 using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
 using BlogApp.Core.DTOs.Concrete;
@@ -48,6 +49,11 @@ builder.Services.AddHttpClient<AuthApiService>(opt =>
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
 });
 
+builder.Services.AddHttpClient<RoleApiService>(opt =>
+{
+    opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
+});
+
 //**Mappleme
 var profiles = ProfileHelper.GetProfiles();
 profiles.Add(new UserProfile());
@@ -63,10 +69,12 @@ builder.Services.AddSingleton(mapper);
 builder.Services.Configure<BlogRightSideBarWidgetOptions>(builder.Configuration.GetSection("BlogRightSideBarWidgetOptions"));
 builder.Services.Configure<AboutUsPageInfo>(builder.Configuration.GetSection("AboutUsPageInfo"));
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 
 builder.Services.AddScoped<IValidator<EmailSendDto>, EmailSendDtoValidator>();
 
 builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddScoped<TokenGenerator>();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IImageHelper, ImageHelper>();

@@ -169,20 +169,20 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponseDto<UserDto>.Fail(400, errors));
         }
 
-        [HttpPut("[action]")]
-        [CheckUserId]
-        public async Task<IActionResult> PasswordChange([FromForm] UserPasswordChangeDto userPasswordChangeDto)
+        [HttpPut("[action]/{userId}")]
+        //[CheckUserId]
+        public async Task<IActionResult> PasswordChange(int userId, UserPasswordChangeDto userPasswordChangeDto)
         {
             var result = _userPasswordChangeDtoValidator.Validate(userPasswordChangeDto);
 
             if (result.IsValid)
             {
-                var userId = HttpContext.Items["userId"] as string;
+                //var userId = HttpContext.Items["userId"] as string;
 
                 var resultUpdate = await _userService.PasswordChangeAsync(userPasswordChangeDto, userId);
 
                 return !resultUpdate.Errors.Any()
-                    ? CreateActionResult(CustomResponseDto<NoContent>.Success(204))
+                    ? CreateActionResult(CustomResponseDto<NoContent>.Success(200))
                     : CreateActionResult(CustomResponseDto<NoContent>.Fail(400, resultUpdate.Errors));
             }
 

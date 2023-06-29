@@ -160,9 +160,9 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<CustomResponseDto<NoContent>> PasswordChangeAsync([FromForm] UserPasswordChangeDto newPassword)
+        public async Task<CustomResponseDto<NoContent>> PasswordChangeAsync(UserPasswordChangeDto newPassword, int userId)
         {
-            var response = await _httpClient.PutAsJsonAsync("user/PasswordChange", newPassword);
+            var response = await _httpClient.PutAsJsonAsync($"user/PasswordChange/{userId}", newPassword);
 
             var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
 

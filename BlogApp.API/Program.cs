@@ -1,7 +1,7 @@
 using AutoMapper;
 using BlogApp.API.Filter;
-using BlogApp.API.Jwt;
 using BlogApp.Business.Helpers;
+using BlogApp.Business.Jwt;
 using BlogApp.Business.Mapping;
 using BlogApp.Business.Services;
 using BlogApp.Business.Validations;
@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
 using System.Reflection;
 using System.Text;
 using FileAccess = BlogApp.Business.Helpers.FileAccess;
@@ -101,17 +102,21 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IImageHelper, ImageHelper>();
 builder.Services.AddScoped<IFileAccess, FileAccess>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<TokenGenerator>();
 
+builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
+
+var tokenSettings = builder.Configuration.GetSection("TokenSettings").Get<TokenSettings>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
 {
     opt.RequireHttpsMetadata = false;
     opt.TokenValidationParameters = new TokenValidationParameters()
     {
-        ValidAudience = TokenSettings.Audience,
-        ValidIssuer = TokenSettings.Issuer,
+        ValidAudience = tokenSettings.Audience,
+        ValidIssuer = tokenSettings.Issuer,
         ClockSkew = TimeSpan.Zero,
         ValidateLifetime = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenSettings.Key)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSettings.Key)),
         ValidateIssuerSigningKey = true
     };
 });

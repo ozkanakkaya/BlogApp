@@ -204,9 +204,9 @@ namespace BlogApp.Business.Services
             return CustomResponseDto<UserDto>.Success(200, Mapper.Map<UserDto>(updateUser));
         }
 
-        public async Task<CustomResponseDto<NoContent>> PasswordChangeAsync(UserPasswordChangeDto userPasswordChangeDto, string userId)
+        public async Task<CustomResponseDto<NoContent>> PasswordChangeAsync(UserPasswordChangeDto userPasswordChangeDto, int userId)
         {
-            var user = await UnitOfWork.Users.GetAsync(x => x.Id == int.Parse(userId));
+            var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
 
             var resultPassword = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, userPasswordChangeDto.CurrentPassword);
 
@@ -217,7 +217,7 @@ namespace BlogApp.Business.Services
                 UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(200);
             }
             else
             {

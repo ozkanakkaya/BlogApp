@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using BlogApp.API.Jwt;
+﻿using BlogApp.Business.Jwt;
 using BlogApp.Core.DTOs.Concrete;
-using BlogApp.Core.Enums;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogApp.API.Controllers
@@ -13,11 +10,13 @@ namespace BlogApp.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
+        private readonly TokenGenerator _tokenGenerator;
 
-        public AuthController(IUserService userService, IRoleService roleService)
+        public AuthController(IUserService userService, IRoleService roleService, TokenGenerator tokenGenerator)
         {
             _userService = userService;
             _roleService = roleService;
+            _tokenGenerator = tokenGenerator;
         }
 
         [HttpPost("[action]")]
@@ -27,7 +26,7 @@ namespace BlogApp.API.Controllers
             if (!result.Errors.Any())
             {
                 var roleResult = await _roleService.GetAllByUserIdAsync(result.Data.Id);
-                var token = TokenGenerator.GenerateToken(result.Data, roleResult.Data);
+                var token = _tokenGenerator.GenerateToken(result.Data, roleResult.Data);
 
                 return CreateActionResult(CustomResponseDto<TokenResponse>.Success(result.StatusCode, token));
 

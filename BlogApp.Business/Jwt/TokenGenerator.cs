@@ -1,17 +1,25 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Response;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace BlogApp.API.Jwt
+namespace BlogApp.Business.Jwt
 {
     public class TokenGenerator
     {
-        public static TokenResponse GenerateToken(CheckUserResponseDto dto, RoleListDto roles)
+        private readonly TokenSettings _settings;
+
+        public TokenGenerator(IOptionsSnapshot<TokenSettings> settings)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenSettings.Key));
+            _settings = settings.Value;
+        }
+
+        public TokenResponse GenerateToken(CheckUserResponseDto dto, RoleListDto roles)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
 
             SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -25,9 +33,9 @@ namespace BlogApp.API.Jwt
             claims.Add(new Claim(ClaimTypes.Name, dto.Username));
             claims.Add(new Claim(ClaimTypes.NameIdentifier, dto.Id.ToString()));
 
-            var expireDate = DateTime.UtcNow.AddMinutes(TokenSettings.Expire);
+            var expireDate = DateTime.UtcNow.AddMinutes(_settings.Expire);
 
-            JwtSecurityToken token = new JwtSecurityToken(issuer: TokenSettings.Issuer, audience: TokenSettings.Audience, claims: claims, notBefore: DateTime.UtcNow, expires: expireDate, signingCredentials: credentials);
+            JwtSecurityToken token = new JwtSecurityToken(issuer: _settings.Issuer, audience: _settings.Audience, claims: claims, notBefore: DateTime.UtcNow, expires: expireDate, signingCredentials: credentials);
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
 

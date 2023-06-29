@@ -1,4 +1,5 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
+using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,17 @@ namespace BlogApp.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _roleService.GetAllRolesAsync();
+            if (result.Errors.Any())
+            {
+                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
+            }
+            return CreateActionResult(CustomResponseDto<RoleListDto>.Success(result.StatusCode, result.Data));
+        }
+
+        [HttpGet("[action]/{userId}")]
+        public async Task<IActionResult> GetAllByUserId(int userId)
+        {
+            var result = await _roleService.GetAllByUserIdAsync(userId);
             if (result.Errors.Any())
             {
                 return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));

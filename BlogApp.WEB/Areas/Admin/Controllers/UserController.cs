@@ -6,12 +6,16 @@ using BlogApp.Core.Utilities.Abstract;
 using BlogApp.WEB.Models;
 using BlogApp.WEB.Services;
 using BlogApp.WEB.Utilities.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BlogApp.Business.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace BlogApp.WEB.Areas.Admin.Controllers
 {
@@ -19,16 +23,18 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly UserApiService _userApiService;
+        private readonly TokenGenerator _tokenGenerator;
         private readonly IImageHelper _imageHelper;
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public UserController(UserApiService userApiService, IImageHelper imageHelper, IMapper mapper, IToastNotification toastNotification)
+        public UserController(UserApiService userApiService, IImageHelper imageHelper, IMapper mapper, IToastNotification toastNotification, TokenGenerator tokenGenerator)
         {
             _userApiService = userApiService;
             _imageHelper = imageHelper;
             _mapper = mapper;
             _toastNotification = toastNotification;
+            _tokenGenerator = tokenGenerator;
         }
 
         [Authorize(Roles = "SuperAdmin,User.Read")]
@@ -299,7 +305,77 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             }
         }
 
+        [Authorize]
+        public IActionResult PasswordChange()
+        {
+            return View();
+        }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> PasswordChange(UserPasswordChangeDto userPasswordChangeDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var result = await _userApiService.PasswordChangeAsync(userPasswordChangeDto, userId);
+
+                if (!result.Errors.Any())
+                {
+                    await HttpContext.SignOutAsync(JwtBearerDefaults.AuthenticationScheme);
+
+                    //LogOut olduktan sonra token oluşturarak yeniden giriş yapılıyor
+                    var user = await _userApiService.GetUserByIdAsync(userId);
+                    var tokenResponse = _tokenGenerator.GenerateToken(new CheckUserResponseDto { Id=user.Data.Id,Username= user.Data.Username},new RoleListDto { Roles = user.Data.Roles });
+
+                    JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                    var token = handler.ReadJwtToken(tokenResponse.Token);
+
+                    if (token != null)
+                    {
+                        var claims = token.Claims.ToList();
+                        claims.Add(new Claim("accessToken", tokenResponse.Token == null ? "" : tokenResponse.Token));
+
+                        ClaimsIdentity identity = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme);
+
+                        var authProps = new AuthenticationProperties
+                        {
+                            AllowRefresh = false,
+                            ExpiresUtc = tokenResponse.ExpireDate,
+                            IsPersistent = true,
+                        };
+
+                        await HttpContext.SignInAsync(JwtBearerDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProps);
+
+                        _toastNotification.AddSuccessToastMessage("Şefreniz başarılı bir şekilde güncellenmiştir.", new ToastrOptions
+                        {
+                            Title = "İşlem Başarılı"
+                        });
+
+                        return View(userPasswordChangeDto);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Yeni şifre ile otomatik olarak giriş yapılamadı!");
+
+                        return View(userPasswordChangeDto);
+                    }
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+
+                    return View(userPasswordChangeDto);
+                }
+            }
+            else
+            {
+                return View(userPasswordChangeDto);
+            }
+        }
 
 
     }
