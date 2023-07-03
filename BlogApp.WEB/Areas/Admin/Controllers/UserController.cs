@@ -62,14 +62,20 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         public async Task<JsonResult> GetAllUsers()
         {
             var users = await _userApiService.GetAllUsersAsync();
-            if (users.Errors != null || !users.Errors.Any())
+            if (!users.Errors.Any())
             {
                 var userListDto = JsonSerializer.Serialize(users.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
 
                 return Json(userListDto);
             }
-            ViewBag.ErrorMessage = users.Errors.FirstOrDefault();
-            return Json(new { error = ViewBag.ErrorMessage });
+
+            string errorMessages = String.Empty;
+            foreach (var error in users.Errors)
+            {
+                errorMessages = $"*{error}\n";
+            }
+
+            return Json(JsonSerializer.Serialize(new { error = errorMessages }));
         }
 
         [Authorize(Roles = "SuperAdmin,User.Create")]
@@ -375,6 +381,122 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             {
                 return View(userPasswordChangeDto);
             }
+        }
+
+        [Authorize(Roles = "SuperAdmin,User.Update")]
+        [HttpPost]
+        public async Task<JsonResult> UndoDelete(int userId)
+        {
+            var result = await _userApiService.UndoDeleteAsync(userId);
+            //var undoDeletedUser = JsonSerializer.Serialize(result.Data);
+            //return Json(undoDeletedUser);
+            if (!result.Errors.Any())
+            {
+                var undoDeletedUserModel = JsonSerializer.Serialize(new UserViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Message = $"'{result.Data.Username}' adlı kullanıcı başarıyla arşivden geri alındı.",
+                    UserDto = result.Data
+                });
+                return Json(undoDeletedUserModel);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
+
+                var undonDeletedUserErrorModel = JsonSerializer.Serialize(new UserViewModel
+                {
+                    ResultStatus = ResultStatus.Error,
+                    Message = $"{errorMessages}\n",
+                });
+                return Json(undonDeletedUserErrorModel);
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,User.Delete")]
+        [HttpPost]
+        public async Task<JsonResult> HardDelete(int userId)
+        {
+            var result = await _userApiService.HardDeleteAsync(userId);
+            //var undoDeletedUser = JsonSerializer.Serialize(result.Data);
+            //return Json(undoDeletedUser);
+            if (!result.Errors.Any() || result.Data != null)
+            {
+                var hardDeletedUserModel = JsonSerializer.Serialize(new UserViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Message = $"'{result.Data.Username}' adlı kullanıcı başarıyla tamamen silindi.",
+                    UserDto = result.Data
+                });
+
+                if (result.Data.ImageUrl != "userImages/defaultUser.png")
+                    await _imageHelper.DeleteAsync(result.Data.ImageUrl);
+
+                return Json(hardDeletedUserModel);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
+
+                var undonDeletedUserErrorModel = JsonSerializer.Serialize(new UserViewModel
+                {
+                    ResultStatus = ResultStatus.Error,
+                    Message = $"{errorMessages}\n",
+                });
+                return Json(undonDeletedUserErrorModel);
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,User.Read")]
+        public async Task<IActionResult> DeletedUsers(int userId)
+        {
+            var users = await _userApiService.GetAllByDeletedAsync();
+
+            if (!users.Errors.Any())
+                return View(users.Data);
+            else
+            {
+                ViewBag.ErrorMessage = users.Errors.FirstOrDefault();
+                return View();
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,User.Read")]
+        public async Task<JsonResult> GetAllDeletedUsers()
+        {
+            var users = await _userApiService.GetAllByDeletedAsync();
+            if (users.Data != null || !users.Errors.Any())
+            {
+                var userListModel = JsonSerializer.Serialize(new UserViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    UserListDto = users.Data
+                });
+
+                return Json(userListModel);
+            }
+
+            string errorMessages = String.Empty;
+            foreach (var error in users.Errors)
+            {
+                errorMessages = $"*{error}\n";
+            }
+
+            var userListModelError = JsonSerializer.Serialize(new UserViewModel
+            {
+                ResultStatus = ResultStatus.Error,
+                Message = $"{errorMessages}\n",
+            });
+
+            return Json(userListModelError);
         }
 
 

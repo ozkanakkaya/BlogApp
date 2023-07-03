@@ -30,11 +30,11 @@
                             $('.spinner-border').show();
                         },
                         success: function (data) {
-                            const userListDto = jQuery.parseJSON(data);
+                            const response = jQuery.parseJSON(data);
                             dataTable.clear();
-                            console.log(userListDto);
-                            if (!userListDto.error) {
-                                $.each(userListDto.$values,
+                            console.log(response);
+                            if (!response.error) {
+                                $.each(response.$values,
                                     function (index, user) {
                                         const newTableRow = dataTable.row.add([
                                             user.Id,
@@ -57,7 +57,7 @@
                                 $('.spinner-border').hide();
                                 $('#usersTable').fadeIn(1400);
                             } else {
-                                toastr.error(`${userListDto.error}`, 'İşlem Başarısız!');
+                                toastr.warning(`${response.error}`, 'Kayıt Bulunamadı!');
                             }
                         },
                         error: function (err) {

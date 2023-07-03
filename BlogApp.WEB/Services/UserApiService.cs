@@ -84,49 +84,49 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int userId)
+        public async Task<CustomResponseDto<UserDto>> UndoDeleteAsync(int userId)
         {
-            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<NoContent>>($"user/undodelete/{userId}", null);
+            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<UserDto>>($"user/undodelete/{userId}", null);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<UserDto>>();
 
             if (responseBody.Errors.Any())
             {
-                return CustomResponseDto<NoContent>.Fail(responseBody.StatusCode, responseBody.Errors);
+                return CustomResponseDto<UserDto>.Fail(responseBody.StatusCode, responseBody.Errors);
             }
             else
             {
-                return CustomResponseDto<NoContent>.Success(responseBody.StatusCode);
+                return CustomResponseDto<UserDto>.Success(responseBody.StatusCode, responseBody.Data);
             }
         }
 
-        public async Task<CustomResponseDto<NoContent>> HardDeleteAsync(int userId)
+        public async Task<CustomResponseDto<UserDto>> HardDeleteAsync(int userId)
         {
-            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<NoContent>>($"user/harddelete/{userId}", null);
+            var response = await _httpClient.PostAsJsonAsync<CustomResponseDto<UserDto>>($"user/{userId}", null);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<UserDto>>();
 
             if (responseBody.Errors.Any())
             {
-                return CustomResponseDto<NoContent>.Fail(responseBody.StatusCode, responseBody.Errors);
+                return CustomResponseDto<UserDto>.Fail(responseBody.StatusCode, responseBody.Errors);
             }
             else
             {
-                return CustomResponseDto<NoContent>.Success(responseBody.StatusCode);
+                return CustomResponseDto<UserDto>.Success(responseBody.StatusCode, responseBody.Data);
             }
         }
 
-        public async Task<CustomResponseDto<List<UserListDto>>> GetAllByDeletedAsync()
+        public async Task<CustomResponseDto<List<UserDto>>> GetAllByDeletedAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<UserListDto>>>($"user/GetAllByDeleted");
+            var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<UserDto>>>($"user/GetAllByDeleted");
 
             if (response.Errors.Any())
             {
-                return CustomResponseDto<List<UserListDto>>.Fail(response.StatusCode, response.Errors);
+                return CustomResponseDto<List<UserDto>>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return CustomResponseDto<List<UserListDto>>.Success(response.StatusCode, response.Data);
+                return CustomResponseDto<List<UserDto>>.Success(response.StatusCode, response.Data);
             }
         }
 

@@ -86,7 +86,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponseDto<List<UserListDto>>.Fail(404, "Herhangi bir kullanıcı bulunamadı!");
+            return CustomResponseDto<List<UserListDto>>.Fail(200, "Herhangi bir kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponseDto<List<UserListDto>>> GetAllByActiveAsync()
@@ -99,7 +99,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponseDto<List<UserListDto>>.Fail(404, "Herhangi bir kullanıcı bulunamadı!");
+            return CustomResponseDto<List<UserListDto>>.Fail(200, "Herhangi bir kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponseDto<UserListDto>> GetUserByIdAsync(int userId)
@@ -112,7 +112,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<UserListDto>.Success(200, userDto);
             }
-            return CustomResponseDto<UserListDto>.Fail(404, "Gösterilecek bir kullanıcı bulunamadı!");
+            return CustomResponseDto<UserListDto>.Fail(200, "Gösterilecek bir kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponseDto<UserDto>> DeleteAsync(int userId)
@@ -125,12 +125,12 @@ namespace BlogApp.Business.Services
 
                 UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();
-                return CustomResponseDto<UserDto>.Success(200,Mapper.Map<UserDto>(user));
+                return CustomResponseDto<UserDto>.Success(200, Mapper.Map<UserDto>(user));
             }
-            return CustomResponseDto<UserDto>.Fail(404, $"{userId} numaralı kullanıcı bulunamadı!");
+            return CustomResponseDto<UserDto>.Fail(200, $"{userId} numaralı kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int userId)//Admin-Arşiv-Users
+        public async Task<CustomResponseDto<UserDto>> UndoDeleteAsync(int userId)//Admin-Arşiv-Users
         {
             var result = await UnitOfWork.Users.AnyAsync(x => x.Id == userId);
             if (result)
@@ -140,42 +140,38 @@ namespace BlogApp.Business.Services
                 user.IsActive = true;
                 UnitOfWork.Users.Update(user);
                 await UnitOfWork.CommitAsync();
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<UserDto>.Success(200, Mapper.Map<UserDto>(user));
             }
-            return CustomResponseDto<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
+            return CustomResponseDto<UserDto>.Fail(200, "Bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<NoContent>> HardDeleteAsync(int userId)//Admin-Arşiv-Users
+        public async Task<CustomResponseDto<UserDto>> HardDeleteAsync(int userId)//Admin-Arşiv-Users
         {
             var result = await UnitOfWork.Users.AnyAsync(x => x.Id == userId);
             if (result)
             {
                 var user = UnitOfWork.Users.Where(x => x.Id == userId);
-
-                var imageUrl = await user.Select(x => x.ImageUrl).FirstOrDefaultAsync();
+                var userDto = user.Select(u => Mapper.Map<UserDto>(u)).FirstOrDefault();
 
                 UnitOfWork.Users.RemoveRange(user);
                 await UnitOfWork.CommitAsync();
 
-                if (imageUrl != "userImages/defaultUser.png")
-                    await _imageHelper.DeleteAsync(imageUrl);
-
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<UserDto>.Success(200, userDto);
             }
-            return CustomResponseDto<NoContent>.Fail(404, "Bir kullanıcı bulunamadı!");
+            return CustomResponseDto<UserDto>.Fail(200, "Bir kullanıcı bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<List<UserListDto>>> GetAllByDeletedAsync()//Admin-Arşiv
+        public async Task<CustomResponseDto<List<UserDto>>> GetAllByDeletedAsync()//Admin-Arşiv
         {
             var users = await UnitOfWork.Users.GetAllAsync(x => x.IsDeleted, x => x.UserRoles);
 
             if (users.Any())
             {
-                var usersDto = users.Select(user => Mapper.Map<UserListDto>(user)).ToList();
+                var usersDto = users.Select(user => Mapper.Map<UserDto>(user)).ToList();
 
-                return CustomResponseDto<List<UserListDto>>.Success(200, usersDto);
+                return CustomResponseDto<List<UserDto>>.Success(200, usersDto);
             }
-            return CustomResponseDto<List<UserListDto>>.Fail(404, "Silinmiş bir kullanıcı bulunamadı!");
+            return CustomResponseDto<List<UserDto>>.Fail(200, "Silinmiş bir kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponseDto<List<UserListDto>>> GetAllByInactiveAsync()//Admin-Arşiv
@@ -188,7 +184,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<List<UserListDto>>.Success(200, usersDto);
             }
-            return CustomResponseDto<List<UserListDto>>.Fail(404, "Aktif olmayan bir kullanıcı bulunamadı!");
+            return CustomResponseDto<List<UserListDto>>.Fail(200, "Aktif olmayan bir kullanıcı bulunamadı!");
         }
 
         public async Task<CustomResponseDto<UserDto>> UpdateUserAsync(UserUpdateDto userUpdateDto)

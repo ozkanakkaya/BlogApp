@@ -8,5 +8,6 @@ namespace BlogApp.WEB.Models
         public ResultStatus ResultStatus { get; set; }
         public string Message { get; set; }
         public UserDto UserDto { get; set; }
+        public IList<UserDto> UserListDto { get; set; }
     }
 }
