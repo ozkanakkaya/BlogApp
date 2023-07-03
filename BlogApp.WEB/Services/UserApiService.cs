@@ -176,17 +176,18 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<CustomResponseDto<NoContent>> ActivateUserAsync(int userId)
+        public async Task<CustomResponseDto<UserDto>> ActivateUserAsync(int userId)
         {
-            var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<NoContent>>($"user/ActivateUser/{userId}");
+            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<UserDto>>($"user/ActivateUser/{userId}", null);
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<UserDto>>();
 
-            if (response.Errors.Any())
+            if (responseBody.Errors.Any())
             {
-                return CustomResponseDto<NoContent>.Fail(response.StatusCode, response.Errors);
+                return CustomResponseDto<UserDto>.Fail(responseBody.StatusCode, responseBody.Errors);
             }
             else
             {
-                return CustomResponseDto<NoContent>.Success(response.StatusCode, response.Data);
+                return CustomResponseDto<UserDto>.Success(responseBody.StatusCode, responseBody.Data);
             }
         }
 

@@ -115,7 +115,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'PUT',
                         dataType: 'json',
                         data: { userId: id },
                         url: '/Admin/User/UndoDelete/',

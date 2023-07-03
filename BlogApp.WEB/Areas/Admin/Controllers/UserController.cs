@@ -78,6 +78,46 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             return Json(JsonSerializer.Serialize(new { error = errorMessages }));
         }
 
+        [Authorize(Roles = "SuperAdmin,User.Read")]
+        public async Task<JsonResult> GetAllByActive()
+        {
+            var users = await _userApiService.GetAllByActiveAsync();
+            if (!users.Errors.Any())
+            {
+                var userListDto = JsonSerializer.Serialize(users.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
+
+                return Json(userListDto);
+            }
+
+            string errorMessages = String.Empty;
+            foreach (var error in users.Errors)
+            {
+                errorMessages = $"*{error}\n";
+            }
+
+            return Json(JsonSerializer.Serialize(new { error = errorMessages }));
+        }
+
+        [Authorize(Roles = "SuperAdmin,User.Read")]
+        public async Task<JsonResult> GetAllByInactive()
+        {
+            var users = await _userApiService.GetAllByInactiveAsync();
+            if (!users.Errors.Any())
+            {
+                var userListDto = JsonSerializer.Serialize(users.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
+
+                return Json(userListDto);
+            }
+
+            string errorMessages = String.Empty;
+            foreach (var error in users.Errors)
+            {
+                errorMessages = $"*{error}\n";
+            }
+
+            return Json(JsonSerializer.Serialize(new { error = errorMessages }));
+        }
+
         [Authorize(Roles = "SuperAdmin,User.Create")]
         [HttpGet]
         public IActionResult Add()
@@ -384,7 +424,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         }
 
         [Authorize(Roles = "SuperAdmin,User.Update")]
-        [HttpPost]
+        [HttpPut]
         public async Task<JsonResult> UndoDelete(int userId)
         {
             var result = await _userApiService.UndoDeleteAsync(userId);
@@ -497,6 +537,30 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             });
 
             return Json(userListModelError);
+        }
+
+        [Authorize(Roles = "SuperAdmin,User.Update")]
+        [HttpPut]
+        public async Task<JsonResult> ActivateUser(int userId)
+        {
+            var result = await _userApiService.ActivateUserAsync(userId);
+
+            if (!result.Errors.Any())
+            {
+                var userJson = JsonSerializer.Serialize(result.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
+
+                return Json(userJson);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
+
+                return Json(JsonSerializer.Serialize(new { error = errorMessages }));
+            }
         }
 
 

@@ -54,12 +54,10 @@ namespace BlogApp.Business.Services
 
             if (!hasUser)
             {
-                //var uploadedImageDtoResult = await _imageHelper.UploadAsync(dto.Username, dto.ImageFile, ImageType.User);
-
                 var user = Mapper.Map<User>(dto);
                 user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
                 user.ImageUrl = dto.ImageUrl;
-                //user.ImageUrl = uploadedImageDtoResult.StatusCode == 200 ? uploadedImageDtoResult.Data.FullName : "userImages/defaultUser.png";
+                user.IsActive = true;//Mail onayı özelliği eklendiğinde burada pasif olarak değer alacak.
 
                 user.UserRoles = new List<UserRole>();
                 user.UserRoles.Add(new UserRole
@@ -104,7 +102,7 @@ namespace BlogApp.Business.Services
 
         public async Task<CustomResponseDto<UserListDto>> GetUserByIdAsync(int userId)
         {
-            var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId && x.IsActive && !x.IsDeleted, x => x.UserRoles);
+            var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId, x => x.UserRoles);
 
             if (user != null)
             {
@@ -221,15 +219,15 @@ namespace BlogApp.Business.Services
             }
         }
 
-        public async Task<CustomResponseDto<NoContent>> ActivateUserAsync(int userId)
+        public async Task<CustomResponseDto<UserDto>> ActivateUserAsync(int userId)
         {
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == userId);
             if (user.IsActive)
-                return CustomResponseDto<NoContent>.Fail(400, "Kullanıcı zaten aktif!");
+                return CustomResponseDto<UserDto>.Fail(200, "Kullanıcı zaten aktif!");
             user.IsActive = true;
             UnitOfWork.Users.Update(user);
             await UnitOfWork.CommitAsync();
-            return CustomResponseDto<NoContent>.Success(204);
+            return CustomResponseDto<UserDto>.Success(200, Mapper.Map<UserDto>(user));
         }
 
         public async Task<CustomResponseDto<NoContent>> DeleteUserImageAsync(int userId)

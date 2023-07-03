@@ -18,12 +18,12 @@
                 }
             },
             {
-                text: 'Yenile',
+                text: 'Aktif Kullanıcılar',
                 className: 'btn btn-warning',
                 action: function (e, dt, node, config) {
                     $.ajax({
                         type: 'GET',
-                        url: '/Admin/User/GetAllUsers/',
+                        url: '/Admin/User/GetAllByActive/',
                         contentType: "application/json",
                         beforeSend: function () {
                             $('#usersTable').hide();
@@ -44,6 +44,59 @@
                                             user.Lastname,
                                             `<img src="/img/${user.ImageUrl}" alt="${user.Username}" class="my-image-table" />`,
                                             `
+                                <button class="btn btn-info btn-sm btn-detail" data-id="${user.Id}"><span class="fas fa-newspaper"></span></button>
+                                <button class="btn btn-warning btn-sm btn-assign" data-id="${user.Id}"><span class="fas fa-user-shield"></span></button>
+                                <button class="btn btn-primary btn-sm btn-update" data-id="${user.Id}"><span class="fas fa-edit"></span></button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="${user.Id}"><span class="fas fa-minus-circle"></span></button>
+                                            `
+                                        ]).node();
+                                        const jqueryTableRow = $(newTableRow);
+                                        jqueryTableRow.attr('name', `${user.Id}`);
+                                    });
+                                dataTable.draw();
+                                $('.spinner-border').hide();
+                                $('#usersTable').fadeIn(1400);
+                            } else {
+                                toastr.warning(`${response.error}`, 'Kayıt Bulunamadı!');
+                            }
+                        },
+                        error: function (err) {
+                            console.log(err);
+                            $('.spinner-border').hide();
+                            $('#usersTable').fadeIn(1000);
+                            toastr.error(`${err.responseText}`, 'Hata!');
+                        }
+                    });
+                }
+            },
+            {
+                text: 'Onay Bekleyenler',
+                className: 'btn btn-secondary',
+                action: function (e, dt, node, config) {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/Admin/User/GetAllByInactive/',
+                        contentType: "application/json",
+                        beforeSend: function () {
+                            $('#usersTable').hide();
+                            $('.spinner-border').show();
+                        },
+                        success: function (data) {
+                            const response = jQuery.parseJSON(data);
+                            dataTable.clear();
+                            console.log(response);
+                            if (!response.error) {
+                                $.each(response.$values,
+                                    function (index, user) {
+                                        const newTableRow = dataTable.row.add([
+                                            user.Id,
+                                            user.Username,
+                                            user.Email,
+                                            user.Firstname,
+                                            user.Lastname,
+                                            `<img src="/img/${user.ImageUrl}" alt="${user.Username}" class="my-image-table" />`,
+                                            `
+                                <button class="btn btn-success btn-sm btn-activate" data-id="${user.Id}"><span class="fas fa-check"></span></button>
                                 <button class="btn btn-info btn-sm btn-detail" data-id="${user.Id}"><span class="fas fa-newspaper"></span></button>
                                 <button class="btn btn-warning btn-sm btn-assign" data-id="${user.Id}"><span class="fas fa-user-shield"></span></button>
                                 <button class="btn btn-primary btn-sm btn-update" data-id="${user.Id}"><span class="fas fa-edit"></span></button>
@@ -104,6 +157,12 @@
     });
 
     /* DataTables end here */
+
+    //fo Table Name
+    $('.btn:not(#btnAdd)').on('click', function () {
+        var buttonText = $(this).text();
+        $('.card-header').html('<i class="fas fa-table mr-1"></i>' + buttonText);
+    });
 
     /* Ajax GET / Getting the _UserAddPartial as Modal Form starts from here. */
 
@@ -390,4 +449,56 @@
             });
 
     });
+
+    /* Ajax POST / Updating a Activate starts from here */
+
+    $(document).on('click',
+        '.btn-activate',
+        function (event) {
+            event.preventDefault();
+            const id = $(this).attr('data-id');
+            const tableRow = $(`[name="${id}"]`);
+            const userName = tableRow.find('td:eq(1)').text();
+            Swal.fire({
+                title: 'Kullanıcıyı aktif etmek istediğinize emin misiniz?',
+                text: `${userName} adlı kullanıcı aktif edilecektir!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Evet, aktif etmek istiyorum.',
+                cancelButtonText: 'Hayır, aktif etmek istemiyorum.'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'PUT',
+                        dataType: 'json',
+                        data: { userId: id },
+                        url: '/Admin/User/ActivateUser/',
+                        success: function (data) {
+                            const response = jQuery.parseJSON(data);
+                            if (!response.error) {
+                                Swal.fire(
+                                    'Aktif Edildi!',
+                                    `${response.Username} adlı kullanıcı başarıyla aktif edilmiştir.`,
+                                    'success'
+                                );
+
+                                dataTable.row(tableRow).remove().draw();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Başarısız İşlem!',
+                                    text: `${response.error}`,
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            console.log(err);
+                            toastr.error(`${err.responseText}`, "Hata!");
+                        }
+                    });
+                }
+            });
+        });
 });

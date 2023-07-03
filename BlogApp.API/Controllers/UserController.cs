@@ -192,15 +192,15 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
         }
 
-        [HttpGet("[action]/{userId}")]
+        [HttpPut("[action]/{userId}")]
         public async Task<IActionResult> ActivateUser(int userId)
         {
             var activateUser = await _userService.ActivateUserAsync(userId);
             if (activateUser.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(activateUser.StatusCode, activateUser.Errors));
+                return CreateActionResult(CustomResponseDto<UserDto>.Fail(activateUser.StatusCode, activateUser.Errors));
             }
-            return CreateActionResult(CustomResponseDto<NoContent>.Success(activateUser.StatusCode, activateUser.Data));
+            return CreateActionResult(CustomResponseDto<UserDto>.Success(activateUser.StatusCode, activateUser.Data));
         }
 
         [HttpPut("[action]/{userId}")]
