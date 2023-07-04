@@ -26,7 +26,7 @@ namespace BlogApp.Business.Services
                     Roles = Mapper.Map<IList<RoleDto>>(roles)
                 });
             }
-            return CustomResponseDto<RoleListDto>.Fail(404, "Bir role bulunamadı!");
+            return CustomResponseDto<RoleListDto>.Fail(200, "Bir role bulunamadı!");
         }
 
         public async Task<CustomResponseDto<RoleListDto>> GetAllByUserIdAsync(int userId)

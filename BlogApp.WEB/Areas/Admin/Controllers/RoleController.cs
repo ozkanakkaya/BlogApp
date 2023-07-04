@@ -1,4 +1,5 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
+using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Enums;
 using BlogApp.WEB.Models;
 using BlogApp.WEB.Services;
@@ -19,9 +20,34 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             _roleApiService = roleApiService;
         }
 
-        public IActionResult Index()
+        [Authorize(Roles = "SuperAdmin,Role.Read")]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var roles = await _roleApiService.GetAllRolesAsync();
+
+            if (!roles.Errors.Any())
+                return View(new RoleListDto
+                {
+                    Roles = roles.Data.Roles
+                });
+            else
+            {
+                ViewBag.ErrorMessage = roles.Errors.FirstOrDefault();
+                return View();
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,Role.Read")]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var roles = await _roleApiService.GetAllRolesAsync();
+
+            var roleListDto = JsonSerializer.Serialize(new RoleListDto
+            {
+                Roles = roles.Data.Roles
+            });
+
+            return Json(roleListDto);
         }
 
         [Authorize(Roles = "SuperAdmin,User.Update")]
@@ -36,7 +62,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         [HttpPut]
         public async Task<IActionResult> Assign(UserRoleAssignDto userRoleAssignDto)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var result = await _roleApiService.AssignAsync(userRoleAssignDto);
 

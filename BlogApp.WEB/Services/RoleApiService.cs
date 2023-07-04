@@ -14,6 +14,20 @@ namespace BlogApp.WEB.Services
             _httpClient = httpClient;
         }
 
+        public async Task<CustomResponseDto<RoleListDto>> GetAllRolesAsync()
+        {
+            var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<RoleListDto>>("role");
+
+            if (response.Errors.Any())
+            {
+                return CustomResponseDto<RoleListDto>.Fail(response.StatusCode, response.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<RoleListDto>.Success(response.StatusCode, response.Data);
+            }
+        }
+
         public async Task<CustomResponseDto<RoleListDto>> GetAllByUserIdAsync(int userId)
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<RoleListDto>>($"role/GetAllByUserId/{userId}");

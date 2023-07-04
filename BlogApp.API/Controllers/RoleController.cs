@@ -15,7 +15,7 @@ namespace BlogApp.API.Controllers
             _roleService = roleService;
         }
 
-        [HttpGet("[action]")]
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var result = await _roleService.GetAllRolesAsync();

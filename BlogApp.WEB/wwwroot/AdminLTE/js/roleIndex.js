@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    /* DataTables start here. */
+    /* DataTables start here.*/
 
     const dataTable = $('#rolesTable').DataTable({
         dom:
