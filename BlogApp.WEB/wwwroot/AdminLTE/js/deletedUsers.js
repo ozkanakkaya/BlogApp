@@ -205,3 +205,11 @@
     /* HardDelete */
 
 });
+
+$(document).on('mouseover', '.btn-undo', function () {
+    this.title = 'Geri Al';
+});
+
+$(document).on('mouseover', '.btn-delete', function () {
+    this.title = 'Tamamen Sil';
+});

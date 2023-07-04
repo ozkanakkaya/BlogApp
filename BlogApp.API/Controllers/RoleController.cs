@@ -48,7 +48,7 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponseDto<UserRoleAssignDto>.Success(result.StatusCode, result.Data));
         }
 
-        [HttpPost("[action]")]
+        [HttpPut("[action]")]
         public async Task<IActionResult> Assign(UserRoleAssignDto userRoleAssignDto)
         {
             var result = await _roleService.AssignAsync(userRoleAssignDto);
@@ -56,7 +56,7 @@ namespace BlogApp.API.Controllers
             {
                 return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponseDto<UserRoleAssignDto>.Success(result.StatusCode, result.Data));
+            return CreateActionResult(CustomResponseDto<UserDto>.Success(result.StatusCode, result.Data));
         }
     }
 }

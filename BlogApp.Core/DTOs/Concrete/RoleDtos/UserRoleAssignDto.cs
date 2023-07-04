@@ -4,12 +4,12 @@
     {
         public UserRoleAssignDto()
         {
-            RoleAssignments = new List<RoleAssignDto>();
+            RoleAssignDtos = new List<RoleAssignDto>();
         }
 
         public int UserId { get; set; }
         public string Username { get; set; }
-        public IList<RoleAssignDto> RoleAssignments { get; set; }
+        public IList<RoleAssignDto> RoleAssignDtos { get; set; }
 
     }
 }

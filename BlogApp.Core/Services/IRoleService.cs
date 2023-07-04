@@ -9,6 +9,6 @@ namespace BlogApp.Core.Services
         Task<CustomResponseDto<RoleListDto>> GetAllRolesAsync();
         Task<CustomResponseDto<RoleListDto>> GetAllByUserIdAsync(int userId);
         Task<CustomResponseDto<UserRoleAssignDto>> GetUserRoleAssignDtoAsync(int userId);
-        Task<CustomResponseDto<UserRoleAssignDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto);
+        Task<CustomResponseDto<UserDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto);
     }
 }

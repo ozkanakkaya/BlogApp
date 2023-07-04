@@ -57,24 +57,23 @@ namespace BlogApp.Business.Services
 
             foreach (var role in roles)
             {
-                var aea = role.Name;
                 RoleAssignDto roleAssignDto = new()
                 {
                     RoleId = role.Id,
                     RoleName = role.Name,
                     HasRole = userRoles.Contains(role.Name)
                 };
-                userRoleAssignDto.RoleAssignments.Add(roleAssignDto);
+                userRoleAssignDto.RoleAssignDtos.Add(roleAssignDto);
             }
             return CustomResponseDto<UserRoleAssignDto>.Success(200, userRoleAssignDto);
         }
 
-        public async Task<CustomResponseDto<UserRoleAssignDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto)
+        public async Task<CustomResponseDto<UserDto>> AssignAsync(UserRoleAssignDto userRoleAssignDto)
         {
             var user = await UnitOfWork.Users.Where(x => x.Id == userRoleAssignDto.UserId).Include(x => x.UserRoles).SingleOrDefaultAsync();
 
             var userNewRoles = new HashSet<int>(
-                userRoleAssignDto.RoleAssignments
+                userRoleAssignDto.RoleAssignDtos
                 .Where(x => x.HasRole)
                 .Select(x => x.RoleId).ToList()
             );
@@ -108,7 +107,7 @@ namespace BlogApp.Business.Services
             }
             UnitOfWork.Users.Update(user);
             await UnitOfWork.CommitAsync();
-            return CustomResponseDto<UserRoleAssignDto>.Success(200, userRoleAssignDto);
+            return CustomResponseDto<UserDto>.Success(200, Mapper.Map<UserDto>(user)); ;
 
         }
     }

@@ -19,7 +19,7 @@
             },
             {
                 text: 'Aktif Kullanıcılar',
-                className: 'btn btn-warning',
+                className: 'btn btn-warning btn-users',
                 action: function (e, dt, node, config) {
                     $.ajax({
                         type: 'GET',
@@ -71,7 +71,7 @@
             },
             {
                 text: 'Onay Bekleyenler',
-                className: 'btn btn-secondary',
+                className: 'btn btn-secondary btn-users',
                 action: function (e, dt, node, config) {
                     $.ajax({
                         type: 'GET',
@@ -159,7 +159,7 @@
     /* DataTables end here */
 
     //fo Table Name
-    $('.btn:not(#btnAdd)').on('click', function () {
+    $('.btn-users').on('click', function () {
         var buttonText = $(this).text();
         $('.card-header').html('<i class="fas fa-table mr-1"></i>' + buttonText);
     });
@@ -402,11 +402,12 @@
                     placeHolderDiv.html(data);
                     placeHolderDiv.find('.modal').modal('show');
                 }).fail(function (err) {
+                    console.log(err);
                     toastr.error(`${err.responseText}`, 'Hata!');
                 });
             });
 
-        /* Ajax POST / Updating a RoleAssign starts from here */
+        /* Ajax PUT / Updating a RoleAssign starts from here */
 
         placeHolderDiv.on('click',
             '#btnAssign',
@@ -417,7 +418,7 @@
                 const dataToSend = new FormData(form.get(0));
                 $.ajax({
                     url: actionUrl,
-                    type: 'POST',
+                    type: 'PUT',
                     data: dataToSend,
                     processData: false,
                     contentType: false,
@@ -428,10 +429,10 @@
                         placeHolderDiv.find('.modal-body').replaceWith(newFormBody);
                         const isValid = newFormBody.find('[name="IsValid"]').val() === 'True';
                         if (isValid) {
-                            const id = userRoleAssignAjaxModel.UserDto.User.Id;
+                            const id = userRoleAssignAjaxModel.UserViewModel.UserDto.Id;
                             const tableRow = $(`[name="${id}"]`);
                             placeHolderDiv.find('.modal').modal('hide');
-                            toastr.success(`${userRoleAssignAjaxModel.UserDto.Message}`, "Başarılı İşlem!");
+                            toastr.success(`${userRoleAssignAjaxModel.UserViewModel.Message}`, "Başarılı İşlem!");
                         } else {
                             let summaryText = "";
                             $('#validation-summary > ul > li').each(function () {
@@ -501,4 +502,23 @@
                 }
             });
         });
+});
+$(document).on('mouseover', '.btn-detail', function () {
+    this.title = 'Detay';
+});
+
+$(document).on('mouseover', '.btn-assign', function () {
+    this.title = 'Rol Atama';
+});
+
+$(document).on('mouseover', '.btn-update', function () {
+    this.title = 'Güncelle';
+});
+
+$(document).on('mouseover', '.btn-delete', function () {
+    this.title = 'Sil';
+});
+
+$(document).on('mouseover', '.btn-activate', function () {
+    this.title = 'Aktif Et';
 });
