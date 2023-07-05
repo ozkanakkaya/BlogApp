@@ -1,35 +1,37 @@
 ﻿<div class="header_top" id="home">
-	<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		<button class="navbar-toggler navbar-toggler-right mx-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-				aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler navbar-toggler-right mx-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
 
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav mr-auto">
-				<li class="nav-item">
-					<a class="nav-link" asp-controller="Home" asp-action="Index">
-						Anasayfa
-						<span class="sr-only">(current)</span>
-					</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" asp-controller="Home" asp-action="About">Hakkımızda</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" asp-controller="Home" asp-action="Contact">İletİşİm</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" asp-controller="Admin" asp-action="Home">Yönetim Paneli</a>
-				</li>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                        Anasayfa
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="About">Hakkımızda</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Contact">İletİşİm</a>
+                </li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Home">Yönetim Paneli</a>
+                    </li>
+                }
+            </ul>
 
-			</ul>
 
 
 
-
-		</div>
-	</nav>
+        </div>
+    </nav>
 
 </div>
