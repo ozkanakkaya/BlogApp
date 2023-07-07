@@ -89,7 +89,7 @@ namespace BlogApp.Business.Services
                     Categories = categories
                 });
             }
-            return CustomResponseDto<CategoryListDto>.Fail(404, "Bir kategori bulunamadı!");
+            return CustomResponseDto<CategoryListDto>.Fail(200, "Bir kategori bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CategoryListDto>> GetAllByActiveAsync()

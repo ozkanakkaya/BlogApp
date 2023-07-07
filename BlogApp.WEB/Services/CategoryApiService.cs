@@ -68,17 +68,17 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<CategoryListDto> GetAllByNonDeletedAsync()
+        public async Task<CustomResponseDto<CategoryListDto>> GetAllByNonDeletedAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<CategoryListDto>>("category/getallbynondeleted");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Kategoriler getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<CategoryListDto>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<CategoryListDto>.Success(response.StatusCode, response.Data);
             }
         }
 
