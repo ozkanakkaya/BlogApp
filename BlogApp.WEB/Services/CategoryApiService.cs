@@ -28,16 +28,16 @@ namespace BlogApp.WEB.Services
             return CustomResponseDto<CategoryDto>.Success(responseBody.StatusCode, responseBody.Data);
         }
 
-        public async Task<bool> UpdateAsync([FromForm] CategoryUpdateDto newCategory)
+        public async Task<CustomResponseDto<CategoryDto>> UpdateAsync(CategoryUpdateDto newCategory)
         {
             var response = await _httpClient.PutAsJsonAsync("category", newCategory);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<CategoryDto>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Güncelleme işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
+                return CustomResponseDto<CategoryDto>.Fail(responseBody.StatusCode, responseBody.Errors);
 
-            return response.IsSuccessStatusCode;
+            return CustomResponseDto<CategoryDto>.Success(responseBody.StatusCode, responseBody.Data);
         }
 
         public async Task<CustomResponseDto<CategoryDto>> DeleteAsync(int categoryId)
@@ -165,18 +165,17 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<CategoryUpdateDto> GetCategoryUpdateDtoAsync(int categoryId)
+        public async Task<CustomResponseDto<CategoryUpdateDto>> GetCategoryUpdateDtoAsync(int categoryId)
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<CategoryUpdateDto>>($"category/getcategoryupdatedto/{categoryId}");
 
             if (response.Errors.Any())
             {
-                //_logger.LogWarning(errorMessage);
-                throw new Exception($"Kategori getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<CategoryUpdateDto>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<CategoryUpdateDto>.Success(response.StatusCode, response.Data);
             }
         }
     }

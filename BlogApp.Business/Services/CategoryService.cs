@@ -129,10 +129,10 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<CategoryUpdateDto>.Success(200, Mapper.Map<CategoryUpdateDto>(category));
             }
-            return CustomResponseDto<CategoryUpdateDto>.Fail(404, "Bir kategori bulunamadı!");
+            return CustomResponseDto<CategoryUpdateDto>.Fail(200, "Bir kategori bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<NoContent>> UpdateAsync(CategoryUpdateDto categoryUpdateDto)
+        public async Task<CustomResponseDto<CategoryDto>> UpdateAsync(CategoryUpdateDto categoryUpdateDto)
         {
             var oldCategory = await UnitOfWork.Categories.Where(x => x.Id == categoryUpdateDto.Id).SingleOrDefaultAsync();
             var updatedCategory = Mapper.Map<CategoryUpdateDto, Category>(categoryUpdateDto, oldCategory);
@@ -140,7 +140,7 @@ namespace BlogApp.Business.Services
             UnitOfWork.Categories.Update(updatedCategory);
             await UnitOfWork.CommitAsync();
 
-            return CustomResponseDto<NoContent>.Success(204);
+            return CustomResponseDto<CategoryDto>.Success(200, Mapper.Map<CategoryDto>(updatedCategory));
         }
 
         public async Task<CustomResponseDto<int>> CountTotalAsync()

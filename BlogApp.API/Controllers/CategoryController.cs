@@ -119,7 +119,7 @@ namespace BlogApp.API.Controllers
             var result = await _categoryService.GetCategoryUpdateDtoAsync(categoryId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(result.StatusCode, result.Errors));
+                return CreateActionResult(CustomResponseDto<CategoryUpdateDto>.Fail(result.StatusCode, result.Errors));
             }
             return CreateActionResult(CustomResponseDto<CategoryUpdateDto>.Success(result.StatusCode, result.Data));
         }
@@ -133,16 +133,16 @@ namespace BlogApp.API.Controllers
                 var resultUpdated = await _categoryService.UpdateAsync(categoryUpdateDto);
                 if (resultUpdated.Errors.Any())
                 {
-                    return CreateActionResult(CustomResponseDto<NoContent>.Fail(resultUpdated.StatusCode, resultUpdated.Errors));
+                    return CreateActionResult(CustomResponseDto<CategoryDto>.Fail(resultUpdated.StatusCode, resultUpdated.Errors));
                 }
-                return CreateActionResult(CustomResponseDto<NoContent>.Success(resultUpdated.StatusCode));
+                return CreateActionResult(CustomResponseDto<CategoryDto>.Success(resultUpdated.StatusCode, resultUpdated.Data));
             }
 
             result.Errors.ForEach(error => ModelState.AddModelError(error.PropertyName, error.ErrorMessage));
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<CategoryDto>.Fail(200, errors));
         }
 
         [HttpGet("[action]")]

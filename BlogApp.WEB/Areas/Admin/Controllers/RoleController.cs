@@ -24,14 +24,14 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         {
             var roles = await _roleApiService.GetAllRolesAsync();
 
-            if (!roles.Errors.Any())
+            if (!roles.Errors.Any() && roles.Data != null)
                 return View(new RoleListDto
                 {
                     Roles = roles.Data.Roles
                 });
             else
             {
-                ViewBag.ErrorMessage = roles.Errors.FirstOrDefault();
+                ViewBag.ErrorMessage = roles.Errors.Any() ? roles.Errors.FirstOrDefault() : "Kayıt Bulunamadı!";
                 return View();
             }
         }

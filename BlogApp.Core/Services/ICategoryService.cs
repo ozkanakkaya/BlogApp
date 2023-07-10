@@ -14,7 +14,7 @@ namespace BlogApp.Core.Services
         Task<CustomResponseDto<CategoryListDto>> GetAllByActiveAsync();
         Task<CustomResponseDto<CategoryListDto>> GetAllCategoriesAsync();
         Task<CustomResponseDto<CategoryUpdateDto>> GetCategoryUpdateDtoAsync(int categoryId);
-        Task<CustomResponseDto<NoContent>> UpdateAsync(CategoryUpdateDto categoryUpdateDto);
+        Task<CustomResponseDto<CategoryDto>> UpdateAsync(CategoryUpdateDto categoryUpdateDto);
         Task<CustomResponseDto<int>> CountTotalAsync();
         Task<CustomResponseDto<int>> CountByNonDeletedAsync();
         Task<CustomResponseDto<CategoryListDto>> GetAllByDeletedAsync();

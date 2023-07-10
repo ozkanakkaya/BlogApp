@@ -42,7 +42,6 @@
                                             category.Name,
                                             category.Description,
                                             category.IsActive ? "Evet" : "Hayır",
-                                            category.IsDeleted ? "Evet" : "Hayır",
                                             convertToShortDate(category.CreatedDate),
                                             category.CreatedByUsername,
                                             convertToShortDate(category.UpdatedDate),
@@ -144,7 +143,6 @@
                             categoryAddAjaxModel.CategoryViewModel.CategoryDto.Name,
                             categoryAddAjaxModel.CategoryViewModel.CategoryDto.Description,
                             categoryAddAjaxModel.CategoryViewModel.CategoryDto.IsActive ? "Evet" : "Hayır",
-                            categoryAddAjaxModel.CategoryViewModel.CategoryDto.IsDeleted ? "Evet" : "Hayır",
                             convertToShortDate(categoryAddAjaxModel.CategoryViewModel.CategoryDto.CreatedDate),
                             categoryAddAjaxModel.CategoryViewModel.CategoryDto.CreatedByUsername,
                             convertToShortDate(categoryAddAjaxModel.CategoryViewModel.CategoryDto.UpdatedDate),
@@ -258,35 +256,33 @@
                     placeHolderDiv.find('.modal-body').replaceWith(newFormBody);
                     const isValid = newFormBody.find('[name="IsValid"]').val() === 'True';
                     if (isValid) {
-                        const id = categoryUpdateAjaxModel.CategoryDto.Category.Id;
+                        const id = categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.Id;
                         const tableRow = $(`[name="${id}"]`);
                         placeHolderDiv.find('.modal').modal('hide');
                         dataTable.row(tableRow).data([
-                            categoryUpdateAjaxModel.CategoryDto.Category.Id,
-                            categoryUpdateAjaxModel.CategoryDto.Category.Name,
-                            categoryUpdateAjaxModel.CategoryDto.Category.Description,
-                            categoryUpdateAjaxModel.CategoryDto.Category.IsActive ? "Evet" : "Hayır",
-                            categoryUpdateAjaxModel.CategoryDto.Category.IsDeleted ? "Evet" : "Hayır",
-                            categoryUpdateAjaxModel.CategoryDto.Category.Note,
-                            convertToShortDate(categoryUpdateAjaxModel.CategoryDto.Category.CreatedDate),
-                            categoryUpdateAjaxModel.CategoryDto.Category.CreatedByName,
-                            convertToShortDate(categoryUpdateAjaxModel.CategoryDto.Category.ModifiedDate),
-                            categoryUpdateAjaxModel.CategoryDto.Category.ModifiedByName,
+                            categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.Id,
+                            categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.Name,
+                            categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.Description,
+                            categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.IsActive ? "Evet" : "Hayır",
+                            convertToShortDate(categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.CreatedDate),
+                            categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.CreatedByUsername,
+                            convertToShortDate(categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.UpdatedDate),
+                            categoryUpdateAjaxModel.CategoryViewModel.CategoryDto.UpdatedByUsername,
                             `
                                 <button class="btn btn-primary btn-sm btn-update" data-id="${categoryUpdateAjaxModel
-                                .CategoryDto.Category.Id}"><span class="fas fa-edit"></span></button>
+                                .CategoryViewModel.CategoryDto.Id}"><span class="fas fa-edit"></span></button>
                                 <button class="btn btn-danger btn-sm btn-delete" data-id="${categoryUpdateAjaxModel
-                                .CategoryDto.Category.Id}"><span class="fas fa-minus-circle"></span></button>
+                                .CategoryViewModel.CategoryDto.Id}"><span class="fas fa-minus-circle"></span></button>
                                             `
                         ]);
                         tableRow.attr("name", `${id}`);
                         dataTable.row(tableRow).invalidate();
-                        toastr.success(`${categoryUpdateAjaxModel.CategoryDto.Message}`, "Başarılı İşlem!");
+                        toastr.success(`${categoryUpdateAjaxModel.CategoryViewModel.Message}`, "Başarılı İşlem!");
                     } else {
                         let summaryText = "";
                         $('#validation-summary > ul > li').each(function () {
                             let text = $(this).text();
-                            summaryText = `*${text}\n`;
+                            summaryText += `*${text}<br/>`;
                         });
                         toastr.warning(summaryText);
                     }
