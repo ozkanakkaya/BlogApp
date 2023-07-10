@@ -28,7 +28,7 @@ namespace BlogApp.WEB.Areas.Admin.ViewComponents
             if (user == null)
                 return Content("Kullanıcı bulunamadı!");
 
-            return View(new UserViewModel
+            return View(new UserProfileViewModel
             {
                 User = user.Data
             });

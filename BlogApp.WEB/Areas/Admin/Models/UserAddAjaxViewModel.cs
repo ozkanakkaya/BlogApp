@@ -1,7 +1,7 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums;
 
-namespace BlogApp.WEB.Models
+namespace BlogApp.WEB.Areas.Admin.Models
 {
     public class UserAddAjaxViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
 
-namespace BlogApp.WEB.Models
+namespace BlogApp.WEB.Areas.Admin.Models
 {
     public class UserUpdateAjaxViewModel
     {

@@ -3,7 +3,6 @@ using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Enums;
 using BlogApp.Core.Enums.ComplexTypes;
 using BlogApp.Core.Utilities.Abstract;
-using BlogApp.WEB.Models;
 using BlogApp.WEB.Services;
 using BlogApp.WEB.Utilities.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +15,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using BlogApp.Business.Jwt;
 using System.IdentityModel.Tokens.Jwt;
+using BlogApp.WEB.Areas.Admin.Models;
 
 namespace BlogApp.WEB.Areas.Admin.Controllers
 {

@@ -126,5 +126,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
                 return Json(deletedCategoryErrorModel);
             }
         }
+
+
     }
 }

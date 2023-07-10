@@ -1,7 +1,6 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
-using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Enums;
-using BlogApp.WEB.Models;
+using BlogApp.WEB.Areas.Admin.Models;
 using BlogApp.WEB.Services;
 using BlogApp.WEB.Utilities.Extensions;
 using Microsoft.AspNetCore.Authorization;
