@@ -43,7 +43,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<CategoryDto>.Success(200, Mapper.Map<CategoryDto>(category));
             }
-            return CustomResponseDto<CategoryDto>.Fail(404, $"{categoryId} numaralı kategori bulunamadı!");
+            return CustomResponseDto<CategoryDto>.Fail(200, $"{categoryId} numaralı kategori bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CategoryDto>> UndoDeleteAsync(int categoryId)//Admin-Arşiv-Users

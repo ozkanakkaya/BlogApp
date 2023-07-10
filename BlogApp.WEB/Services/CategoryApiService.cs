@@ -40,16 +40,16 @@ namespace BlogApp.WEB.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<bool> DeleteAsync(int categoryId)
+        public async Task<CustomResponseDto<CategoryDto>> DeleteAsync(int categoryId)
         {
             var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<CategoryDto>>($"category/delete/{categoryId}", null);
 
             var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<CategoryDto>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Silme işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
+                return CustomResponseDto<CategoryDto>.Fail(responseBody.StatusCode, responseBody.Errors);
 
-            return response.IsSuccessStatusCode;
+            return CustomResponseDto<CategoryDto>.Success(responseBody.StatusCode, responseBody.Data);
         }
 
         public async Task<CustomResponseDto<CategoryListDto>> GetAllByActiveAsync()

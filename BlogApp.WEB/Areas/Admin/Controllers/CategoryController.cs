@@ -93,5 +93,38 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
 
             return Json(JsonSerializer.Serialize(new { error = errorMessages }));
         }
+
+        [Authorize(Roles = "SuperAdmin,Category.Delete")]
+        [HttpPost]
+        public async Task<JsonResult> Delete(int categoryId)
+        {
+            var result = await _categoryApiService.DeleteAsync(categoryId);
+
+            if (!result.Errors.Any())
+            {
+                var deletedCategoryModel = JsonSerializer.Serialize(new CategoryViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Message = $"'{result.Data.Name}' adlı kategori başarıyla silindi. \nTamamen silmek için veya geri almak için : \nÇöp Kutusu/Kategoriler menüsüne gidiniz.",
+                    CategoryDto = result.Data
+                });
+                return Json(deletedCategoryModel);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
+
+                var deletedCategoryErrorModel = JsonSerializer.Serialize(new CategoryViewModel
+                {
+                    ResultStatus = ResultStatus.Error,
+                    Message = $"{errorMessages}\n",
+                });
+                return Json(deletedCategoryErrorModel);
+            }
+        }
     }
 }

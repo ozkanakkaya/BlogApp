@@ -199,10 +199,10 @@
                         url: '/Admin/Category/Delete/',
                         success: function (data) {
                             const categoryDto = jQuery.parseJSON(data);
-                            if (categoryDto.ResultStatus === 0) {
+                            if (categoryDto.ResultStatus === 200) {
                                 Swal.fire(
                                     'Silindi!',
-                                    `${categoryDto.Category.Name} adlı kategori başarıyla silinmiştir.`,
+                                    `${categoryDto.Message}`,
                                     'success'
                                 );
                                 dataTable.row(tableRow).remove().draw();

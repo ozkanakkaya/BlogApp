@@ -55,7 +55,7 @@ namespace BlogApp.API.Controllers
             if (!result.Errors.Any())
                 return CreateActionResult(CustomResponseDto<CategoryDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<CategoryDto>.Fail(200, result.Errors));
         }
 
         [HttpPut("[action]/{categoryId}")]
