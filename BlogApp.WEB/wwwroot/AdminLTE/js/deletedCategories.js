@@ -24,20 +24,17 @@
                             const deletedCategories = jQuery.parseJSON(data);
                             dataTable.clear();
                             console.log(deletedCategories);
-                            if (deletedCategories.ResultStatus === 0) {
-                                $.each(deletedCategories.Categories.$values,
+                            if (deletedCategories.ResultStatus === 200) {
+                                $.each(deletedCategories.CategoryListDto.Categories,
                                     function (index, category) {
                                         const newTableRow = dataTable.row.add([
                                             category.Id,
                                             category.Name,
                                             category.Description,
-                                            category.IsActive ? "Evet" : "Hayır",
-                                            category.IsDeleted ? "Evet" : "Hayır",
-                                            category.Note,
                                             convertToShortDate(category.CreatedDate),
-                                            category.CreatedByName,
-                                            convertToShortDate(category.ModifiedDate),
-                                            category.ModifiedByName,
+                                            category.CreatedByUsername,
+                                            convertToShortDate(category.UpdatedDate),
+                                            category.UpdatedByUsername,
                                             `
                                 <button class="btn btn-warning btn-sm btn-undo" data-id="${category.Id}"><span class="fas fa-undo"></span></button>
                                 <button class="btn btn-danger btn-sm btn-delete" data-id="${category.Id}"><span class="fas fa-minus-circle"></span></button>
@@ -50,7 +47,7 @@
                                 $('.spinner-border').hide();
                                 $('#deletedCategoriesTable').fadeIn(1400);
                             } else {
-                                toastr.error(`${deletedCategories.Categories.Message}`, 'İşlem Başarısız!');
+                                toastr.error(`${deletedCategories.Message}`, 'İşlem Başarısız!');
                             }
                         },
                         error: function (err) {
@@ -109,7 +106,7 @@
             let categoryName = tableRow.find('td:eq(1)').text();
             Swal.fire({
                 title: 'Arşivden geri getirmek istediğinize emin misiniz?',
-                text: `${categoryName} adlı kategori arşivden geri getirilecektir.`,
+                text: `'${categoryName}' adlı kategori arşivden geri getirilecektir.`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -119,14 +116,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'PUT',
                         dataType: 'json',
                         data: { categoryId: id },
                         url: '/Admin/Category/UndoDelete/',
                         success: function (data) {
                             const undoDeletedCategoryResult = jQuery.parseJSON(data);
                             console.log(undoDeletedCategoryResult);
-                            if (undoDeletedCategoryResult.ResultStatus === 0) {
+                            if (undoDeletedCategoryResult.ResultStatus === 200) {
                                 Swal.fire(
                                     'Arşivden Geri Getirildi!',
                                     `${undoDeletedCategoryResult.Message}`,
@@ -165,7 +162,7 @@
             let categoryName = tableRow.find('td:eq(1)').text();
             Swal.fire({
                 title: 'Kalıcı olarak silmek istediğinize emin misiniz?',
-                text: `${categoryName} adlı kategori kalıcı olarak silinecektir!`,
+                text: `'${categoryName}' adlı kategori kalıcı olarak silinecektir!`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -175,14 +172,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'DELETE',
                         dataType: 'json',
                         data: { categoryId: id },
                         url: '/Admin/Category/HardDelete/',
                         success: function (data) {
                             const hardDeleteResult = jQuery.parseJSON(data);
                             console.log(hardDeleteResult);
-                            if (hardDeleteResult.ResultStatus === 0) {
+                            if (hardDeleteResult.ResultStatus === 200) {
                                 Swal.fire(
                                     'Kalıcı olarak silindi!',
                                     `${hardDeleteResult.Message}`,
@@ -208,4 +205,12 @@
         });
     /* HardDelete */
 
+});
+
+$(document).on('mouseover', '.btn-undo', function () {
+    this.title = 'Geri Al';
+});
+
+$(document).on('mouseover', '.btn-delete', function () {
+    this.title = 'Tamamen Sil';
 });

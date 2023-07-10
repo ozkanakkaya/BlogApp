@@ -496,7 +496,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         }
 
         [Authorize(Roles = "SuperAdmin,User.Read")]
-        public async Task<IActionResult> DeletedUsers(int userId)
+        public async Task<IActionResult> DeletedUsers()
         {
             var users = await _userApiService.GetAllByDeletedAsync();
 

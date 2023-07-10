@@ -1,0 +1,83 @@
+﻿@model BlogApp.Core.DTOs.Concrete.CategoryListDto
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Silinmiş Kategoriler";
+    var errorMessage = ViewBag.ErrorMessage as string;
+}
+<ol class="breadcrumb mb-3 mt-2">
+    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Yönetim Paneli</a></li>
+    <li class="breadcrumb-item active"><a asp-area="Admin" asp-controller="Category" asp-action="DeletedCategories">Silinmiş Kategoriler</a></li>
+</ol>
+@if (string.IsNullOrEmpty(errorMessage))
+{
+    <div id="modalPlaceHolder" aria-hidden="true"></div>
+    <div class="card mb-4 mt-2">
+        <div class="card-header">
+            <i class="fas fa-table mr-1"></i>
+            Silinmiş Kategoriler Listesi
+        </div>
+        <div class="card-body">
+            <div class="spinner-border" role="status" style="display:none;">
+                <span class="sr-only">Yükleniyor...</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="deletedCategoriesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Adı</th>
+                            <th>Açıklaması</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Oluşturan Kullanıcı Adı</th>
+                            <th>Son Düzenlenme Tarihi</th>
+                            <th>Son Düzenleyen Kullanıcı Adı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>Adı</th>
+                            <th>Açıklaması</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Oluşturan Kullanıcı Adı</th>
+                            <th>Son Düzenlenme Tarihi</th>
+                            <th>Son Düzenleyen Kullanıcı Adı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <tr name="@category.Id">
+                                <td>@category.Id</td>
+                                <td>@category.Name</td>
+                                <td>@category.Description</td>
+                                <td>@category.CreatedDate.ToShortDateString()</td>
+                                <td>@category.CreatedByUsername</td>
+                                <td>@category.UpdatedDate.ToShortDateString()</td>
+                                <td>@category.UpdatedByUsername</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm btn-undo" data-id="@category.Id"><span class="fas fa-undo"></span></button>
+                                    <button class="btn btn-danger btn-sm btn-delete" data-id="@category.Id"><span class="fas fa-minus-circle"></span></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger mt-3">
+        @ViewBag.ErrorMessage <br />
+        Yönetim Paneli anasayfasına geri dönmek için lütfen <a class="alert-link" asp-area="Admin" asp-controller="Home" asp-action="Index">tıklayınız.</a>
+    </div>
+}
+@section Scripts
+    {
+
+    <script src="~/AdminLTE/js/deletedCategories.js" type="application/ecmascript"></script>
+}

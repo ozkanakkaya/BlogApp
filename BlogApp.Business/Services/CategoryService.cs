@@ -58,22 +58,23 @@ namespace BlogApp.Business.Services
                 await UnitOfWork.CommitAsync();
                 return CustomResponseDto<CategoryDto>.Success(200, Mapper.Map<CategoryDto>(category));
             }
-            return CustomResponseDto<CategoryDto>.Fail(404, "Bir kategori bulunamadı!");
+            return CustomResponseDto<CategoryDto>.Fail(200, "Bir kategori bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<NoContent>> HardDeleteAsync(int categoryId)//Admin-Arşiv-Users
+        public async Task<CustomResponseDto<CategoryDto>> HardDeleteAsync(int categoryId)//Admin-Arşiv-Users
         {
             var result = await UnitOfWork.Categories.AnyAsync(x => x.Id == categoryId);
             if (result)
             {
                 var category = UnitOfWork.Categories.Where(x => x.Id == categoryId);
+                var categoryDto = await category.Select(x => Mapper.Map<CategoryDto>(x)).FirstOrDefaultAsync();
 
                 UnitOfWork.Categories.RemoveRange(category);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<CategoryDto>.Success(200, categoryDto);
             }
-            return CustomResponseDto<NoContent>.Fail(404, "Bir kategori bulunamadı!");
+            return CustomResponseDto<CategoryDto>.Fail(200, "Bir kategori bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CategoryListDto>> GetAllByNonDeletedAsync()//Aktif ve pasif tüm kategoriler
@@ -103,7 +104,7 @@ namespace BlogApp.Business.Services
                     Categories = categories
                 });
             }
-            return CustomResponseDto<CategoryListDto>.Fail(404, "Bir kategori bulunamadı!");
+            return CustomResponseDto<CategoryListDto>.Fail(200, "Bir kategori bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CategoryListDto>> GetAllCategoriesAsync()
@@ -117,7 +118,7 @@ namespace BlogApp.Business.Services
                     Categories = categories
                 });
             }
-            return CustomResponseDto<CategoryListDto>.Fail(404, "Bir kategori bulunamadı!");
+            return CustomResponseDto<CategoryListDto>.Fail(200, "Bir kategori bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CategoryUpdateDto>> GetCategoryUpdateDtoAsync(int categoryId)
@@ -170,7 +171,7 @@ namespace BlogApp.Business.Services
                     Categories = categories
                 });
             }
-            return CustomResponseDto<CategoryListDto>.Fail(404, "Silinmiş bir kategori bulunamadı!");
+            return CustomResponseDto<CategoryListDto>.Fail(200, "Silinmiş bir kategori bulunamadı!");
         }
     }
 }

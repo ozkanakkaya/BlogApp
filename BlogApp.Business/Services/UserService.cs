@@ -149,7 +149,7 @@ namespace BlogApp.Business.Services
             if (result)
             {
                 var user = UnitOfWork.Users.Where(x => x.Id == userId);
-                var userDto = user.Select(u => Mapper.Map<UserDto>(u)).FirstOrDefault();
+                var userDto = await user.Select(u => Mapper.Map<UserDto>(u)).FirstOrDefaultAsync();
 
                 UnitOfWork.Users.RemoveRange(user);
                 await UnitOfWork.CommitAsync();

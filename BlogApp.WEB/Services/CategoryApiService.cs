@@ -8,12 +8,10 @@ namespace BlogApp.WEB.Services
     public class CategoryApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CategoryApiService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
+        public CategoryApiService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<CustomResponseDto<CategoryDto>> AddAsync(CategoryCreateDto newCategory)
@@ -85,56 +83,56 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<CategoryListDto> GetAllByDeletedAsync()
+        public async Task<CustomResponseDto<CategoryListDto>> GetAllByDeletedAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<CategoryListDto>>("category/getallbydeleted");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Kategoriler getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<CategoryListDto>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<CategoryListDto>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<CategoryListDto> GetAllAsync()
+        public async Task<CustomResponseDto<CategoryListDto>> GetAllAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<CategoryListDto>>("category/getall");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Kategoriler getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<CategoryListDto>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<CategoryListDto>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<bool> HardDeleteAsync(int categoryId)
+        public async Task<CustomResponseDto<CategoryDto>> HardDeleteAsync(int categoryId)
         {
             var response = await _httpClient.DeleteAsync($"category/harddelete/{categoryId}");
-
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
-
-            if (responseBody.Errors.Any())
-                throw new Exception($"Silme işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
-
-            return response.IsSuccessStatusCode;
-        }
-
-        public async Task<CategoryDto> UndoDeleteAsync(int categoryId)
-        {
-            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<CategoryDto>>($"blog/undodelete/{categoryId}", null);
 
             var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<CategoryDto>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Silmeyi geri alma işlemini sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
+                return CustomResponseDto<CategoryDto>.Fail(responseBody.StatusCode, responseBody.Errors);
 
-            return responseBody.Data;
+            return CustomResponseDto<CategoryDto>.Success(responseBody.StatusCode, responseBody.Data);
+        }
+
+        public async Task<CustomResponseDto<CategoryDto>> UndoDeleteAsync(int categoryId)
+        {
+            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<CategoryDto>>($"category/undodelete/{categoryId}", null);
+
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<CategoryDto>>();
+
+            if (responseBody.Errors.Any())
+                return CustomResponseDto<CategoryDto>.Fail(responseBody.StatusCode, responseBody.Errors);
+
+            return CustomResponseDto<CategoryDto>.Success(responseBody.StatusCode, responseBody.Data);
         }
 
         public async Task<CustomResponseDto<int>> CountTotalAsync()

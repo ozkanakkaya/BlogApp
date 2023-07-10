@@ -183,5 +183,115 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
                 return Json(categoryUpdateAjaxModelStateErrorModel);
             }
         }
+
+        [Authorize(Roles = "SuperAdmin,Category.Read")]
+        public async Task<IActionResult> DeletedCategories()
+        {
+            var users = await _categoryApiService.GetAllByDeletedAsync();
+
+            if (!users.Errors.Any())
+                return View(users.Data);
+            else
+            {
+                ViewBag.ErrorMessage = users.Errors.FirstOrDefault();
+                return View();
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,Category.Read")]
+        public async Task<JsonResult> GetAllDeletedCategories()
+        {
+            var result = await _categoryApiService.GetAllByDeletedAsync();
+            if (result.Data != null || !result.Errors.Any())
+            {
+                var categoryListModel = JsonSerializer.Serialize(new CategoryViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    CategoryListDto = result.Data
+                });
+
+                return Json(categoryListModel);
+            }
+
+            string errorMessages = String.Empty;
+            foreach (var error in result.Errors)
+            {
+                errorMessages = $"*{error}\n";
+            }
+
+            var categoryListModelError = JsonSerializer.Serialize(new CategoryViewModel
+            {
+                ResultStatus = ResultStatus.Error,
+                Message = $"{errorMessages}\n",
+            });
+
+            return Json(categoryListModelError);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Category.Update")]
+        [HttpPut]
+        public async Task<JsonResult> UndoDelete(int categoryId)
+        {
+            var result = await _categoryApiService.UndoDeleteAsync(categoryId);
+
+            if (!result.Errors.Any())
+            {
+                var undoDeletedCategoryModel = JsonSerializer.Serialize(new CategoryViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Message = $"'{result.Data.Name}' adlı kategori başarıyla arşivden geri alındı.",
+                    CategoryDto = result.Data
+                });
+                return Json(undoDeletedCategoryModel);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
+
+                var undonDeletedCategoryErrorModel = JsonSerializer.Serialize(new CategoryViewModel
+                {
+                    ResultStatus = ResultStatus.Error,
+                    Message = $"{errorMessages}\n",
+                });
+                return Json(undonDeletedCategoryErrorModel);
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,Category.Delete")]
+        [HttpDelete]
+        public async Task<JsonResult> HardDelete(int categoryId)
+        {
+            var result = await _categoryApiService.HardDeleteAsync(categoryId);
+
+            if (!result.Errors.Any() && result.Data != null)
+            {
+                var hardDeletedUserModel = JsonSerializer.Serialize(new CategoryViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Message = $"'{result.Data.Name}' adlı kullanıcı başarıyla tamamen silindi.",
+                });
+
+                return Json(hardDeletedUserModel);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
+
+                var undonDeletedUserErrorModel = JsonSerializer.Serialize(new CategoryViewModel
+                {
+                    ResultStatus = ResultStatus.Error,
+                    Message = $"{errorMessages}\n",
+                });
+                return Json(undonDeletedUserErrorModel);
+            }
+        }
     }
 }

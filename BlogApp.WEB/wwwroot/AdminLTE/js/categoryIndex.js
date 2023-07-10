@@ -293,3 +293,11 @@
 
     });
 });
+
+$(document).on('mouseover', '.btn-update', function () {
+    this.title = 'Güncelle';
+});
+
+$(document).on('mouseover', '.btn-delete', function () {
+    this.title = 'Sil';
+});
