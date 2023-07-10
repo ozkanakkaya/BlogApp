@@ -6,6 +6,7 @@ using BlogApp.WEB.Utilities.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BlogApp.WEB.Areas.Admin.Controllers
 {
@@ -71,6 +72,26 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             });
 
             return Json(categoryAddAjaxErrorModel);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Category.Read")]
+        public async Task<JsonResult> GetAllCategories()
+        {
+            var result = await _categoryApiService.GetAllByNonDeletedAsync();
+            if (!result.Errors.Any() && result.Data != null)
+            {
+                var categories = JsonSerializer.Serialize(result.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
+
+                return Json(categories);
+            }
+
+            string errorMessages = String.Empty;
+            foreach (var error in result.Errors)
+            {
+                errorMessages = $"*{error}\n";
+            }
+
+            return Json(JsonSerializer.Serialize(new { error = errorMessages }));
         }
     }
 }

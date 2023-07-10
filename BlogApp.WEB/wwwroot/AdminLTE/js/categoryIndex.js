@@ -34,7 +34,7 @@
                             const categoryListDto = jQuery.parseJSON(data);
                             dataTable.clear();
                             console.log(categoryListDto);
-                            if (categoryListDto.ResultStatus === 0) {
+                            if (!categoryListDto.error) {
                                 $.each(categoryListDto.Categories.$values,
                                     function (index, category) {
                                         const newTableRow = dataTable.row.add([
@@ -43,11 +43,10 @@
                                             category.Description,
                                             category.IsActive ? "Evet" : "Hayır",
                                             category.IsDeleted ? "Evet" : "Hayır",
-                                            category.Note,
                                             convertToShortDate(category.CreatedDate),
-                                            category.CreatedByName,
-                                            convertToShortDate(category.ModifiedDate),
-                                            category.ModifiedByName,
+                                            category.CreatedByUsername,
+                                            convertToShortDate(category.UpdatedDate),
+                                            category.UpdatedByUsername,
                                             `
                                 <button class="btn btn-primary btn-sm btn-update" data-id="${category.Id}"><span class="fas fa-edit"></span></button>
                                 <button class="btn btn-danger btn-sm btn-delete" data-id="${category.Id}"><span class="fas fa-minus-circle"></span></button>
@@ -60,7 +59,7 @@
                                 $('.spinner-border').hide();
                                 $('#categoriesTable').fadeIn(1400);
                             } else {
-                                toastr.error(`${categoryListDto.Message}`, 'İşlem Başarısız!');
+                                toastr.error(`${categoryListDto.error}`, 'İşlem Başarısız!');
                             }
                         },
                         error: function (err) {

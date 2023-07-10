@@ -11,16 +11,6 @@ namespace BlogApp.WEB.Middlewares
             _httpContextAccessor = httpContextAccessor;
         }
 
-        //public async Task Invoke(HttpContext context)
-        //{
-        //    var accessToken = _httpContextAccessor.HttpContext.User.Claims.SingleOrDefault(x => x.Type == "accessToken")?.Value;
-        //    if (!string.IsNullOrEmpty(accessToken))
-        //    {
-        //        context.Request.Headers.Add("Authorization", $"Bearer {accessToken}");
-        //    }
-
-        //    await _next(context);
-        //}
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
         {

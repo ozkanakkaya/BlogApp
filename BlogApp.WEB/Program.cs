@@ -13,12 +13,6 @@ using BlogApp.WEB.Services;
 using BlogApp.WEB.Validations;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.CodeAnalysis.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using static System.Net.WebRequestMethods;
 using FileAccess = BlogApp.Business.Helpers.FileAccess;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -117,22 +111,6 @@ app.UseNToastNotify();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-//app.UseMiddleware<JwtTokenMiddleware>();
-//app.UseMiddleware<JwtTokenMiddleware>(httpContextAccessor);
-
-//app.Use(async (httpContext, next) =>
-//{
-//    try
-//    {
-//        app.UseMiddleware<JwtTokenMiddleware>(httpContext);
-//        await next();
-//    }
-//    finally
-//    {
-//        await next();
-//    }
-//});
 
 app.MapAreaControllerRoute(
     name: "Admin",
