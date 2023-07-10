@@ -6,7 +6,7 @@ namespace BlogApp.Core.Services
 {
     public interface ICategoryService : IService<Category>
     {
-        Task<CustomResponseDto<CategoryCreateDto>> AddAsync(CategoryCreateDto categoryCreateDto);
+        Task<CustomResponseDto<CategoryDto>> AddAsync(CategoryCreateDto categoryCreateDto);
         Task<CustomResponseDto<CategoryDto>> DeleteAsync(int categoryId);
         Task<CustomResponseDto<CategoryDto>> UndoDeleteAsync(int categoryId);
         Task<CustomResponseDto<NoContent>> HardDeleteAsync(int categoryId);

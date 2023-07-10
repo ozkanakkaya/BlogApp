@@ -1,28 +1,31 @@
 ﻿using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 
 namespace BlogApp.WEB.Services
 {
     public class CategoryApiService
     {
         private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CategoryApiService(HttpClient httpClient)
+        public CategoryApiService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<CategoryCreateDto> AddAsync([FromForm] CategoryCreateDto newCategory)
+        public async Task<CustomResponseDto<CategoryDto>> AddAsync(CategoryCreateDto newCategory)
         {
             var response = await _httpClient.PostAsJsonAsync("category", newCategory);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<CategoryCreateDto>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<CategoryDto>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Ekleme işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
+                return CustomResponseDto<CategoryDto>.Fail(responseBody.StatusCode, responseBody.Errors);
 
-            return responseBody.Data;
+            return CustomResponseDto<CategoryDto>.Success(responseBody.StatusCode, responseBody.Data);
         }
 
         public async Task<bool> UpdateAsync([FromForm] CategoryUpdateDto newCategory)

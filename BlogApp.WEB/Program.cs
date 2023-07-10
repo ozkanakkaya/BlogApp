@@ -8,11 +8,13 @@ using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Services;
 using BlogApp.Core.Utilities.Abstract;
 using BlogApp.WEB.Configurations;
+using BlogApp.WEB.Middlewares;
 using BlogApp.WEB.Services;
 using BlogApp.WEB.Validations;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -27,32 +29,32 @@ builder.Services.AddControllersWithViews().AddNToastNotifyToastr();
 builder.Services.AddHttpClient<BlogApiService>(opt =>
 {
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
-});
+}).AddHttpMessageHandler<CustomAuthorizationHandler>();
 
 builder.Services.AddHttpClient<CategoryApiService>(opt =>
 {
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
-});
+}).AddHttpMessageHandler<CustomAuthorizationHandler>();
 
 builder.Services.AddHttpClient<CommentApiService>(opt =>
 {
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
-});
+}).AddHttpMessageHandler<CustomAuthorizationHandler>();
 
 builder.Services.AddHttpClient<UserApiService>(opt =>
 {
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
-});
+}).AddHttpMessageHandler<CustomAuthorizationHandler>();
 
 builder.Services.AddHttpClient<AuthApiService>(opt =>
 {
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
-});
+}).AddHttpMessageHandler<CustomAuthorizationHandler>();
 
 builder.Services.AddHttpClient<RoleApiService>(opt =>
 {
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
-});
+}).AddHttpMessageHandler<CustomAuthorizationHandler>();
 
 //**Mappleme
 var profiles = ProfileHelper.GetProfiles();
@@ -79,6 +81,8 @@ builder.Services.AddScoped<TokenGenerator>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IImageHelper, ImageHelper>();
 builder.Services.AddScoped<IFileAccess, FileAccess>();
+
+builder.Services.AddTransient<CustomAuthorizationHandler>();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -113,6 +117,22 @@ app.UseNToastNotify();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+//app.UseMiddleware<JwtTokenMiddleware>();
+//app.UseMiddleware<JwtTokenMiddleware>(httpContextAccessor);
+
+//app.Use(async (httpContext, next) =>
+//{
+//    try
+//    {
+//        app.UseMiddleware<JwtTokenMiddleware>(httpContext);
+//        await next();
+//    }
+//    finally
+//    {
+//        await next();
+//    }
+//});
 
 app.MapAreaControllerRoute(
     name: "Admin",

@@ -14,7 +14,7 @@ namespace BlogApp.Business.Services
         public CategoryService(IGenericRepository<Category> repository, IUnitOfWork unitOfWork, IMapper mapper) : base(repository, unitOfWork, mapper)
         {
         }
-        public async Task<CustomResponseDto<CategoryCreateDto>> AddAsync(CategoryCreateDto categoryCreateDto)
+        public async Task<CustomResponseDto<CategoryDto>> AddAsync(CategoryCreateDto categoryCreateDto)
         {
             var hasCategory = await UnitOfWork.Categories.AnyAsync(x => x.Name == categoryCreateDto.Name);
 
@@ -25,9 +25,9 @@ namespace BlogApp.Business.Services
                 await UnitOfWork.Categories.AddAsync(category);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponseDto<CategoryCreateDto>.Success(201, categoryCreateDto);
+                return CustomResponseDto<CategoryDto>.Success(200, Mapper.Map<CategoryDto>(category));
             }
-            return CustomResponseDto<CategoryCreateDto>.Fail(400, "Bu isimde bir kategori adı zaten mevcut!");
+            return CustomResponseDto<CategoryDto>.Fail(200, "Bu isimde bir kategori adı zaten mevcut!");
         }
 
         public async Task<CustomResponseDto<CategoryDto>> DeleteAsync(int categoryId)

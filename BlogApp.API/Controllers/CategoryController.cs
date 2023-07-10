@@ -1,7 +1,9 @@
-﻿using BlogApp.Core.DTOs.Concrete;
+﻿using BlogApp.Business.Services;
+using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Response;
 using BlogApp.Core.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogApp.API.Controllers
@@ -20,7 +22,7 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] CategoryCreateDto categoryCreateDto)
+        public async Task<IActionResult> Add(CategoryCreateDto categoryCreateDto)
         {
             var result = _categoryCreateDtoValidator.Validate(categoryCreateDto);
 
@@ -30,11 +32,11 @@ namespace BlogApp.API.Controllers
 
                 if (!resultAdd.Errors.Any())
                 {
-                    return CreateActionResult(CustomResponseDto<CategoryCreateDto>.Success(resultAdd.StatusCode, resultAdd.Data));
+                    return CreateActionResult(CustomResponseDto<CategoryDto>.Success(resultAdd.StatusCode, resultAdd.Data));
                 }
                 else
                 {
-                    return CreateActionResult(CustomResponseDto<CategoryCreateDto>.Fail(resultAdd.StatusCode, resultAdd.Errors));
+                    return CreateActionResult(CustomResponseDto<CategoryDto>.Fail(resultAdd.StatusCode, resultAdd.Errors));
                 }
             }
 
@@ -42,7 +44,7 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(200, errors));
         }
 
         [HttpPut("[action]/{categoryId}")]

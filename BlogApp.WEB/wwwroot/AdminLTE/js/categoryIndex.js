@@ -141,30 +141,29 @@
                     if (isValid) {
                         placeHolderDiv.find('.modal').modal('hide');
                         const newTableRow = dataTable.row.add([
-                            categoryAddAjaxModel.CategoryDto.Category.Id,
-                            categoryAddAjaxModel.CategoryDto.Category.Name,
-                            categoryAddAjaxModel.CategoryDto.Category.Description,
-                            categoryAddAjaxModel.CategoryDto.Category.IsActive ? "Evet" : "Hayır",
-                            categoryAddAjaxModel.CategoryDto.Category.IsDeleted ? "Evet" : "Hayır",
-                            categoryAddAjaxModel.CategoryDto.Category.Note,
-                            convertToShortDate(categoryAddAjaxModel.CategoryDto.Category.CreatedDate),
-                            categoryAddAjaxModel.CategoryDto.Category.CreatedByName,
-                            convertToShortDate(categoryAddAjaxModel.CategoryDto.Category.ModifiedDate),
-                            categoryAddAjaxModel.CategoryDto.Category.ModifiedByName,
+                            categoryAddAjaxModel.CategoryViewModel.CategoryDto.Id,
+                            categoryAddAjaxModel.CategoryViewModel.CategoryDto.Name,
+                            categoryAddAjaxModel.CategoryViewModel.CategoryDto.Description,
+                            categoryAddAjaxModel.CategoryViewModel.CategoryDto.IsActive ? "Evet" : "Hayır",
+                            categoryAddAjaxModel.CategoryViewModel.CategoryDto.IsDeleted ? "Evet" : "Hayır",
+                            convertToShortDate(categoryAddAjaxModel.CategoryViewModel.CategoryDto.CreatedDate),
+                            categoryAddAjaxModel.CategoryViewModel.CategoryDto.CreatedByUsername,
+                            convertToShortDate(categoryAddAjaxModel.CategoryViewModel.CategoryDto.UpdatedDate),
+                            categoryAddAjaxModel.CategoryViewModel.CategoryDto.UpdatedByUsername,
                             `
-                                <button class="btn btn-primary btn-sm btn-update" data-id="${categoryAddAjaxModel.CategoryDto.Category.Id}"><span class="fas fa-edit"></span></button>
-                                <button class="btn btn-danger btn-sm btn-delete" data-id="${categoryAddAjaxModel.CategoryDto.Category.Id}"><span class="fas fa-minus-circle"></span></button>
+                                <button class="btn btn-primary btn-sm btn-update" data-id="${categoryAddAjaxModel.CategoryViewModel.CategoryDto.Id}"><span class="fas fa-edit"></span></button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="${categoryAddAjaxModel.CategoryViewModel.CategoryDto.Id}"><span class="fas fa-minus-circle"></span></button>
                                             `
                         ]).node();
                         const jqueryTableRow = $(newTableRow);
-                        jqueryTableRow.attr('name', `${categoryAddAjaxModel.CategoryDto.Category.Id}`);
+                        jqueryTableRow.attr('name', `${categoryAddAjaxModel.CategoryViewModel.CategoryDto.Id}`);
                         dataTable.draw();
-                        toastr.success(`${categoryAddAjaxModel.CategoryDto.Message}`, 'Başarılı İşlem!');
+                        toastr.success(`${categoryAddAjaxModel.CategoryViewModel.Message}`, 'Başarılı İşlem!');
                     } else {
                         let summaryText = "";
                         $('#validation-summary > ul > li').each(function () {
                             let text = $(this).text();
-                            summaryText += `*${text}\n`;
+                            summaryText += `*${text}<br/>`;
                         });
                         toastr.warning(summaryText);
                     }

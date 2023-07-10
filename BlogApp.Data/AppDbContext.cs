@@ -29,14 +29,13 @@ namespace BlogApp.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<BlogTag> BlogTags { get; set; }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-
             foreach (var item in ChangeTracker.Entries())
             {
                 if (item.Entity is BaseEntity entityReference)
                 {
+                    var httpContext = _httpContextAccessor.HttpContext;
                     var username = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
                     var methodName = httpContext.Request.Path.Value.Split("/").Last();
 
@@ -47,6 +46,8 @@ namespace BlogApp.Data
                                 entityReference.CreatedDate = DateTime.Now;
                                 entityReference.UpdatedDate = entityReference.CreatedDate;
                                 if (username != null) entityReference.CreatedByUsername = username;
+                                if (username != null) entityReference.UpdatedByUsername = username;
+
                                 break;
                             }
                         case EntityState.Modified:
@@ -62,7 +63,7 @@ namespace BlogApp.Data
                     }
                 }
             }
-            return base.SaveChangesAsync(cancellationToken);
+            return await base.SaveChangesAsync(cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

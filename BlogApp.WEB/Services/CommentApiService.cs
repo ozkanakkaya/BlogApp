@@ -18,11 +18,6 @@ namespace BlogApp.WEB.Services
 
         public async Task<CustomResponseDto<CommentDto>> AddAsync(CommentCreateDto newComment)
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            var accessToken = httpContext.User.Claims.SingleOrDefault(x => x.Type == "accessToken")?.Value;
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
             var response = await _httpClient.PostAsJsonAsync("comment", newComment);
 
             var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<CommentDto>>();
