@@ -41,7 +41,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
                     CategoriesCount = categoriesCountResult.Data,
                     CommentsCount = commentsCountResult.Data,
                     UsersCount = usersCountResult.Data,
-                    Blogs = blogsResult
+                    Blogs = blogsResult.Data
                 });
             }
             return NotFound();

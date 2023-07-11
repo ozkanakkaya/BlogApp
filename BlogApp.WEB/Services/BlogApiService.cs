@@ -89,31 +89,31 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<List<BlogListDto>> GetAllByUserIdAsync(int userId)
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByUserIdAsync(int userId)
         {
-            var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<BlogListDto>>>($"blog/GetAllByDeleted/{userId}");
+            var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<BlogListDto>>>($"blog/GetAllByUserId/{userId}");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Bloglar getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<List<BlogListDto>>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<List<BlogListDto>>.Success(response.StatusCode, response.Data);
             }
         }
 
-        public async Task<List<BlogListDto>> GetAllAsync()
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<BlogListDto>>>("blog/GetAll");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Bloglar getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<List<BlogListDto>>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<List<BlogListDto>>.Success(response.StatusCode, response.Data);
             }
         }
 

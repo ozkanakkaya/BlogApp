@@ -123,9 +123,9 @@ namespace BlogApp.API.Controllers
             var blogs = await _blogService.GetAllByUserIdAsync(userId);
             if (blogs.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, blogs.Errors));
+                return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Fail(blogs.StatusCode, blogs.Errors));
             }
-            return CreateActionResult(CustomResponseDto<PersonalBlogDto>.Success(200, blogs.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(blogs.StatusCode, blogs.Data));
         }
 
         [HttpGet("[action]")]

@@ -226,24 +226,31 @@ namespace BlogApp.Business.Services
             return true;
         }
 
-        public async Task<CustomResponseDto<PersonalBlogDto>> GetAllByUserIdAsync(int userId)//Kullanıcı Paneli-Bloglarım
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByUserIdAsync(int userId)//Kullanıcı Paneli-Bloglarım
         {
             var blogs = await UnitOfWork.Blogs.GetAllAsync(x => x.UserId == userId && x.IsActive && !x.IsDeleted, x => x.BlogCategories, x => x.BlogTags, x => x.User);
 
+            //if (blogs.Any())
+            //{
+            //    var blogListDto = blogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
+
+            //    var personalBlogDto = new PersonalBlogDto();
+            //    personalBlogDto.Blogs = blogListDto;
+            //    personalBlogDto.TotalBlogCount = blogs.Count;
+            //    personalBlogDto.TotalActiveBlogCount = await UnitOfWork.Blogs.Where(x => x.IsActive && x.UserId == userId).CountAsync();
+            //    personalBlogDto.TotalInactiveBlogCount = await UnitOfWork.Blogs.Where(x => !x.IsActive && x.UserId == userId).CountAsync();
+            //    blogs.ForEach(x => { personalBlogDto.TotalBlogsViewedCount += x.ViewCount; });
+
+            //    return CustomResponseDto<PersonalBlogDto>.Success(200, personalBlogDto);
+            //}
             if (blogs.Any())
             {
                 var blogListDto = blogs.Select(blog => Mapper.Map<BlogListDto>(blog)).ToList();
 
-                var personalBlogDto = new PersonalBlogDto();
-                personalBlogDto.Blogs = blogListDto;
-                personalBlogDto.TotalBlogCount = blogs.Count;
-                personalBlogDto.TotalActiveBlogCount = await UnitOfWork.Blogs.Where(x => x.IsActive && x.UserId == userId).CountAsync();
-                personalBlogDto.TotalInactiveBlogCount = await UnitOfWork.Blogs.Where(x => !x.IsActive && x.UserId == userId).CountAsync();
-                blogs.ForEach(x => { personalBlogDto.TotalBlogsViewedCount += x.ViewCount; });
-
-                return CustomResponseDto<PersonalBlogDto>.Success(200, personalBlogDto);
+                return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponseDto<PersonalBlogDto>.Fail(404, "Bir blog bulunamadı!");
+
+            return CustomResponseDto<List<BlogListDto>>.Fail(200, "Bir blog bulunamadı!");
         }
 
         public async Task<CustomResponseDto<int>> CountTotalBlogsAsync()//Admin-Home
@@ -643,7 +650,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<BlogListDto>.Success(200, blogDto);
             }
-            return CustomResponseDto<BlogListDto>.Fail(404, "Gösterilecek bir blog bulunamadı!");
+            return CustomResponseDto<BlogListDto>.Fail(200, "Gösterilecek bir blog bulunamadı!");
 
         }
 
