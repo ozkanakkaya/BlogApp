@@ -58,7 +58,7 @@
     //Select2
     $('#categoryList').select2({
         theme: 'bootstrap4',
-        placeholder: "Lütfen bir kategori seçiniz...",
+        placeholder: "Lütfen kategori(leri) seçiniz.",
         allowClear: true
     });
     //Select2

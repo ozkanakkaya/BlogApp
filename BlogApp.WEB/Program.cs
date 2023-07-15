@@ -8,6 +8,7 @@ using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Services;
 using BlogApp.Core.Utilities.Abstract;
 using BlogApp.WEB.Configurations;
+using BlogApp.WEB.Mapping;
 using BlogApp.WEB.Middlewares;
 using BlogApp.WEB.Services;
 using BlogApp.WEB.Validations;
@@ -53,7 +54,7 @@ builder.Services.AddHttpClient<RoleApiService>(opt =>
 //**Mappleme
 var profiles = ProfileHelper.GetProfiles();
 profiles.Add(new UserProfile());
-
+profiles.Add(new BlogPostProfile());
 var configuration = new MapperConfiguration(opt =>
 {
     opt.AddProfiles(profiles);

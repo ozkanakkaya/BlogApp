@@ -83,11 +83,11 @@ namespace BlogApp.Business.Services
 
             if (categories.Any())
             {
-                //var categoryListDto = categories.Select(category => Mapper.Map<CategoryListDto>(category));
+                var categoriesDto = categories.Select(category => Mapper.Map<CategoryDto>(category)).ToList();
 
                 return CustomResponseDto<CategoryListDto>.Success(200, new CategoryListDto
                 {
-                    Categories = categories
+                    Categories = categoriesDto
                 });
             }
             return CustomResponseDto<CategoryListDto>.Fail(200, "Bir kategori bulunamadı!");
@@ -99,9 +99,11 @@ namespace BlogApp.Business.Services
 
             if (categories.Any())
             {
+                var categoriesDto = categories.Select(category => Mapper.Map<CategoryDto>(category)).ToList();
+
                 return CustomResponseDto<CategoryListDto>.Success(200, new CategoryListDto
                 {
-                    Categories = categories
+                    Categories = categoriesDto
                 });
             }
             return CustomResponseDto<CategoryListDto>.Fail(200, "Bir kategori bulunamadı!");
@@ -113,9 +115,11 @@ namespace BlogApp.Business.Services
 
             if (categories.Any())
             {
+                var categoriesDto = categories.Select(category => Mapper.Map<CategoryDto>(category)).ToList();
+
                 return CustomResponseDto<CategoryListDto>.Success(200, new CategoryListDto
                 {
-                    Categories = categories
+                    Categories = categoriesDto
                 });
             }
             return CustomResponseDto<CategoryListDto>.Fail(200, "Bir kategori bulunamadı!");
@@ -164,11 +168,11 @@ namespace BlogApp.Business.Services
 
             if (categories.Any())
             {
-                var categoriesDto = categories.Select(category => Mapper.Map<CategoryListDto>(category)).ToList();
+                var categoriesDto = categories.Select(category => Mapper.Map<CategoryDto>(category)).ToList();
 
                 return CustomResponseDto<CategoryListDto>.Success(200, new CategoryListDto
                 {
-                    Categories = categories
+                    Categories = categoriesDto
                 });
             }
             return CustomResponseDto<CategoryListDto>.Fail(200, "Silinmiş bir kategori bulunamadı!");

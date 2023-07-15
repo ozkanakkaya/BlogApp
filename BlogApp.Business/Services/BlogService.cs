@@ -70,15 +70,13 @@ namespace BlogApp.Business.Services
                     CategoryId = categoryId
                 });
             }
-            //blog.CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogDto.AppUserId)).Username;
 
-            var imageResult = await _imageHelper.UploadAsync(blogCreateDto.Title, blogCreateDto.ImageFile, ImageType.Post);
-            blog.ImageUrl = imageResult.StatusCode == 200 ? imageResult.Data.FullName : "postImages/defaultImage.png";
+            blog.ImageUrl = blogCreateDto.ImageUrl;
 
             await UnitOfWork.Blogs.AddAsync(blog);
             await UnitOfWork.CommitAsync();
 
-            return CustomResponseDto<BlogCreateDto>.Success(201, blogCreateDto);
+            return CustomResponseDto<BlogCreateDto>.Success(200, blogCreateDto);
         }
 
         public async Task<CustomResponseDto<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto)

@@ -5,6 +5,6 @@ namespace BlogApp.Core.DTOs.Concrete
 {
     public class CategoryListDto : IDto
     {
-        public IList<Category> Categories { get; set; }
+        public IList<CategoryDto> Categories { get; set; }
     }
 }

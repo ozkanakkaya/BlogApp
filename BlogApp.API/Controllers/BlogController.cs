@@ -25,7 +25,7 @@ namespace BlogApp.API.Controllers
 
         //[Authorize(Roles = "Admin,Author")]
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] BlogCreateDto blogCreateDto)
+        public async Task<IActionResult> Add(BlogCreateDto blogCreateDto)
         {
             var result = _blogCreateDtoValidator.Validate(blogCreateDto);
 
@@ -35,7 +35,7 @@ namespace BlogApp.API.Controllers
 
                 var addResult = await _blogService.AddBlogWithTagsAndCategoriesAsync(blogCreateDto);
                 //if (!addResult.Errors.Any())
-                return CreateActionResult(CustomResponseDto<BlogCreateDto>.Success(201, addResult.Data));
+                return CreateActionResult(CustomResponseDto<BlogCreateDto>.Success(200, addResult.Data));
                 //return CreateActionResult(CustomResponse<BlogCreateDto>.Fail(addResult.StatusCode, addResult.Errors));
             }
 
@@ -46,7 +46,7 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<BlogCreateDto>.Fail(200, errors));
         }
 
         [HttpPut]

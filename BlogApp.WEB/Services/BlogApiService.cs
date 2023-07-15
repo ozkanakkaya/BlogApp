@@ -14,16 +14,16 @@ namespace BlogApp.WEB.Services
             _httpClient = httpClient;
         }
 
-        public async Task<BlogCreateDto> AddAsync([FromForm] BlogCreateDto newBlog)
+        public async Task<CustomResponseDto<BlogCreateDto>> AddAsync(BlogCreateDto newBlog)
         {
             var response = await _httpClient.PostAsJsonAsync("blog", newBlog);
 
             var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<BlogCreateDto>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Ekleme işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
+                return CustomResponseDto<BlogCreateDto>.Fail(responseBody.StatusCode, responseBody.Errors);
 
-            return responseBody.Data;
+            return CustomResponseDto<BlogCreateDto>.Success(responseBody.StatusCode, responseBody.Data);
         }
 
         public async Task<bool> UpdateAsync([FromForm] BlogUpdateDto newBlog)
