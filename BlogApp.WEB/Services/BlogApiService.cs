@@ -26,28 +26,36 @@ namespace BlogApp.WEB.Services
             return CustomResponseDto<BlogCreateDto>.Success(responseBody.StatusCode, responseBody.Data);
         }
 
-        public async Task<bool> UpdateAsync([FromForm] BlogUpdateDto newBlog)
+        public async Task<CustomResponseDto<NoContent>> UpdateAsync(BlogUpdateDto newBlog)
         {
             var response = await _httpClient.PutAsJsonAsync("blog", newBlog);
 
             var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Güncelleme işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
-
-            return response.IsSuccessStatusCode;
+            {
+                return CustomResponseDto<NoContent>.Fail(responseBody.StatusCode, responseBody.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<NoContent>.Success(responseBody.StatusCode, responseBody.Data);
+            }
         }
 
-        public async Task<bool> DeleteAsync(int blogId)
+        public async Task<CustomResponseDto<BlogListDto>> DeleteAsync(int blogId)
         {
-            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<NoContent>>($"blog/delete/{blogId}", null);
+            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<BlogListDto>>($"blog/delete/{blogId}", null);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<BlogListDto>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Silme işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
-
-            return response.IsSuccessStatusCode;
+            {
+                return CustomResponseDto<BlogListDto>.Fail(responseBody.StatusCode, responseBody.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<BlogListDto>.Success(responseBody.StatusCode, responseBody.Data);
+            }
         }
 
         public async Task<List<BlogListDto>> GetAllByActiveAsync()

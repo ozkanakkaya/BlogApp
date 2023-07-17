@@ -9,6 +9,8 @@ namespace BlogApp.WEB.Mapping
         public BlogPostProfile()
         {
             CreateMap<BlogCreateDto, BlogAddViewModel>().ReverseMap();
+            CreateMap<BlogListDto, BlogUpdateViewModel>().ReverseMap();
+            CreateMap<BlogUpdateDto, BlogUpdateViewModel>().ReverseMap();
         }
     }
 }

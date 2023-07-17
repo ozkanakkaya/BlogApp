@@ -9,7 +9,7 @@ namespace BlogApp.Core.Services
     {
         Task<CustomResponseDto<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogDto);
         Task<CustomResponseDto<NoContent>> UpdateBlogAsync(BlogUpdateDto blogUpdateDto);
-        Task<CustomResponseDto<NoContent>> DeleteAsync(int blogId);
+        Task<CustomResponseDto<BlogListDto>> DeleteAsync(int blogId);
         Task<CustomResponseDto<List<BlogListDto>>> GetAllByActiveAsync();
         Task<CustomResponseDto<List<BlogListDto>>> GetAllByNonDeletedAsync();
         Task<CustomResponseDto<List<BlogListDto>>> GetAllByDeletedAsync();

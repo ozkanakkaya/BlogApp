@@ -50,16 +50,16 @@ namespace BlogApp.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromForm] BlogUpdateDto blogUpdateDto)
+        public async Task<IActionResult> Update(BlogUpdateDto blogUpdateDto)
         {
             var result = _blogUpdateDtoValidotor.Validate(blogUpdateDto);
 
             if (result.IsValid)
             {
                 var resultUpdate = await _blogService.UpdateBlogAsync(blogUpdateDto);
-                if (resultUpdate.StatusCode == 204)
+                if (resultUpdate.StatusCode == 200)
                 {
-                    return CreateActionResult(CustomResponseDto<NoContent>.Success(204));
+                    return CreateActionResult(CustomResponseDto<NoContent>.Success(200));
                 }
             }
 
@@ -70,7 +70,7 @@ namespace BlogApp.API.Controllers
 
             var errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(400, errors));
+            return CreateActionResult(CustomResponseDto<NoContent>.Fail(200, errors));
         }
 
         [HttpPut("[action]/{blogId}")]
@@ -79,9 +79,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.DeleteAsync(blogId);
 
             if (!result.Errors.Any())
-                return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
+                return CreateActionResult(CustomResponseDto<BlogListDto>.Success(result.StatusCode, result.Data));
 
-            return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
+            return CreateActionResult(CustomResponseDto<BlogListDto>.Fail(result.StatusCode, result.Errors));
         }
 
         [HttpGet]//api/blogs

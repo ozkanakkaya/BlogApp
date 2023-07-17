@@ -17,7 +17,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="articlesTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="blogPostsTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -71,19 +71,23 @@
                                 <td><img src="~/img/@blogPost.ImageUrl" class="my-image-table" /></td>
                                 <td>@blogPost.ViewCount</td>
                                 <td>@blogPost.CommentCount</td>
-                                <td>@(
-                                    blogPost.IsActive ? "Evet" : "Hayır"
-                                    )</td>
-                                <td>@(
-                                    blogPost.IsDeleted ? "Evet" : "Hayır"
-                                    )</td> 
+                                <td>
+                                    @(
+                                        blogPost.IsActive ? "Evet" : "Hayır"
+                                        )
+                                </td>
+                                <td>
+                                    @(
+                                        blogPost.IsDeleted ? "Evet" : "Hayır"
+                                        )
+                                </td>
                                 <td>@blogPost.CreatedDate.ToShortDateString()</td>
                                 <td>@blogPost.CreatedByUsername</td>
                                 <td>@blogPost.UpdatedDate.ToShortDateString()</td>
                                 <td>@blogPost.UpdatedByUsername</td>
                                 <td>
                                     <a class="btn btn-primary btn-sm btn-update" data-id="@blogPost.Id"
-                                    asp-area="Admin" asp-controller="Blog" asp-action="Update" asp-route-articleId="@blogPost.Id">
+                                       asp-area="Admin" asp-controller="Blog" asp-action="Update" asp-route-blogId="@blogPost.Id">
                                         <span class="fas fa-edit">
                                         </span>
                                     </a>
@@ -108,8 +112,8 @@ else
     {
     <script src="~/AdminLTE/js/blogIndex.js" type="application/ecmascript"></script>
     <script>
-        $(document).ready(function() {
-            $('#btnAdd').click(function() {
+        $(document).ready(function () {
+            $('#btnAdd').click(function () {
                 window.location.href = '@Url.Action("Add","Blog")';
             })
         })

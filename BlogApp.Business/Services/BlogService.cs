@@ -10,6 +10,7 @@ using BlogApp.Core.Utilities.Abstract;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Reflection.Metadata.Ecma335;
 
 namespace BlogApp.Business.Services
 {
@@ -22,7 +23,7 @@ namespace BlogApp.Business.Services
         }
         public async Task<CustomResponseDto<BlogCreateDto>> AddBlogWithTagsAndCategoriesAsync(BlogCreateDto blogCreateDto)
         {
-            var tagSplit = blogCreateDto.Tags.Split(',');
+            var tagSplit = blogCreateDto.Tags.TrimEnd(',').Split(',');
 
             var blog = Mapper.Map<Blog>(blogCreateDto);
             blog.BlogTags = new List<BlogTag>();
@@ -30,7 +31,9 @@ namespace BlogApp.Business.Services
 
             foreach (var tag in tagSplit)
             {
-                var tagName = tag.Trim();
+                var tagName = !string.IsNullOrWhiteSpace(tag) ? tag.Trim() : null;
+                if (tagName == null) continue;
+
                 var checkTag = await UnitOfWork.Tags.Where(x => x.Name == tagName && !x.IsDeleted).FirstOrDefaultAsync();
                 if (checkTag == null)
                 {
@@ -40,7 +43,6 @@ namespace BlogApp.Business.Services
                         IsDeleted = false,
                         IsActive = true,
                         Description = tagName,
-                        //CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogDto.AppUserId)).Username
                     };
 
                     await UnitOfWork.Tags.AddAsync(tagModel);
@@ -100,11 +102,14 @@ namespace BlogApp.Business.Services
             if (!SetwiseEquivalentTo<string>(blogUpdateDto.Tags.Split(',').Select(x => x.Trim()).ToList(), oldBlog.BlogTags.Select(x => x.Tag.Name).ToList()))
             {
                 blog.BlogTags.Clear();
-                var tagSplit = blogUpdateDto.Tags.Split(',');
+
+                var tagSplit = blogUpdateDto.Tags.TrimEnd(',').Split(',');
 
                 foreach (var tag in tagSplit)
                 {
-                    var tagName = tag.Trim();
+                    var tagName = !string.IsNullOrWhiteSpace(tag) ? tag.Trim() : null;
+                    if (tagName == null) continue;
+
                     var checkTag = await UnitOfWork.Tags.Where(x => x.Name == tagName && !x.IsDeleted).FirstOrDefaultAsync();
                     if (checkTag == null)
                     {
@@ -114,7 +119,6 @@ namespace BlogApp.Business.Services
                             IsDeleted = false,
                             IsActive = true,
                             Description = tagName,
-                            //CreatedByUsername = (await _appUserRepository.GetByIdAsync(blogUpdateDto.AppUserId)).Username
                         };
 
                         await UnitOfWork.Tags.AddAsync(tagModel);
@@ -135,45 +139,27 @@ namespace BlogApp.Business.Services
                 }
             }
 
-            //blog.UpdatedByUsername = (await _appUserRepository.GetByIdAsync(blogUpdateDto.AppUserId)).Username;
-
-            bool isNewImageUploaded = false;
-            var oldUserImage = oldBlog.ImageUrl;
-
-            if (blogUpdateDto.ImageFile != null)
-            {
-                var imageResult = await _imageHelper.UploadAsync(blogUpdateDto.Title, blogUpdateDto.ImageFile, ImageType.Post);
-                if (imageResult.StatusCode == 200)
-                    blog.ImageUrl = imageResult.Data.FullName;
-
-                if (oldUserImage != "postImages/defaultImage.png")
-                {
-                    isNewImageUploaded = true;
-                }
-            }
+            blog.ImageUrl = blogUpdateDto.ImageUrl;
 
             UnitOfWork.Blogs.Update(blog);
             await UnitOfWork.CommitAsync();
 
-            if (isNewImageUploaded)
-                await _imageHelper.DeleteAsync(oldUserImage);
-
-            return CustomResponseDto<NoContent>.Success(204);
+            return CustomResponseDto<NoContent>.Success(200);
         }
 
-        public async Task<CustomResponseDto<NoContent>> DeleteAsync(int blogId)
+        public async Task<CustomResponseDto<BlogListDto>> DeleteAsync(int blogId)
         {
             var blog = await UnitOfWork.Blogs.Where(x => x.Id == blogId).FirstOrDefaultAsync();
             if (blog != null)
             {
                 blog.IsDeleted = true;
                 blog.IsActive = false;
-                //blog.UpdatedByUsername = (await _appUserRepository.GetByIdAsync(blog.AppUserId)).Username;
+
                 UnitOfWork.Blogs.Update(blog);
                 await UnitOfWork.CommitAsync();
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<BlogListDto>.Success(200, Mapper.Map<BlogListDto>(blog));
             }
-            return CustomResponseDto<NoContent>.Fail(404, $"{blogId} numaralı blog bulunamadı!");
+            return CustomResponseDto<BlogListDto>.Fail(200, $"{blogId} numaralı blog bulunamadı!");
         }
 
         public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByActiveAsync()
