@@ -24,7 +24,7 @@ namespace BlogApp.WEB.ViewComponents
 
             return View(new RightSideBarViewModel
             {
-                MostReadBlogs = mostReadBlogs,
+                MostReadBlogs = mostReadBlogs.Data,
                 CategoryListDto = categoriesResult.Data,
                 LatestPosts = latestPosts.Data.BlogListDto
             });

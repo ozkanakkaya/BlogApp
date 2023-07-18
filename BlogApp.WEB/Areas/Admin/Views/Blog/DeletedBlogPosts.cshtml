@@ -1,0 +1,101 @@
+﻿@model List<BlogApp.Core.DTOs.Concrete.BlogListDto>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Silinmiş Blog Yazıları";
+    var errorMessage = ViewBag.ErrorMessage as string;
+}
+<ol class="breadcrumb mb-3 mt-2">
+    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Yönetim Paneli</a></li>
+    <li class="breadcrumb-item active"><a asp-area="Admin" asp-controller="Blog" asp-action="DeletedBlogPosts">Silinmiş Blog Yazıları</a></li>
+</ol>
+@if (string.IsNullOrEmpty(errorMessage))
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table mr-1"></i>
+            Silinmiş Makaleler
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="deletedBlogPostsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Kategori</th>
+                            <th>Başlık</th>
+                            <th>Küçük Resim</th>
+                            <th>Okunma Sayısı</th>
+                            <th>Yorum Sayısı</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Oluşturan Kullanıcı Adı</th>
+                            <th>Son Düzenlenme Tarihi</th>
+                            <th>Son Düzenleyen Kullanıcı Adı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>#</th>
+                            <th>Kategori</th>
+                            <th>Başlık</th>
+                            <th>Küçük Resim</th>
+                            <th>Okunma Sayısı</th>
+                            <th>Yorum Sayısı</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Oluşturan Kullanıcı Adı</th>
+                            <th>Son Düzenlenme Tarihi</th>
+                            <th>Son Düzenleyen Kullanıcı Adı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var blogPost in Model)
+                        {
+                            <tr name="@blogPost.Id">
+                                <td>@blogPost.Id</td>
+                                <td>
+                                    @foreach (var category in blogPost.Categories)
+                                    {
+                                        @category.Name
+                                        @if (!category.Equals(blogPost.Categories.Last()))
+                                        {
+                                            <text>, </text>
+                                        }
+                                    }
+                                </td>
+                                <td>@blogPost.Title</td>
+                                <td><img src="~/img/@blogPost.ImageUrl" class="my-image-table" /></td>
+                                <td>@blogPost.ViewCount</td>
+                                <td>@blogPost.CommentCount</td>
+                                <td>@blogPost.CreatedDate.ToShortDateString()</td>
+                                <td>@blogPost.CreatedByUsername</td>
+                                <td>@blogPost.UpdatedDate.ToShortDateString()</td>
+                                <td>@blogPost.UpdatedByUsername</td>
+                                <td>
+                                    <a class="btn btn-warning btn-sm btn-undo" data-id="@blogPost.Id"><span class="fas fa-undo"></span></a>
+                                    <button class="btn btn-danger btn-sm btn-delete" data-id="@blogPost.Id"><span class="fas fa-minus-circle"></span></button>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger mt-3">
+        @ViewBag.ErrorMessage <br />
+        Yönetim Paneli anasayfasına geri dönmek için lütfen <a class="alert-link" asp-area="Admin" asp-controller="Home" asp-action="Index">tıklayınız.</a>
+    </div>
+}
+@section Scripts
+    {
+    <script src="~/AdminLTE/js/deletedBlogPosts.js" type="application/ecmascript"></script>
+}
+@section Styles
+    {
+
+}

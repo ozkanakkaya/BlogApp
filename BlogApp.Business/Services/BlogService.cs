@@ -198,7 +198,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Silinmiş bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(200, "Silinmiş bir blog bulunamadı!");
         }
 
         public bool SetwiseEquivalentTo<T>(List<T> list, List<T> other) where T : IEquatable<T>
@@ -283,30 +283,26 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<List<BlogListDto>>.Success(200, blogListDto);
             }
-            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(200, "Bir blog bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<NoContent>> HardDeleteAsync(int blogId)//Admin-Arşiv-Blog
+        public async Task<CustomResponseDto<BlogListDto>> HardDeleteAsync(int blogId)//Admin-Arşiv-Blog
         {
             var result = await UnitOfWork.Blogs.AnyAsync(x => x.Id == blogId);
             if (result)
             {
                 var blog = UnitOfWork.Blogs.Where(x => x.Id == blogId);
-
-                var image = await blog.Select(x => x.ImageUrl).FirstOrDefaultAsync();
+                var blogDto = await blog.Select(u => Mapper.Map<BlogListDto>(u)).FirstOrDefaultAsync();
 
                 UnitOfWork.Blogs.RemoveRange(blog);
                 await UnitOfWork.CommitAsync();
 
-                if (image != "postImages/defaultImage.png")
-                    await _imageHelper.DeleteAsync(image);
-
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<BlogListDto>.Success(200, blogDto);
             }
-            return CustomResponseDto<NoContent>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<BlogListDto>.Fail(200, "Bir blog bulunamadı!");
         }
 
-        public async Task<CustomResponseDto<NoContent>> UndoDeleteAsync(int blogId)//Admin-Arşiv-Blog
+        public async Task<CustomResponseDto<BlogListDto>> UndoDeleteAsync(int blogId)//Admin-Arşiv-Blog
         {
             var result = await UnitOfWork.Blogs.AnyAsync(x => x.Id == blogId);
             if (result)
@@ -314,13 +310,12 @@ namespace BlogApp.Business.Services
                 var blog = await UnitOfWork.Blogs.Where(x => x.Id == blogId).FirstOrDefaultAsync();
                 blog.IsDeleted = false;
                 blog.IsActive = true;
-                //blog.UpdatedByUsername=
-                //blog.UpdatedDate=
+
                 UnitOfWork.Blogs.Update(blog);
                 await UnitOfWork.CommitAsync();
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<BlogListDto>.Success(200, Mapper.Map<BlogListDto>(blog));
             }
-            return CustomResponseDto<NoContent>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<BlogListDto>.Fail(200, "Bir blog bulunamadı!");
         }
 
         public async Task<CustomResponseDto<string>> IncreaseViewCountAsync(int blogId)//Anasayfa-Blog Detayda
@@ -395,7 +390,7 @@ namespace BlogApp.Business.Services
                 return CustomResponseDto<List<BlogListDto>>.Success(200, takeSize < 1 ? blogListDto : blogListDto.Take(takeSize.Value).ToList());
 
             }
-            return CustomResponseDto<List<BlogListDto>>.Fail(404, "Bir blog bulunamadı!");
+            return CustomResponseDto<List<BlogListDto>>.Fail(200, "Bir blog bulunamadı!");
 
         }
 

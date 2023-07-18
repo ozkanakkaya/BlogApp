@@ -83,17 +83,17 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<List<BlogListDto>> GetAllByDeletedAsync()
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByDeletedAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<BlogListDto>>>("blog/GetAllByDeleted");
 
             if (response.Errors.Any())
             {
-                throw new Exception($"Bloglar getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<List<BlogListDto>>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<List<BlogListDto>>.Success(response.StatusCode, response.Data);
             }
         }
 
@@ -125,28 +125,36 @@ namespace BlogApp.WEB.Services
             }
         }
 
-        public async Task<bool> HardDeleteAsync(int blogId)
+        public async Task<CustomResponseDto<BlogListDto>> HardDeleteAsync(int blogId)
         {
-            var response = await _httpClient.DeleteAsync($"blog/HardDelete/{blogId}");
+            var response = await _httpClient.DeleteAsync($"blog/{blogId}");
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<BlogListDto>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Silme işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
-
-            return response.IsSuccessStatusCode;
+            {
+                return CustomResponseDto<BlogListDto>.Fail(responseBody.StatusCode, responseBody.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<BlogListDto>.Success(responseBody.StatusCode, responseBody.Data);
+            }
         }
 
-        public async Task<bool> UndoDeleteAsync(int blogId)
+        public async Task<CustomResponseDto<BlogListDto>> UndoDeleteAsync(int blogId)
         {
-            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<NoContent>>($"blog/undodelete/{blogId}", null);
+            var response = await _httpClient.PutAsJsonAsync<CustomResponseDto<BlogListDto>>($"blog/undodelete/{blogId}", null);
 
-            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<NoContent>>();
+            var responseBody = await response.Content.ReadFromJsonAsync<CustomResponseDto<BlogListDto>>();
 
             if (responseBody.Errors.Any())
-                throw new Exception($"Silmeyi geri alma işlemi sırasında hata oluştu. Hata mesajları: {string.Join(',', responseBody.Errors)}");
-
-            return response.IsSuccessStatusCode;
+            {
+                return CustomResponseDto<BlogListDto>.Fail(responseBody.StatusCode, responseBody.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<BlogListDto>.Success(responseBody.StatusCode, responseBody.Data);
+            }
         }
 
         public async Task<CustomResponseDto<BlogListResultDto>> SearchAsync(string keyword, int currentPage = 1, int pageSize = 5, bool isAscending = false)
@@ -165,18 +173,17 @@ namespace BlogApp.WEB.Services
 
         }
 
-        public async Task<List<BlogListDto>> GetAllByViewCountAsync(bool isAscending, int takeSize)
+        public async Task<CustomResponseDto<List<BlogListDto>>> GetAllByViewCountAsync(bool isAscending, int takeSize)
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<List<BlogListDto>>>($"blog/GetAllByViewCount?isAscending={isAscending}&takeSize={takeSize}");
 
             if (response.Errors.Any())
             {
-                //_logger.LogWarning(errorMessage);
-                throw new Exception($"Bloglar görüntüleme sayısına göre getirilirken hata oluştu. Hata mesajları: {string.Join(',', response.Errors)}");
+                return CustomResponseDto<List<BlogListDto>>.Fail(response.StatusCode, response.Errors);
             }
             else
             {
-                return response.Data;
+                return CustomResponseDto<List<BlogListDto>>.Success(response.StatusCode, response.Data);
             }
         }
 

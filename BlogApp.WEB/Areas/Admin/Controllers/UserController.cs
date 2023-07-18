@@ -430,7 +430,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             var result = await _userApiService.UndoDeleteAsync(userId);
             //var undoDeletedUser = JsonSerializer.Serialize(result.Data);
             //return Json(undoDeletedUser);
-            if (!result.Errors.Any())
+            if (!result.Errors.Any() && result.Data != null)
             {
                 var undoDeletedUserModel = JsonSerializer.Serialize(new UserViewModel
                 {
@@ -464,7 +464,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             var result = await _userApiService.HardDeleteAsync(userId);
             //var undoDeletedUser = JsonSerializer.Serialize(result.Data);
             //return Json(undoDeletedUser);
-            if (!result.Errors.Any() || result.Data != null)
+            if (!result.Errors.Any() && result.Data != null)
             {
                 var hardDeletedUserModel = JsonSerializer.Serialize(new UserViewModel
                 {
@@ -513,7 +513,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         public async Task<JsonResult> GetAllDeletedUsers()
         {
             var users = await _userApiService.GetAllByDeletedAsync();
-            if (users.Data != null || !users.Errors.Any())
+            if (users.Data != null && !users.Errors.Any())
             {
                 var userListModel = JsonSerializer.Serialize(new UserViewModel
                 {

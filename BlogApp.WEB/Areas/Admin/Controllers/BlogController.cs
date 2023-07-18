@@ -235,7 +235,7 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
                 {
                     ResultStatus = ResultStatus.Success,
                     Message = $"'{result.Data.Title}' başlıklı blog yazısı başarıyla silindi. \nTamamen silmek için veya geri almak için : \nÇöp Kutusu/Blog Yazıları menüsüne gidiniz.",
-                    BlogListDto = result.Data
+                    BlogDto = result.Data
                 });
                 return Json(deletedBlogModel);
             }
@@ -254,6 +254,135 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
                 });
                 return Json(deletedBlogErrorModel);
             }
+        }
+
+        [Authorize(Roles = "SuperAdmin,Blog.Read")]
+        public async Task<IActionResult> DeletedBlogPosts()
+        {
+            var users = await _blogApiService.GetAllByDeletedAsync();
+
+            if (!users.Errors.Any())
+                return View(users.Data);
+            else
+            {
+                ViewBag.ErrorMessage = users.Errors.FirstOrDefault();
+                return View();
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,User.Read")]
+        public async Task<JsonResult> GetAllDeletedBlogPosts()
+        {
+            var blogPosts = await _blogApiService.GetAllByDeletedAsync();
+            if (blogPosts.Data != null && !blogPosts.Errors.Any())
+            {
+                var blogPostListModel = JsonSerializer.Serialize(new BlogViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    BlogListDto = blogPosts.Data
+                }
+                , new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve
+                });
+
+                return Json(blogPostListModel);
+            }
+
+            string errorMessages = String.Empty;
+            foreach (var error in blogPosts.Errors)
+            {
+                errorMessages = $"*{error}\n";
+            }
+
+            var blogPostListModelError = JsonSerializer.Serialize(new BlogViewModel
+            {
+                ResultStatus = ResultStatus.Error,
+                Message = $"{errorMessages}\n",
+            });
+
+            return Json(blogPostListModelError);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Blog.Update")]
+        [HttpPut]
+        public async Task<JsonResult> UndoDelete(int blogId)
+        {
+            var result = await _blogApiService.UndoDeleteAsync(blogId);
+
+            if (!result.Errors.Any() && result.Data != null)
+            {
+                var undoDeletedBlogPostModel = JsonSerializer.Serialize(new BlogViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Message = $"'{result.Data.Title}' başlıklı blog yazısı başarıyla arşivden geri alındı.",
+                    BlogDto = result.Data
+                });
+                return Json(undoDeletedBlogPostModel);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
+
+                var undonDeletedBlogPostErrorModel = JsonSerializer.Serialize(new BlogViewModel
+                {
+                    ResultStatus = ResultStatus.Error,
+                    Message = $"{errorMessages}\n",
+                });
+                return Json(undonDeletedBlogPostErrorModel);
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,Blog.Delete")]
+        [HttpDelete]
+        public async Task<JsonResult> HardDelete(int blogId)
+        {
+            var result = await _blogApiService.HardDeleteAsync(blogId);
+
+            if (!result.Errors.Any() && result.Data != null)
+            {
+                var hardDeleteBlogPostModel = JsonSerializer.Serialize(new BlogViewModel
+                {
+                    ResultStatus = ResultStatus.Success,
+                    Message = $"'{result.Data.Title}' başlıklı blog yazısızı başarıyla tamamen silindi.",
+                    BlogDto = result.Data
+                });
+
+                if (result.Data.ImageUrl != "postImages/defaultImage.png")
+                    await _imageHelper.DeleteAsync(result.Data.ImageUrl);
+
+                return Json(hardDeleteBlogPostModel);
+            }
+            else
+            {
+                string errorMessages = String.Empty;
+                foreach (var error in result.Errors)
+                {
+                    errorMessages = $"*{error}\n";
+                }
+
+                var undoDeleteBlogPostErrorModel = JsonSerializer.Serialize(new BlogViewModel
+                {
+                    ResultStatus = ResultStatus.Error,
+                    Message = $"{errorMessages}\n",
+                });
+                return Json(undoDeleteBlogPostErrorModel);
+            }
+        }
+
+        [Authorize(Roles = "SuperAdmin,Blog.Read")]
+        public async Task<JsonResult> GetAllByViewCount(bool isAscending, int takeSize)
+        {
+            var result = await _blogApiService.GetAllByViewCountAsync(isAscending, takeSize);
+            var blogPosts = JsonSerializer.Serialize(result.Data, new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            });
+            return Json(blogPosts);
         }
     }
 }

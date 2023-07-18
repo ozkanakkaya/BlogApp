@@ -2,7 +2,7 @@
 
     /* DataTables start here. */
 
-   const dataTable = $('#deletedArticlesTable').DataTable({
+    const dataTable = $('#deletedBlogPostsTable').DataTable({
         dom:
             "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
             "<'row'<'col-sm-12'tr>>" +
@@ -14,63 +14,60 @@
                 action: function (e, dt, node, config) {
                     $.ajax({
                         type: 'GET',
-                        url: '/Admin/Article/GetAllDeletedArticles/',
+                        url: '/Admin/Blog/GetAllDeletedBlogPosts/',
                         contentType: "application/json",
                         beforeSend: function () {
-                            $('#deletedArticlesTable').hide();
+                            $('#deletedBlogPostsTable').hide();
                             $('.spinner-border').show();
                         },
                         success: function (data) {
-                            const articleResult = jQuery.parseJSON(data);
+                            const blogPostListModel = jQuery.parseJSON(data);
                             dataTable.clear();
-                            console.log(articleResult);
-                            if (articleResult.Data.ResultStatus === 0) {
+                            //console.log(blogPostListModel);
+                            if (blogPostListModel.ResultStatus === 200) {
                                 let categoriesArray = [];
-                                $.each(articleResult.Data.Articles.$values,
-                                    function (index, article) {
-                                        const newArticle = getJsonNetObject(article, articleResult.Data.Articles.$values);
-                                        let newCategory = getJsonNetObject(newArticle.Category, newArticle);
-                                        if (newCategory !== null) {
-                                            categoriesArray.push(newCategory);
+                                $.each(blogPostListModel.BlogListDto.$values,
+                                    function (index, bloPost) {
+                                        const newBlogPost = getJsonNetObject(bloPost, blogPostListModel.BlogListDto);
+                                        let newCategories = getJsonNetObject(newBlogPost.Categories, newBlogPost);
+                                        if (newCategories !== null) {
+                                            categoriesArray.push(newCategories);
                                         }
-                                        if (newCategory === null) {
-                                            newCategory = categoriesArray.find((category) => {
-                                                return category.$id === newArticle.Category.$ref;
+                                        if (newCategories === null) {
+                                            newCategories = categoriesArray.find((category) => {
+                                                return category.$id === newBlogPost.Categories.$ref;
                                             });
                                         }
                                         const newTableRow = dataTable.row.add([
-                                            newArticle.Id,
-                                            newCategory.Name,
-                                            newArticle.Title,
-                                            `<img src="/img/${newArticle.Thumbnail}" alt="${newArticle.Title}" class="my-image-table" />`,
-                                            `${convertToShortDate(newArticle.Date)}`,
-                                            newArticle.ViewCount,
-                                            newArticle.CommentCount,
-                                            `${newArticle.IsActive ? "Evet" : "Hayır"}`,
-                                            `${newArticle.IsDeleted ? "Evet" : "Hayır"}`,
-                                            `${convertToShortDate(newArticle.CreatedDate)}`,
-                                            newArticle.CreatedByName,
-                                            `${convertToShortDate(newArticle.ModifiedDate)}`,
-                                            newArticle.ModifiedByName,
+                                            newBlogPost.Id,
+                                            newCategories.$values.map(category => category.Name).join(', '),
+                                            newBlogPost.Title,
+                                            `<img src="/img/${newBlogPost.ImageUrl}" alt="${newBlogPost.Title}" class="my-image-table" />`,
+                                            newBlogPost.ViewCount,
+                                            newBlogPost.CommentCount,
+                                            `${convertToShortDate(newBlogPost.CreatedDate)}`,
+                                            newBlogPost.CreatedByUsername,
+                                            `${convertToShortDate(newBlogPost.UpdatedDate)}`,
+                                            newBlogPost.UpdatedByUsername,
                                             `
-                                <button class="btn btn-primary btn-sm btn-undo" data-id="${newArticle.Id}"><span class="fas fa-undo"></span></button>
-                                <button class="btn btn-danger btn-sm btn-delete" data-id="${newArticle.Id}"><span class="fas fa-minus-circle"></span></button>
+                                <button class="btn btn-primary btn-sm btn-undo" data-id="${newBlogPost.Id}"><span class="fas fa-undo"></span></button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="${newBlogPost.Id}"><span class="fas fa-minus-circle"></span></button>
                                             `
                                         ]).node();
                                         const jqueryTableRow = $(newTableRow);
-                                        jqueryTableRow.attr('name', `${newArticle.Id}`);
+                                        jqueryTableRow.attr('name', `${newBlogPost.Id}`);
                                     });
                                 dataTable.draw();
                                 $('.spinner-border').hide();
-                                $('#deletedArticlesTable').fadeIn(1400);
+                                $('#deletedBlogPostsTable').fadeIn(1400);
                             } else {
-                                toastr.error(`${articleResult.Data.Message}`, 'İşlem Başarısız!');
+                                toastr.error(`${blogPostListModel.Message}`, 'İşlem Başarısız!');
                             }
                         },
                         error: function (err) {
                             console.log(err);
                             $('.spinner-border').hide();
-                            $('#deletedArticlesTable').fadeIn(1000);
+                            $('#deletedBlogPostsTable').fadeIn(1000);
                             toastr.error(`${err.responseText}`, 'Hata!');
                         }
                     });
@@ -120,10 +117,10 @@
             event.preventDefault();
             const id = $(this).attr('data-id');
             const tableRow = $(`[name="${id}"]`);
-            const articleTitle = tableRow.find('td:eq(2)').text();
+            const blogPostTitle = tableRow.find('td:eq(2)').text();
             Swal.fire({
                 title: 'Kalıcı olarak silmek istediğinize emin misiniz?',
-                text: `${articleTitle} başlıklı makale kalıcı olarak silinicektir!`,
+                text: `'${blogPostTitle}' başlıklı blog yazısı kalıcı olarak silinicektir!`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -133,16 +130,16 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'DELETE',
                         dataType: 'json',
-                        data: { articleId: id },
-                        url: '/Admin/Article/HardDelete/',
+                        data: { blogId: id },
+                        url: '/Admin/Blog/HardDelete/',
                         success: function (data) {
-                            const articleResult = jQuery.parseJSON(data);
-                            if (articleResult.ResultStatus === 0) {
+                            const blogPostResult = jQuery.parseJSON(data);
+                            if (blogPostResult.ResultStatus === 200) {
                                 Swal.fire(
                                     'Silindi!',
-                                    `${articleResult.Message}`,
+                                    `${blogPostResult.Message}`,
                                     'success'
                                 );
 
@@ -151,7 +148,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Başarısız İşlem!',
-                                    text: `${articleResult.Message}`,
+                                    text: `${blogPostResult.Message}`,
                                 });
                             }
                         },
@@ -174,10 +171,10 @@
             event.preventDefault();
             const id = $(this).attr('data-id');
             const tableRow = $(`[name="${id}"]`);
-            let articleTitle = tableRow.find('td:eq(2)').text();
+            let blogPostTitle = tableRow.find('td:eq(2)').text();
             Swal.fire({
                 title: 'Arşivden geri getirmek istediğinize emin misiniz?',
-                text: `${articleTitle} başlıklı makale arşivden geri getirilecektir!`,
+                text: `'${blogPostTitle}' başlıklı makale arşivden geri getirilecektir!`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -187,17 +184,17 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'PUT',
                         dataType: 'json',
-                        data: { articleId: id },
-                        url: '/Admin/Article/UndoDelete/',
+                        data: { blogId: id },
+                        url: '/Admin/Blog/UndoDelete/',
                         success: function (data) {
-                            const articleUndoDeleteResult = jQuery.parseJSON(data);
-                            console.log(articleUndoDeleteResult);
-                            if (articleUndoDeleteResult.ResultStatus === 0) {
+                            const blogPostResult = jQuery.parseJSON(data);
+                            console.log(blogPostResult);
+                            if (blogPostResult.ResultStatus === 200) {
                                 Swal.fire(
                                     'Arşivden Geri Getirildi!',
-                                    `${articleUndoDeleteResult.Message}`,
+                                    `${blogPostResult.Message}`,
                                     'success'
                                 );
 
@@ -206,7 +203,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Başarısız İşlem!',
-                                    text: `${articleUndoDeleteResult.Message}`,
+                                    text: `${blogPostResult.Message}`,
                                 });
                             }
                         },

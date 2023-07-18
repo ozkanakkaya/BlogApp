@@ -112,9 +112,9 @@ namespace BlogApp.API.Controllers
             var deletedBlogs = await _blogService.GetAllByDeletedAsync();
             if (deletedBlogs.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, deletedBlogs.Errors));
+                return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Fail(deletedBlogs.StatusCode, deletedBlogs.Errors));
             }
-            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(200, deletedBlogs.Data));
+            return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(deletedBlogs.StatusCode, deletedBlogs.Data));
         }
 
         [HttpGet("[action]/{userId}")]
@@ -145,9 +145,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.HardDeleteAsync(blogId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<BlogListDto>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
+            return CreateActionResult(CustomResponseDto<BlogListDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpPut("[action]/{blogId}")]
@@ -156,9 +156,9 @@ namespace BlogApp.API.Controllers
             var result = await _blogService.UndoDeleteAsync(blogId);
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<BlogListDto>.Fail(result.StatusCode, result.Errors));
             }
-            return CreateActionResult(CustomResponseDto<NoContent>.Success(result.StatusCode));
+            return CreateActionResult(CustomResponseDto<BlogListDto>.Success(result.StatusCode, result.Data));
         }
 
         [HttpGet("[action]")]
@@ -181,7 +181,7 @@ namespace BlogApp.API.Controllers
 
             if (result.Errors.Any())
             {
-                return CreateActionResult(CustomResponseDto<NoContent>.Fail(404, result.Errors));
+                return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Fail(result.StatusCode, result.Errors));
             }
             return CreateActionResult(CustomResponseDto<List<BlogListDto>>.Success(result.StatusCode, result.Data));
 

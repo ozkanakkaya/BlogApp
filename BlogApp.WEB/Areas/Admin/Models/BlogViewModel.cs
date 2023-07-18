@@ -7,6 +7,7 @@ namespace BlogApp.WEB.Areas.Admin.Models
     {
         public ResultStatus ResultStatus { get; set; }
         public string Message { get; set; }
-        public BlogListDto BlogListDto { get; set; }
+        public BlogListDto BlogDto { get; set; }
+        public List<BlogListDto> BlogListDto { get; set; }
     }
 }
