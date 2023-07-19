@@ -24,37 +24,27 @@
                             const commentResult = jQuery.parseJSON(data);
                             dataTable.clear();
                             console.log(commentResult);
-                            if (commentResult.Data) {
+                            if (commentResult.ResultStatus === 200) {
                                 const articlesArray = [];
-                                $.each(commentResult.Data.Comments.$values,
+                                $.each(commentResult.CommentListDto.Comments,
                                     function (index, comment) {
-                                        const newComment = getJsonNetObject(comment, commentResult.Data.Comments.$values);
-                                        let newArticle = getJsonNetObject(newComment.Article, newComment);
-                                        if (newArticle !== null) {
-                                            articlesArray.push(newArticle);
-                                        }
-                                        if (newArticle === null) {
-                                            newArticle = articlesArray.find((article) => {
-                                                return article.$id === newComment.Article.$ref;
-                                            });
-                                        }
                                         const newTableRow = dataTable.row.add([
-                                            newComment.Id,
-                                            newArticle.Title,
-                                            newComment.Text.length > 75 ? newComment.Text.substring(0, 75) : newComment.Text,
-                                            `${newComment.IsActive ? "Evet" : "Hayır"}`,
-                                            `${newComment.IsDeleted ? "Evet" : "Hayır"}`,
-                                            `${convertToShortDate(newComment.CreatedDate)}`,
-                                            newComment.CreatedByName,
-                                            `${convertToShortDate(newComment.ModifiedDate)}`,
-                                            newComment.ModifiedByName,
+                                            comment.Id,
+                                            comment.BlogTitle,
+                                            comment.Content.length > 75 ? comment.Content.substring(0, 75) : comment.Content,
+                                            `${comment.IsActive ? "Evet" : "Hayır"}`,
+                                            `${comment.IsDeleted ? "Evet" : "Hayır"}`,
+                                            `${convertToShortDate(comment.CreatedDate)}`,
+                                            comment.CreatedByUsername,
+                                            `${convertToShortDate(comment.UpdatedDate)}`,
+                                            comment.UpdatedByUsername,
                                             `
-                                <button class="btn btn-warning btn-sm btn-undo" data-id="${newComment.Id}"><span class="fas fa-undo"></span></button>
-                                <button class="btn btn-danger btn-sm btn-delete" data-id="${newComment.Id}"><span class="fas fa-minus-circle"></span></button>
+                                <button class="btn btn-warning btn-sm btn-undo" data-id="${comment.Id}"><span class="fas fa-undo"></span></button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="${comment.Id}"><span class="fas fa-minus-circle"></span></button>
                                             `
                                         ]).node();
                                         const jqueryTableRow = $(newTableRow);
-                                        jqueryTableRow.attr('name', `${newComment.Id}`);
+                                        jqueryTableRow.attr('name', `${comment.Id}`);
                                     });
                                 dataTable.draw();
                                 $('.spinner-border').hide();
@@ -130,14 +120,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'DELETE',
                         dataType: 'json',
                         data: { commentId: id },
                         url: '/Admin/Comment/HardDelete/',
                         success: function (data) {
                             const commentResult = jQuery.parseJSON(data);
                             console.log(commentResult);
-                            if (commentResult.ResultStatus===0) {
+                            if (commentResult.ResultStatus === 200) {
                                 Swal.fire(
                                     'Silindi!',
                                     `${commentResult.Message}`,
@@ -187,17 +177,17 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'PUT',
                         dataType: 'json',
                         data: { commentId: id },
                         url: '/Admin/Comment/UndoDelete/',
                         success: function (data) {
                             const commentResult = jQuery.parseJSON(data);
                             console.log(commentResult);
-                            if (commentResult.Data) {
+                            if (commentResult.ResultStatus === 200) {
                                 Swal.fire(
                                     'Arşivden Geri Getirildi!',
-                                    `${commentResult.Data.Comment.Id} no'lu yorum arşivden geri getirilmiştir.`,
+                                    `${commentResult.Message}`,
                                     'success'
                                 );
                                 dataTable.row(tableRow).remove().draw();
@@ -205,7 +195,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Başarısız İşlem!',
-                                    text: `Beklenmedik bir hata oluştu.`,
+                                    text: `${commentResult.Message}`,
                                 });
                             }
                         },

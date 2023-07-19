@@ -19,10 +19,10 @@ namespace BlogApp.Business.Services
             //if (userId != null)
             //{
             var blog = await UnitOfWork.Blogs.GetAsync(x => x.Id == commentCreateDto.BlogId);
-            if (blog == null) return CustomResponseDto<CommentDto>.Fail(400, "Yorum yapabileceğiniz bir blog bulunamadı!");
+            if (blog == null) return CustomResponseDto<CommentDto>.Fail(200, "Yorum yapabileceğiniz bir blog bulunamadı!");
 
             var user = await UnitOfWork.Users.GetAsync(x => x.Id == int.Parse(userId));
-            if (user == null) return CustomResponseDto<CommentDto>.Fail(400, "Kullanıcı bilgileri getirilemedi!");
+            if (user == null) return CustomResponseDto<CommentDto>.Fail(200, "Kullanıcı bilgileri getirilemedi!");
 
             var comment = Mapper.Map<Comment>(commentCreateDto);
             comment.Email = user.Email;
@@ -74,7 +74,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<CommentDto>.Success(200, Mapper.Map<CommentDto>(comment));
             }
-            return CustomResponseDto<CommentDto>.Fail(404, $"{commentId} numaralı yorum bulunamadı!");
+            return CustomResponseDto<CommentDto>.Fail(200, $"{commentId} numaralı yorum bulunamadı!");
         }
 
         public async Task<CustomResponseDto<NoContent>> HardDeleteAsync(int commentId)
@@ -86,7 +86,7 @@ namespace BlogApp.Business.Services
                 {
                     UnitOfWork.Comments.Remove(comment);
                     await UnitOfWork.CommitAsync();
-                    return CustomResponseDto<NoContent>.Success(204);
+                    return CustomResponseDto<NoContent>.Success(200);
                 }
 
                 var blog = comment.Blog;
@@ -95,9 +95,9 @@ namespace BlogApp.Business.Services
                 UnitOfWork.Blogs.Update(blog);
                 await UnitOfWork.CommitAsync();
 
-                return CustomResponseDto<NoContent>.Success(204);
+                return CustomResponseDto<NoContent>.Success(200);
             }
-            return CustomResponseDto<NoContent>.Fail(404, "Bir yorum bulunamadı!");
+            return CustomResponseDto<NoContent>.Fail(200, "Bir yorum bulunamadı!");
         }
 
         public async Task<CustomResponseDto<int>> CountTotalAsync()
@@ -130,7 +130,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<CommentDto>.Success(200, Mapper.Map<CommentDto>(comment));
             }
-            return CustomResponseDto<CommentDto>.Fail(404, "Bir yorum bulunamadı!");
+            return CustomResponseDto<CommentDto>.Fail(200, "Bir yorum bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CommentDto>> UndoDeleteAsync(int categoryId)
@@ -153,7 +153,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<CommentDto>.Success(200, Mapper.Map<CommentDto>(comment));
             }
-            return CustomResponseDto<CommentDto>.Fail(404, "Bir yorum bulunamadı!");
+            return CustomResponseDto<CommentDto>.Fail(200, "Bir yorum bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CommentDto>> GetCommentByIdAsync(int commentId)
@@ -164,7 +164,7 @@ namespace BlogApp.Business.Services
             {
                 return CustomResponseDto<CommentDto>.Success(200, Mapper.Map<CommentDto>(comment));
             }
-            return CustomResponseDto<CommentDto>.Fail(404, "Bir yorum bilgisi bulunamadı!");
+            return CustomResponseDto<CommentDto>.Fail(200, "Bir yorum bilgisi bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CommentUpdateDto>> GetCommentUpdateDtoAsync(int commentId)
@@ -176,7 +176,7 @@ namespace BlogApp.Business.Services
 
                 return CustomResponseDto<CommentUpdateDto>.Success(200, Mapper.Map<CommentUpdateDto>(comment));
             }
-            return CustomResponseDto<CommentUpdateDto>.Fail(404, "Bir yorum bilgisi bulunamadı!");
+            return CustomResponseDto<CommentUpdateDto>.Fail(200, "Bir yorum bilgisi bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CommentListDto>> GetAllCommentsAsync()
@@ -190,7 +190,7 @@ namespace BlogApp.Business.Services
                     Comments = Mapper.Map<IList<CommentDto>>(comments)
                 });
             }
-            return CustomResponseDto<CommentListDto>.Fail(404, "Bir yorum bulunamadı!");
+            return CustomResponseDto<CommentListDto>.Fail(200, "Bir yorum bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CommentListDto>> GetAllByDeletedAsync()
@@ -206,7 +206,7 @@ namespace BlogApp.Business.Services
                     Comments = Mapper.Map<IList<CommentDto>>(comments)
                 });
             }
-            return CustomResponseDto<CommentListDto>.Fail(404, "Silinmiş bir yorum bulunamadı!");
+            return CustomResponseDto<CommentListDto>.Fail(200, "Silinmiş bir yorum bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CommentListDto>> GetAllByNonDeletedAsync()//Aktif ve pasif tüm yorumlar
@@ -220,7 +220,7 @@ namespace BlogApp.Business.Services
                     Comments = Mapper.Map<IList<CommentDto>>(comments)
                 });
             }
-            return CustomResponseDto<CommentListDto>.Fail(404, "Bir yorum bulunamadı!");
+            return CustomResponseDto<CommentListDto>.Fail(200, "Bir yorum bulunamadı!");
         }
 
         public async Task<CustomResponseDto<CommentListDto>> GetAllByActiveAsync()
@@ -234,7 +234,7 @@ namespace BlogApp.Business.Services
                     Comments = Mapper.Map<IList<CommentDto>>(comments)
                 });
             }
-            return CustomResponseDto<CommentListDto>.Fail(404, "Bir yorum bulunamadı!");
+            return CustomResponseDto<CommentListDto>.Fail(200, "Bir yorum bulunamadı!");
         }
     }
 }

@@ -12,6 +12,7 @@ namespace BlogApp.Core.DTOs.Concrete
         public string CreatedByUsername { get; set; }
         public string UpdatedByUsername { get; set; }
         public int UserId { get; set; }
+        public string Username { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
         public string ImageUrl { get; set; }

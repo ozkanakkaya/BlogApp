@@ -252,12 +252,12 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
                     errorMessages = $"*{error}\n";
                 }
 
-                var undonDeletedCategoryErrorModel = JsonSerializer.Serialize(new CategoryViewModel
+                var undoDeletedCategoryErrorModel = JsonSerializer.Serialize(new CategoryViewModel
                 {
                     ResultStatus = ResultStatus.Error,
                     Message = $"{errorMessages}\n",
                 });
-                return Json(undonDeletedCategoryErrorModel);
+                return Json(undoDeletedCategoryErrorModel);
             }
         }
 
@@ -269,13 +269,13 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
 
             if (!result.Errors.Any() && result.Data != null)
             {
-                var hardDeletedUserModel = JsonSerializer.Serialize(new CategoryViewModel
+                var hardDeletedCommentModel = JsonSerializer.Serialize(new CategoryViewModel
                 {
                     ResultStatus = ResultStatus.Success,
                     Message = $"'{result.Data.Name}' adlı kullanıcı başarıyla tamamen silindi.",
                 });
 
-                return Json(hardDeletedUserModel);
+                return Json(hardDeletedCommentModel);
             }
             else
             {
@@ -285,12 +285,12 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
                     errorMessages = $"*{error}\n";
                 }
 
-                var undonDeletedUserErrorModel = JsonSerializer.Serialize(new CategoryViewModel
+                var undoDeletedCommentErrorModel = JsonSerializer.Serialize(new CategoryViewModel
                 {
                     ResultStatus = ResultStatus.Error,
                     Message = $"{errorMessages}\n",
                 });
-                return Json(undonDeletedUserErrorModel);
+                return Json(undoDeletedCommentErrorModel);
             }
         }
     }

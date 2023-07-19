@@ -24,30 +24,30 @@
                             const commentResult = jQuery.parseJSON(data);
                             dataTable.clear();
                             console.log(commentResult);
-                            if (commentResult.Data) {
-                                const articlesArray = [];
-                                $.each(commentResult.Data.Comments.$values,
+                            if (!commentResult.error) {
+                                const blogPostsArray = [];
+                                $.each(commentResult.Comments.$values,
                                     function (index, comment) {
-                                        const newComment = getJsonNetObject(comment, commentResult.Data.Comments.$values);
-                                        let newArticle = getJsonNetObject(newComment.Article, newComment);
-                                        if (newArticle !== null) {
-                                            articlesArray.push(newArticle);
-                                        }
-                                        if (newArticle === null) {
-                                            newArticle = articlesArray.find((article) => {
-                                                return article.$id === newComment.Article.$ref;
-                                            });
-                                        }
+                                        const newComment = getJsonNetObject(comment, commentResult.Comments.$values);
+                                        //let newArticle = getJsonNetObject(newComment.Article, newComment);
+                                        //if (newArticle !== null) {
+                                        //    blogPostsArray.push(newArticle);
+                                        //}
+                                        //if (newArticle === null) {
+                                        //    newArticle = blogPostsArray.find((article) => {
+                                        //        return article.$id === newComment.Article.$ref;
+                                        //    });
+                                        //}
                                         const newTableRow = dataTable.row.add([
                                             newComment.Id,
-                                            newArticle.Title,
-                                            newComment.Text.length > 75 ? newComment.Text.substring(0, 75) : newComment.Text,
+                                            newComment.BlogTitle,
+                                            newComment.Content.length > 75 ? newComment.Content.substring(0, 75) : newComment.Content,
                                             `${newComment.IsActive ? "Evet" : "Hayır"}`,
                                             `${newComment.IsDeleted ? "Evet" : "Hayır"}`,
                                             `${convertToShortDate(newComment.CreatedDate)}`,
-                                            newComment.CreatedByName,
-                                            `${convertToShortDate(newComment.ModifiedDate)}`,
-                                            newComment.ModifiedByName,
+                                            newComment.CreatedByUsername,
+                                            `${convertToShortDate(newComment.UpdatedDate)}`,
+                                            newComment.UpdatedByUsername,
                                             getButtonsForDataTable(newComment)
                                         ]).node();
                                         const jqueryTableRow = $(newTableRow);
@@ -57,7 +57,7 @@
                                 $('.spinner-border').hide();
                                 $('#commentsTable').fadeIn(1400);
                             } else {
-                                toastr.error(`${commentResult.Message}`, 'İşlem Başarısız!');
+                                toastr.error(`${commentResult.error}`, 'İşlem Başarısız!');
                             }
                         },
                         error: function (err) {
@@ -127,17 +127,18 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'PUT',
                         dataType: 'json',
                         data: { commentId: id },
                         url: '/Admin/Comment/Delete/',
                         success: function (data) {
                             const commentResult = jQuery.parseJSON(data);
                             console.log(commentResult);
-                            if (commentResult.Data) {
+                            if (commentResult.ResultStatus === 200) {
                                 Swal.fire(
                                     'Silindi!',
-                                    `${commentResult.Data.Comment.Id} no'lu yorum başarıyla silinmiştir.`,
+                                    `${commentResult.Message}`,
+/*                                    `${commentResult.CommentDto.Id} no'lu yorum başarıyla silinmiştir.\nTamamen silmek için veya geri almak için : \nÇöp Kutusu/Yorumlar menüsüne gidiniz.`,*/
                                     'success'
                                 );
 
@@ -146,7 +147,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Başarısız İşlem!',
-                                    text: `Beklenmedik bir hata oluştu.`,
+                                    text: `${commentResult.Message}`,
                                 });
                             }
                         },
@@ -188,7 +189,7 @@
                 const dataToSend = new FormData(form.get(0));
                 $.ajax({
                     url: actionUrl,
-                    type: 'POST',
+                    type: 'PUT',
                     data: dataToSend,
                     processData: false,
                     contentType: false,
@@ -199,24 +200,24 @@
                         placeHolderDiv.find('.modal-body').replaceWith(newFormBody);
                         const isValid = newFormBody.find('[name="IsValid"]').val() === 'True';
                         if (isValid) {
-                            const id = commentUpdateAjaxModel.CommentDto.Comment.Id;
+                            const id = commentUpdateAjaxModel.CommentViewModel.CommentDto.Id;
                             const tableRow = $(`[name="${id}"]`);
                             placeHolderDiv.find('.modal').modal('hide');
                             dataTable.row(tableRow).data([
-                                commentUpdateAjaxModel.CommentDto.Comment.Id,
-                                commentUpdateAjaxModel.CommentDto.Comment.Article.Title,
-                                commentUpdateAjaxModel.CommentDto.Comment.Text.length > 75 ? commentUpdateAjaxModel.CommentDto.Comment.Text.substring(0, 75) : commentUpdateAjaxModel.CommentDto.Comment.Text,
-                                `${commentUpdateAjaxModel.CommentDto.Comment.IsActive ? "Evet" : "Hayır"}`,
-                                `${commentUpdateAjaxModel.CommentDto.Comment.IsDeleted ? "Evet" : "Hayır"}`,
-                                `${convertToShortDate(commentUpdateAjaxModel.CommentDto.Comment.CreatedDate)}`,
-                                commentUpdateAjaxModel.CommentDto.Comment.CreatedByName,
-                                `${convertToShortDate(commentUpdateAjaxModel.CommentDto.Comment.ModifiedDate)}`,
-                                commentUpdateAjaxModel.CommentDto.Comment.ModifiedByName,
-                                getButtonsForDataTable(commentUpdateAjaxModel.CommentDto.Comment)
+                                commentUpdateAjaxModel.CommentViewModel.CommentDto.Id,
+                                commentUpdateAjaxModel.CommentViewModel.CommentDto.BlogTitle,
+                                commentUpdateAjaxModel.CommentViewModel.CommentDto.Content.length > 75 ? commentUpdateAjaxModel.CommentViewModel.CommentDto.Content.substring(0, 75) : commentUpdateAjaxModel.CommentViewModel.CommentDto.Content,
+                                `${commentUpdateAjaxModel.CommentViewModel.CommentDto.IsActive ? "Evet" : "Hayır"}`,
+                                `${commentUpdateAjaxModel.CommentViewModel.CommentDto.IsDeleted ? "Evet" : "Hayır"}`,
+                                `${convertToShortDate(commentUpdateAjaxModel.CommentViewModel.CommentDto.CreatedDate)}`,
+                                commentUpdateAjaxModel.CommentViewModel.CommentDto.CreatedByUsername,
+                                `${convertToShortDate(commentUpdateAjaxModel.CommentViewModel.CommentDto.UpdatedDate)}`,
+                                commentUpdateAjaxModel.CommentViewModel.CommentDto.UpdatedByUsername,
+                                getButtonsForDataTable(commentUpdateAjaxModel.CommentViewModel.CommentDto)
                             ]);
                             tableRow.attr("name", `${id}`);
                             dataTable.row(tableRow).invalidate();
-                            toastr.success(`${commentUpdateAjaxModel.CommentDto.Comment.Id} no'lu yorum başarıyla güncellenmiştir`, "Başarılı İşlem!");
+                            toastr.success(`${commentUpdateAjaxModel.CommentViewModel.CommentDto.Id} no'lu yorum başarıyla güncellenmiştir`, "Başarılı İşlem!");
                         } else {
                             let summaryText = "";
                             $('#validation-summary > ul > li').each(function () {
@@ -278,31 +279,31 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        type: 'POST',
+                        type: 'PUT',
                         dataType: 'json',
                         data: { commentId: id },
                         url: '/Admin/Comment/Approve/',
                         success: function (data) {
                             const commentResult = jQuery.parseJSON(data);
                             console.log(commentResult);
-                            if (commentResult.Data) {
+                            if (commentResult.ResultStatus === 200) {
                                 dataTable.row(tableRow).data([
-                                    commentResult.Data.Comment.Id,
-                                    commentResult.Data.Comment.Article.Title,
-                                    commentResult.Data.Comment.Text.length > 75 ? commentResult.Data.Comment.Text.substring(0, 75) : commentResult.Data.Comment.Text,
-                                    `${commentResult.Data.Comment.IsActive ? "Evet" : "Hayır"}`,
-                                    `${commentResult.Data.Comment.IsDeleted ? "Evet" : "Hayır"}`,
-                                    `${convertToShortDate(commentResult.Data.Comment.CreatedDate)}`,
-                                    commentResult.Data.Comment.CreatedByName,
-                                    `${convertToShortDate(commentResult.Data.Comment.ModifiedDate)}`,
-                                    commentResult.Data.Comment.ModifiedByName,
-                                    getButtonsForDataTable(commentResult.Data.Comment)
+                                    commentResult.CommentDto.Id,
+                                    commentResult.CommentDto.BlogTitle,
+                                    commentResult.CommentDto.Content.length > 75 ? commentResult.CommentDto.Content.substring(0, 75) : commentResult.CommentDto.Content,
+                                    `${commentResult.CommentDto.IsActive ? "Evet" : "Hayır"}`,
+                                    `${commentResult.CommentDto.IsDeleted ? "Evet" : "Hayır"}`,
+                                    `${convertToShortDate(commentResult.CommentDto.CreatedDate)}`,
+                                    commentResult.CommentDto.CreatedByUsername,
+                                    `${convertToShortDate(commentResult.CommentDto.UpdatedDate)}`,
+                                    commentResult.CommentDto.UpdatedByUsername,
+                                    getButtonsForDataTable(commentResult.CommentDto)
                                 ]);
                                 tableRow.attr("name", `${id}`);
                                 dataTable.row(tableRow).invalidate();
                                 Swal.fire(
                                     'Onaylandı!',
-                                    `${commentResult.Data.Comment.Id} no'lu yorum başarıyla onaylanmıştır.`,
+                                    `${commentResult.CommentDto.Id} no'lu yorum başarıyla onaylanmıştır.`,
                                     'success'
                                 );
 
@@ -310,7 +311,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Başarısız İşlem!',
-                                    text: `Beklenmedik bir hata ile karşılaşıldı.`,
+                                    text: `${commentResult.Message}`,
                                 });
                             }
                         },

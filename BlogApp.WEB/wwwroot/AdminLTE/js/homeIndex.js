@@ -47,7 +47,7 @@
                 {
                     type: 'bar',
                     data: {
-                        labels: blogResult.$values.map(blog => blog.Title),//Foreach döngüsü,
+                        labels: blogResult.$values.map(blog => blog.Title.length > 30 ? blog.Title.substring(0, 30)+`...` : blog.Title),//Foreach döngüsü,
                         datasets: [
                             {
                                 label: 'Okunma Sayısı',
