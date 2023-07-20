@@ -157,6 +157,17 @@ namespace BlogApp.API.Controllers
             return CreateActionResult(CustomResponseDto<CommentUpdateDto>.Fail(result.StatusCode, result.Errors));
         }
 
+        [HttpGet("[action]/{userId}")]
+        public async Task<IActionResult> GetAllCommentsByUserId(int userId)
+        {
+            var result = await _commentService.GetAllCommentsByUserIdAsync(userId);
+
+            if (!result.Errors.Any())
+                return CreateActionResult(CustomResponseDto<CommentListDto>.Success(result.StatusCode, result.Data));
+
+            return CreateActionResult(CustomResponseDto<CommentListDto>.Fail(result.StatusCode, result.Errors));
+        }
+
         [HttpGet("[action]")]
         public async Task<IActionResult> GetAll()
         {

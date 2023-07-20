@@ -2,6 +2,7 @@
 using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.Design;
 using System.Net.Http.Headers;
 namespace BlogApp.WEB.Services
 {
@@ -187,6 +188,20 @@ namespace BlogApp.WEB.Services
         public async Task<CustomResponseDto<CommentListDto>> GetAllByActiveAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<CommentListDto>>("comment");
+
+            if (response.Errors.Any())
+            {
+                return CustomResponseDto<CommentListDto>.Fail(response.StatusCode, response.Errors);
+            }
+            else
+            {
+                return CustomResponseDto<CommentListDto>.Success(response.StatusCode, response.Data);
+            }
+        }
+
+        public async Task<CustomResponseDto<CommentListDto>> GetAllCommentsByUserIdAsync(int userId)
+        {
+            var response = await _httpClient.GetFromJsonAsync<CustomResponseDto<CommentListDto>>($"comment/GetAllCommentsByUserId/{userId}");
 
             if (response.Errors.Any())
             {

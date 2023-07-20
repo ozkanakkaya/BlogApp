@@ -167,6 +167,20 @@ namespace BlogApp.Business.Services
             return CustomResponseDto<CommentDto>.Fail(200, "Bir yorum bilgisi bulunamadı!");
         }
 
+        public async Task<CustomResponseDto<CommentListDto>> GetAllCommentsByUserIdAsync(int userId)
+        {
+            var comments = await UnitOfWork.Comments.GetAllAsync(x => x.UserId == userId, x => x.Blog);
+
+            if (comments != null)
+            {
+                return CustomResponseDto<CommentListDto>.Success(200, new CommentListDto
+                {
+                    Comments = Mapper.Map<IList<CommentDto>>(comments)
+                });
+            }
+            return CustomResponseDto<CommentListDto>.Fail(200, "Bir yorum bilgisi bulunamadı!");
+        }
+
         public async Task<CustomResponseDto<CommentUpdateDto>> GetCommentUpdateDtoAsync(int commentId)
         {
             var result = await UnitOfWork.Comments.AnyAsync(x => x.Id == commentId);

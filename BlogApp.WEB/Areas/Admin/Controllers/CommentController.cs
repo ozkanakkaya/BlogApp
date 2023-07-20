@@ -7,6 +7,9 @@ using System.Text.Json;
 using BlogApp.Core.Enums;
 using BlogApp.WEB.Areas.Admin.Models;
 using BlogApp.WEB.Utilities.Extensions;
+using System.Security.Claims;
+using BlogApp.Core.Entities.Concrete;
+using BlogApp.Core.Response;
 
 namespace BlogApp.WEB.Areas.Admin.Controllers
 {
@@ -14,37 +17,59 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
     public class CommentController : Controller
     {
         private readonly CommentApiService _commentApiService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CommentController(CommentApiService categoryApiService)
+        public CommentController(CommentApiService categoryApiService, IHttpContextAccessor httpContextAccessor)
         {
             _commentApiService = categoryApiService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        [Authorize(Roles = "SuperAdmin,Comment.Read")]
+        [Authorize(Roles = "SuperAdmin,Admin,Comment.Read")]
         public async Task<IActionResult> Index()
         {
-            var result = await _commentApiService.GetAllByNonDeletedAsync();
+            var httpContext = _httpContextAccessor.HttpContext.User.Claims;
+            var userRoles = httpContext.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+            var isAdmin = userRoles.Contains("SuperAdmin") || userRoles.Contains("Admin");
+
+            var result = isAdmin
+                ? await _commentApiService.GetAllAsync()
+                : await GetCommentsByUserIdAsync(httpContext);
+
             if (!result.Errors.Any() && result.Data != null)
+            {
+                ViewBag.TableTitle = isAdmin ? "Tüm Kullanıcıların Yorumları" : "Yorumlarınız";
                 return View(new CommentListDto
                 {
                     Comments = result.Data.Comments
                 });
-            else
-            {
-                ViewBag.ErrorMessage = result.Errors.Any() ? result.Errors.FirstOrDefault() : "Kayıt Bulunamadı!";
-                return View();
             }
+
+            ViewBag.ErrorMessage = result.Errors.Any() ? result.Errors.FirstOrDefault() : "Kayıt Bulunamadı!";
+            return View();
         }
 
-        [Authorize(Roles = "SuperAdmin,Comment.Read")]
+        private async Task<CustomResponseDto<CommentListDto>> GetCommentsByUserIdAsync(IEnumerable<Claim> claims)
+        {
+            var userId = int.Parse(claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+            return await _commentApiService.GetAllCommentsByUserIdAsync(userId);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Admin,Comment.Read")]
         public async Task<JsonResult> GetAllComments()
         {
-            var result = await _commentApiService.GetAllByNonDeletedAsync();
+            var httpContext = _httpContextAccessor.HttpContext.User.Claims;
+            var userRoles = httpContext.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            var result = (userRoles.Contains("SuperAdmin") || userRoles.Contains("Admin")) 
+                ? await _commentApiService.GetAllAsync() 
+                : await GetCommentsByUserIdAsync(httpContext);
+
             if (!result.Errors.Any() && result.Data != null)
             {
-                var categories = JsonSerializer.Serialize(result.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
+                var comments = JsonSerializer.Serialize(result.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
 
-                return Json(categories);
+                return Json(comments);
             }
 
             string errorMessages = String.Empty;

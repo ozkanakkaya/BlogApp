@@ -11,6 +11,7 @@ using BlogApp.Core.DTOs.Concrete;
 using NToastNotify;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using BlogApp.Core.Response;
 
 namespace BlogApp.WEB.Areas.Admin.Controllers
 {
@@ -39,39 +40,53 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
         {
             var httpContext = _httpContextAccessor.HttpContext.User.Claims;
             var userRoles = httpContext.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+            var isAdmin = userRoles.Contains("SuperAdmin") || userRoles.Contains("Admin");
 
-            if (userRoles.Contains("SuperAdmin") || userRoles.Contains("Admin"))
+            var result = isAdmin
+                ? await _blogApiService.GetAllAsync()
+                : await GetBlogPostsByUserIdAsync(httpContext);
+
+            if (!result.Errors.Any() && result.Data != null)
             {
-                var result = await _blogApiService.GetAllAsync();
-
-                if (!result.Errors.Any() && result.Data != null)
-                {
-                    ViewBag.TableTitle = "Tüm Blog Yazıları";
-                    return View(result.Data);
-                }
-
-                else
-                {
-                    ViewBag.ErrorMessage = result.Errors.Any() ? result.Errors.FirstOrDefault() : "Kayıt Bulunamadı!";
-                    return View();
-                }
+                ViewBag.TableTitle = isAdmin ? "Tüm Blog Yazıları" : "Blog Yazılarınız";
+                return View(result.Data);
             }
-            else
+
+            ViewBag.ErrorMessage = result.Errors.Any() ? result.Errors.FirstOrDefault() : "Kayıt Bulunamadı!";
+            return View();
+        }
+
+        private async Task<CustomResponseDto<List<BlogListDto>>> GetBlogPostsByUserIdAsync(IEnumerable<Claim> claims)
+        {
+            var userId = int.Parse(claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+            return await _blogApiService.GetAllByUserIdAsync(userId);
+        }
+
+        [Authorize(Roles = "SuperAdmin,Admin,Blog.Read")]
+        public async Task<JsonResult> GetAllBlogs()
+        {
+            var httpContext = _httpContextAccessor.HttpContext.User.Claims;
+            var userRoles = httpContext.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            var blogPosts = (userRoles.Contains("SuperAdmin") || userRoles.Contains("Admin"))
+                ? await _blogApiService.GetAllAsync()
+                : await GetBlogPostsByUserIdAsync(httpContext);
+
+
+            if (!blogPosts.Errors.Any())
             {
-                var userId = int.Parse(httpContext.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
-                var result = await _blogApiService.GetAllByUserIdAsync(userId);
+                var blogListDto = JsonSerializer.Serialize(blogPosts.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
 
-                if (!result.Errors.Any() && result.Data != null)
-                {
-                    ViewBag.TableTitle = "Blog Yazılarınız";
-                    return View(result.Data);
-                }
-                else
-                {
-                    ViewBag.ErrorMessage = result.Errors.Any() ? result.Errors.FirstOrDefault() : "Kayıt Bulunamadı!";
-                    return View();
-                }
+                return Json(blogListDto);
             }
+
+            string errorMessages = String.Empty;
+            foreach (var error in blogPosts.Errors)
+            {
+                errorMessages = $"*{error}\n";
+            }
+
+            return Json(JsonSerializer.Serialize(new { error = errorMessages }));
         }
 
         [Authorize(Roles = "SuperAdmin,Blog.Create")]
@@ -131,27 +146,6 @@ namespace BlogApp.WEB.Areas.Admin.Controllers
             var categories = await _categoryApiService.GetAllByActiveAsync();
             blogAddViewModel.Categories = categories.Data.Categories;
             return View(blogAddViewModel);
-        }
-
-        [Authorize(Roles = "SuperAdmin,Blog.Read")]
-        public async Task<JsonResult> GetAllBlogs()
-        {
-            var blogPosts = await _blogApiService.GetAllAsync();
-
-            if (!blogPosts.Errors.Any())
-            {
-                var blogListDto = JsonSerializer.Serialize(blogPosts.Data, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve });
-
-                return Json(blogListDto);
-            }
-
-            string errorMessages = String.Empty;
-            foreach (var error in blogPosts.Errors)
-            {
-                errorMessages = $"*{error}\n";
-            }
-
-            return Json(JsonSerializer.Serialize(new { error = errorMessages }));
         }
 
         [Authorize(Roles = "SuperAdmin,Blog.Update")]

@@ -13,7 +13,7 @@ namespace BlogApp.Core.Services
         Task<CustomResponseDto<TagListDto>> GetAllByActiveAsync();
         Task<CustomResponseDto<TagListDto>> GetAllTagsAsync();
         Task<CustomResponseDto<TagUpdateDto>> GetTagUpdateDtoAsync(int tagId);
-        Task<CustomResponseDto<NoContent>> UpdateAsync(TagUpdateDto tagUpdateDto);
+        Task<CustomResponseDto<TagDto>> UpdateAsync(TagUpdateDto tagUpdateDto);
         Task<CustomResponseDto<int>> CountTotalAsync();
         Task<CustomResponseDto<int>> CountByNonDeletedAsync();
         Task<CustomResponseDto<TagListDto>> GetAllByDeletedAsync();

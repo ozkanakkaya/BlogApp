@@ -51,6 +51,11 @@ builder.Services.AddHttpClient<RoleApiService>(opt =>
     opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
 }).AddHttpMessageHandler<CustomAuthorizationHandler>();
 
+builder.Services.AddHttpClient<TagApiService>(opt =>
+{
+    opt.BaseAddress = new Uri(builder.Configuration["BaseUrl"]);
+}).AddHttpMessageHandler<CustomAuthorizationHandler>();
+
 //**Mappleme
 var profiles = ProfileHelper.GetProfiles();
 profiles.Add(new UserProfile());

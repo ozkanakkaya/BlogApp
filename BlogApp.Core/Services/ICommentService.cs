@@ -15,6 +15,7 @@ namespace BlogApp.Core.Services
         Task<CustomResponseDto<CommentDto>> ApproveAsync(int commentId);
         Task<CustomResponseDto<CommentDto>> UndoDeleteAsync(int categoryId);
         Task<CustomResponseDto<CommentDto>> GetCommentByIdAsync(int categoryId);
+        Task<CustomResponseDto<CommentListDto>> GetAllCommentsByUserIdAsync(int userId);
         Task<CustomResponseDto<CommentUpdateDto>> GetCommentUpdateDtoAsync(int commentId);
         Task<CustomResponseDto<CommentListDto>> GetAllCommentsAsync();
         Task<CustomResponseDto<CommentListDto>> GetAllByDeletedAsync();

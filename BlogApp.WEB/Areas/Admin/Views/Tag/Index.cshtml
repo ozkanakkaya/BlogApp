@@ -1,0 +1,89 @@
+﻿@model BlogApp.Core.DTOs.Concrete.TagListDto
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Etiketler";
+    var errorMessage = ViewBag.ErrorMessage as string;
+}
+<ol class="breadcrumb mb-3 mt-2">
+    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Yönetim Paneli</a></li>
+    <li class="breadcrumb-item active"><a asp-area="Admin" asp-controller="Tag" asp-action="Index">Etiketler</a></li>
+</ol>
+@if (string.IsNullOrEmpty(errorMessage))
+{
+    <div id="modalPlaceHolder" aria-hidden="true"></div>
+    <div class="card mb-4 mt-2">
+        <div class="card-header">
+            <i class="fas fa-table mr-1"></i>
+            Etiket Listesi
+        </div>
+        <div class="card-body">
+            <div class="spinner-border" role="status" style="display:none;">
+                <span class="sr-only">Yükleniyor...</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="tagsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Adı</th>
+                            <th>Açıklaması</th>
+                            <th>Aktif Mi?</th>
+                            <th>Silinmiş Mi?</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Oluşturan Kullanıcı Adı</th>
+                            <th>Son Düzenlenme Tarihi</th>
+                            <th>Son Düzenleyen Kullanıcı Adı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>ID</th>
+                            <th>Adı</th>
+                            <th>Açıklaması</th>
+                            <th>Aktif Mi?</th>
+                            <th>Silinmiş Mi?</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Oluşturan Kullanıcı Adı</th>
+                            <th>Son Düzenlenme Tarihi</th>
+                            <th>Son Düzenleyen Kullanıcı Adı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var tag in Model.Tags)
+                        {
+                            <tr name="@tag.Id">
+                                <td>@tag.Id</td>
+                                <td>@tag.Name</td>
+                                <td>@tag.Description</td>
+                                <td>@(tag.IsActive ? "Evet" : "Hayır")</td>
+                                <td>@(tag.IsDeleted ? "Evet" : "Hayır")</td>
+                                <td>@tag.CreatedDate.ToShortDateString()</td>
+                                <td>@tag.CreatedByUsername</td>
+                                <td>@tag.UpdatedDate.ToShortDateString()</td>
+                                <td>@tag.UpdatedByUsername</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm btn-update" data-id="@tag.Id"><span class="fas fa-edit"></span></button>
+                                    <button class="btn btn-danger btn-sm btn-delete" data-id="@tag.Id"><span class="fas fa-minus-circle"></span></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger mt-3">
+        @ViewBag.ErrorMessage <br />
+        Yönetim Paneli anasayfasına geri dönmek için lütfen <a class="alert-link" asp-area="Admin" asp-controller="Home" asp-action="Index">tıklayınız.</a>
+    </div>
+}
+@section Scripts
+    {
+
+    <script src="~/AdminLTE/js/tagIndex.js" type="application/ecmascript"></script>
+}
