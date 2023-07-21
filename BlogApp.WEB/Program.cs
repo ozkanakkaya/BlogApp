@@ -7,6 +7,7 @@ using BlogApp.Core.DTOs.Concrete;
 using BlogApp.Core.Entities.Concrete;
 using BlogApp.Core.Services;
 using BlogApp.Core.Utilities.Abstract;
+using BlogApp.Core.Utilities.Extensions;
 using BlogApp.WEB.Configurations;
 using BlogApp.WEB.Mapping;
 using BlogApp.WEB.Middlewares;
@@ -71,7 +72,13 @@ builder.Services.AddSingleton(mapper);
 builder.Services.Configure<BlogRightSideBarWidgetOptions>(builder.Configuration.GetSection("BlogRightSideBarWidgetOptions"));
 builder.Services.Configure<AboutUsPageInfo>(builder.Configuration.GetSection("AboutUsPageInfo"));
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.Configure<WebsiteInfo>(builder.Configuration.GetSection("WebsiteInfo"));
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
+
+builder.Services.ConfigureWritable<BlogRightSideBarWidgetOptions>(builder.Configuration.GetSection("BlogRightSideBarWidgetOptions"));
+builder.Services.ConfigureWritable<AboutUsPageInfo>(builder.Configuration.GetSection("AboutUsPageInfo"));
+builder.Services.ConfigureWritable<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.ConfigureWritable<WebsiteInfo>(builder.Configuration.GetSection("WebsiteInfo"));
 
 builder.Services.AddScoped<IValidator<EmailSendDto>, EmailSendDtoValidator>();
 

@@ -1,7 +1,11 @@
-﻿@model BlogApp.WEB.Configurations.AboutUsPageInfo
+﻿@using BlogApp.WEB.Configurations;
+@using Microsoft.Extensions.Options;
+@inject IOptionsSnapshot<WebsiteInfo> WebsiteInfo
+@model BlogApp.WEB.Configurations.AboutUsPageInfo
 @{
     ViewData["Title"] = "About";
     Layout = "~/Views/Shared/_AboutLayout.cshtml";
+    var websiteInfo = WebsiteInfo.Value;
 }
 <h3 class="tittle">HAKKIMIZDA</h3>
 <div class="row inner-sec">
@@ -11,7 +15,7 @@
                 <div class="container text-center py-5">
                     <div class="logo">
                         <a class="navbar-brand">
-                            <i class="fab fa-linode"></i> BlogKervanı
+                            <i class="fab fa-linode"></i> @websiteInfo.MenuTitle
                         </a>
                     </div>
                     <div class="container mt-4 mb-5">

@@ -1,4 +1,4 @@
-﻿namespace BlogApp.WEB.Utilities.Helpers
+﻿namespace BlogApp.Core.Utilities.Concrete
 {
     public class MessageHelpers
     {

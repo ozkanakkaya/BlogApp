@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Utilities\Helpers\Abstract\" />
+    <Folder Include="Utilities\Helpers\Concrete\" />
   </ItemGroup>
 
   <ItemGroup>

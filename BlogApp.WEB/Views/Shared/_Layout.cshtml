@@ -1,12 +1,15 @@
-﻿@{
-    Layout = null;
+﻿@using BlogApp.WEB.Configurations;
+@using Microsoft.Extensions.Options;
+@inject IOptionsSnapshot<WebsiteInfo> WebsiteInfo
+@{
+    var websiteInfo = WebsiteInfo.Value;
 }
 
 <!DOCTYPE html>
 <html lang="tr">
 
 <head>
-    <title>Blog Kervanı</title>
+    <title>@ViewBag.Title | @websiteInfo.Title </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
     <meta name="keywords" content="Blog Kervanı, en güncel ve özgün blog yazılarına ev sahipliği yapan bir platformdur. Tüm ilgi alanlarına yönelik yazıların yer aldığı Blog Kervanı'nda keşfedeceğiniz birçok ilginç konu bulacaksınız. Ücretsiz üyelik ile her gün yeni bir şeyler öğrenin ve deneyimleyin." />

@@ -17,6 +17,10 @@
                     <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
                     Blog Yazıları
                 </a>
+                <a class="nav-link" asp-area="Admin" asp-controller="Comment" asp-action="Index">
+                    <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
+                    Yorumlar
+                </a>
                 <a class="nav-link" asp-area="Admin" asp-controller="Category" asp-action="Index">
                     <div class="sb-nav-link-icon"><i class="fas fa-th-list"></i></div>
                     Kategoriler
@@ -24,10 +28,6 @@
                 <a class="nav-link" asp-area="Admin" asp-controller="Tag" asp-action="Index">
                     <div class="sb-nav-link-icon"><i class="fas fa-th-list"></i></div>
                     Etiketler
-                </a>
-                <a class="nav-link" asp-area="Admin" asp-controller="Comment" asp-action="Index">
-                    <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
-                    Yorumlar
                 </a>
                 @if (Model.UserDto.Roles.Any(r => r.Name.Equals("SuperAdmin") || r.Name.Equals("Role.Read")))
                 {
@@ -57,16 +57,16 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-at"></i></div>
                         E-Posta Ayarları
                     </a>
-                    <a class="nav-link" asp-area="Admin" asp-controller="Options" asp-action="ArticleRightSideBarWidgetSettings">
+                    <a class="nav-link" asp-area="Admin" asp-controller="Options" asp-action="BlogRightSideBarWidgetSettings">
                         <div class="sb-nav-link-icon"><i class="fas fa-newspaper"></i></div>
-                        Makale Sayfaları İçin Widget Ayarları
+                        Blog Yazısı Sayfaları İçin Widget Ayarları
                     </a>
                     <a class="nav-link" asp-area="Admin" asp-controller="Options" asp-action="About">
                         <div class="sb-nav-link-icon"><i class="fas fa-address-card"></i></div>
                         Hakkımızda Sayfa İçerikleri
                     </a>
                 }
-                @if (Model.UserDto.Roles.Any(r => r.Name.Equals("SuperAdmin")))
+                @if (Model.UserDto.Roles.Any(r => r.Name.Equals("SuperAdmin") || r.Name.Equals("Admin")))
                 {
                     <div class="sb-sidenav-menu-heading">Diğer</div>
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">

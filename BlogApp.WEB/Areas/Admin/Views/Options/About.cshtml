@@ -1,0 +1,42 @@
+﻿@model BlogApp.WEB.Configurations.AboutUsPageInfo
+
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Hakkımızda Sayfa İçerikleri";
+}
+<ol class="breadcrumb mb-3 mt-2">
+    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Yönetim Paneli</a></li>
+    <li class="breadcrumb-item active"><a asp-area="Admin" asp-controller="Options" asp-action="About">Hakkımızda Sayfası Ayarları</a></li>
+</ol>
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="card mt-1 mb-1">
+            <div class="card-header">
+                <h4 class="text-center"><span class="fas fa-edit"></span> Hakkımızda Sayfa İçerikleri</h4>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Options" asp-action="About" method="post" id="form-aboutuspageinfo-update">
+                    <div asp-validation-summary="All" class="text-danger" id="validation-summary"></div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label asp-for="Title">Başlık</label>
+                            <input class="form-control" asp-for="Title" placeholder="Lütfen başlık bilgisini giriniz." />
+                            <span class="text-danger" asp-validation-for="Title"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="Content">İçerik</label>
+                            <textarea class="form-control" asp-for="Content" placeholder="Lütfen içerik bilgisini giriniz." rows="6"></textarea>
+                            <span class="text-danger" asp-validation-for="Content"></span>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <button type="submit" class="btn btn-primary"><span class="fas fa-save"></span> Kaydet</button>
+                            <a class="btn btn-danger" asp-area="Admin" asp-controller="Home" asp-action="Index"><span class="fas fa-times"></span> İptal</a>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

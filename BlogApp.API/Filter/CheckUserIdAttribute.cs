@@ -16,7 +16,7 @@ namespace BlogApp.API.Filter
 
             if (userId == null)
             {
-                context.Result = new BadRequestObjectResult(CustomResponseDto<NoContent>.Fail(400, "İşleminizi gerçekleştirebilmek için üye olun veya giriş yapın!"));
+                context.Result = new BadRequestObjectResult(CustomResponseDto<NoContent>.Fail(400, "Yorum yapabilmek için üye olun veya giriş yapın!"));
             }
             else
             {
